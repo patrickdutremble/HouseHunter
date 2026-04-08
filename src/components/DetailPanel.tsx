@@ -82,12 +82,13 @@ export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPane
                 <span className="text-xs font-medium text-slate-400 uppercase tracking-wide w-32 shrink-0 pt-0.5">
                   {col.label}
                 </span>
-                <div className="flex-1 text-sm text-slate-700">
+                <div className="flex-1 text-sm text-slate-700 min-w-0">
                   <EditableCell
                     value={value}
                     format={col.format}
                     editable={col.editable}
                     align="left"
+                    wrap
                     onSave={(newValue) => onUpdate(listing.id, col.key, newValue)}
                   />
                 </div>

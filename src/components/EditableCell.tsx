@@ -9,10 +9,11 @@ interface EditableCellProps {
   format: ColumnFormat
   editable: boolean
   align: 'left' | 'right'
+  wrap?: boolean
   onSave: (newValue: string | number | null) => void
 }
 
-export function EditableCell({ value, format, editable, align, onSave }: EditableCellProps) {
+export function EditableCell({ value, format, editable, align, wrap = false, onSave }: EditableCellProps) {
   const [editing, setEditing] = useState(false)
   const [editValue, setEditValue] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
@@ -73,11 +74,12 @@ export function EditableCell({ value, format, editable, align, onSave }: Editabl
 
   const displayValue = formatCellValue(value, format)
   const cursorClass = editable ? 'cursor-pointer hover:bg-blue-50 rounded px-1 -mx-1 transition-colors' : ''
+  const overflowClass = wrap ? 'break-words whitespace-normal' : 'truncate'
 
   return (
     <span
       onClick={handleClick}
-      className={`block truncate ${alignClass} ${cursorClass}`}
+      className={`block ${overflowClass} ${alignClass} ${cursorClass}`}
       title={editable ? 'Click to edit' : undefined}
     >
       {displayValue}
