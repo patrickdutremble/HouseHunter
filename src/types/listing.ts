@@ -1,6 +1,7 @@
 export interface Listing {
   id: string
-  link: string | null
+  centris_link: string | null
+  broker_link: string | null
   location: string | null
   full_address: string | null
   mls_number: string | null

@@ -24,6 +24,7 @@ export function formatCellValue(value: unknown, format: ColumnFormat): string {
     case 'integer':
       return formatInteger(value as number)
     case 'link':
+    case 'link-icon':
     case 'text':
       return String(value)
   }

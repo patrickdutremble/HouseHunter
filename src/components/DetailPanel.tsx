@@ -46,15 +46,25 @@ export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPane
       {/* Body */}
       <div className="flex-1 overflow-y-auto px-5 py-4">
         {/* Quick Links */}
-        <div className="flex gap-2 mb-5">
-          {listing.link && (
+        <div className="flex gap-2 mb-5 flex-wrap">
+          {listing.centris_link && (
             <a
-              href={listing.link}
+              href={listing.centris_link}
               target="_blank"
               rel="noopener noreferrer"
               className="px-3 py-1.5 text-xs font-medium bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors"
             >
               View on Centris &#8599;
+            </a>
+          )}
+          {listing.broker_link && (
+            <a
+              href={listing.broker_link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3 py-1.5 text-xs font-medium bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-colors"
+            >
+              Broker site &#8599;
             </a>
           )}
           {googleMapsUrl && (
@@ -73,7 +83,6 @@ export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPane
         <div className="space-y-3">
           {detailColumns.map(col => {
             if (col.key === 'status') return null
-            if (col.key === 'link') return null
 
             const value = listing[col.key as keyof Listing]
 

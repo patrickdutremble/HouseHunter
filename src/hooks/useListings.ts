@@ -66,6 +66,22 @@ export function useListings() {
     return true
   }
 
+  const addListing = async () => {
+    const { data, error: insertError } = await supabase
+      .from('listings')
+      .insert({})
+      .select()
+      .single()
+
+    if (insertError || !data) {
+      setError(insertError?.message ?? 'Failed to add listing')
+      return null
+    }
+
+    setListings(prev => [data as Listing, ...prev])
+    return data as Listing
+  }
+
   const deleteListing = async (id: string) => {
     const { error: deleteError } = await supabase
       .from('listings')
@@ -81,5 +97,5 @@ export function useListings() {
     return true
   }
 
-  return { listings, loading, error, fetchListings, updateListing, deleteListing }
+  return { listings, loading, error, fetchListings, updateListing, addListing, deleteListing }
 }

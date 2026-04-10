@@ -66,7 +66,7 @@ export function ListingsTable({ listings, selectedId, onSelect, onUpdate }: List
               <tr>
                 <td colSpan={99} className="px-4 py-12 text-center text-slate-400 text-sm">
                   {listings.length === 0
-                    ? 'No listings yet. Paste a Centris link above to get started.'
+                    ? 'No listings yet. Click "Add listing" to get started.'
                     : 'No listings match your filters.'}
                 </td>
               </tr>

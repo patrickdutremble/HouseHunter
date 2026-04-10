@@ -21,7 +21,8 @@ const CSV_COLUMNS: { key: keyof Listing; label: string }[] = [
   { key: 'commute_pvm_transit', label: 'Commute to PVM (transit)' },
   { key: 'personal_rating', label: 'Rating' },
   { key: 'notes', label: 'Notes' },
-  { key: 'link', label: 'Link' },
+  { key: 'centris_link', label: 'Centris Link' },
+  { key: 'broker_link', label: 'Broker Link' },
   { key: 'status', label: 'Status' },
 ]
 

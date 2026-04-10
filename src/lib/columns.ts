@@ -1,5 +1,5 @@
 export type ColumnAlign = 'left' | 'right'
-export type ColumnFormat = 'text' | 'currency' | 'integer' | 'link'
+export type ColumnFormat = 'text' | 'currency' | 'integer' | 'link' | 'link-icon'
 
 export interface ColumnDef {
   key: string
@@ -13,6 +13,8 @@ export interface ColumnDef {
 }
 
 export const columns: ColumnDef[] = [
+  { key: 'centris_link', label: 'Centris', align: 'left', format: 'link-icon', editable: true, showInTable: true, showInDetail: true, width: '60px' },
+  { key: 'broker_link', label: 'Broker', align: 'left', format: 'link-icon', editable: true, showInTable: true, showInDetail: true, width: '60px' },
   { key: 'location', label: 'Location', align: 'left', format: 'text', editable: true, showInTable: true, showInDetail: true, width: '140px' },
   { key: 'property_type', label: 'Type', align: 'left', format: 'text', editable: true, showInTable: true, showInDetail: true, width: '90px' },
   { key: 'price', label: 'Price', align: 'right', format: 'currency', editable: true, showInTable: true, showInDetail: true, width: '120px' },
@@ -31,7 +33,6 @@ export const columns: ColumnDef[] = [
   { key: 'commute_pvm_transit', label: 'PVM', align: 'right', format: 'text', editable: true, showInTable: true, showInDetail: true, width: '70px' },
   { key: 'personal_rating', label: 'Rating', align: 'left', format: 'text', editable: true, showInTable: true, showInDetail: true, width: '80px' },
   { key: 'notes', label: 'Notes', align: 'left', format: 'text', editable: true, showInTable: false, showInDetail: true },
-  { key: 'link', label: 'Link', align: 'left', format: 'link', editable: false, showInTable: false, showInDetail: true },
   { key: 'full_address', label: 'Full Address', align: 'left', format: 'text', editable: true, showInTable: false, showInDetail: true },
   { key: 'mls_number', label: 'MLS #', align: 'left', format: 'text', editable: false, showInTable: false, showInDetail: true },
   { key: 'status', label: 'Status', align: 'left', format: 'text', editable: false, showInTable: true, showInDetail: true, width: '80px' },
