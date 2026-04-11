@@ -25,6 +25,7 @@ export function AddListingClient() {
   const taxes = taxesParam ? Number(taxesParam) : null
   const feesParam = searchParams.get('fees')
   const fees = feesParam ? Number(feesParam) : null
+  const bedrooms = searchParams.get('bedrooms')
 
   useEffect(() => {
     if (didRun.current) return
@@ -60,6 +61,7 @@ export function AddListingClient() {
           price: price != null && Number.isFinite(price) ? price : null,
           taxes_yearly: taxes != null && Number.isFinite(taxes) ? taxes : null,
           common_fees_yearly: fees != null && Number.isFinite(fees) ? fees : null,
+          bedrooms: bedrooms || null,
         })
         .select('id')
         .single()
@@ -72,7 +74,7 @@ export function AddListingClient() {
     }
 
     run()
-  }, [url, location, type, price, taxes, fees])
+  }, [url, location, type, price, taxes, fees, bedrooms])
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
@@ -94,6 +96,7 @@ export function AddListingClient() {
             <dl className="text-sm text-slate-600 space-y-1.5 mb-4">
               <Field label="Type" value={type} />
               <Field label="Location" value={location} />
+              <Field label="Bedrooms" value={bedrooms} />
               <Field label="Price" value={price != null ? `$${price.toLocaleString('en-CA')}` : null} />
               <Field label="Taxes/yr" value={taxes != null ? `$${taxes.toLocaleString('en-CA')}` : null} />
               <Field label="Fees/yr" value={fees != null ? `$${fees.toLocaleString('en-CA')}` : null} />

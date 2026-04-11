@@ -71,6 +71,9 @@
     "function extractYearly(rx){var tables=document.querySelectorAll('.financial-details-table-yearly');for(var k=0;k<tables.length;k++){var tbl=tables[k];var titleEl=tbl.querySelector('.financial-details-table-title');if(!titleEl)continue;if(!rx.test(titleEl.textContent.trim()))continue;var totalEl=tbl.querySelector('.financial-details-table-total');if(!totalEl)continue;var digits=totalEl.textContent.replace(/[^\\d]/g,'');if(digits)return digits;}return null;}",
     "var taxes=extractYearly(/^taxes$/i);",
     "var fees=extractYearly(/^(fees|frais)$/i);",
+    "var bedrooms=null;",
+    "var bedMatch=document.body.innerText.match(/(\\d+)\\s+(?:bedroom|chambre)/i);",
+    "if(bedMatch)bedrooms=bedMatch[1];",
     "var p=new URLSearchParams();",
     "p.set('url',url);",
     "if(loc)p.set('location',loc);",
@@ -78,6 +81,7 @@
     "if(price)p.set('price',price);",
     "if(taxes)p.set('taxes',taxes);",
     "if(fees)p.set('fees',fees);",
+    "if(bedrooms)p.set('bedrooms',bedrooms);",
     "window.open(APP+'/add-listing?'+p.toString(),'_blank');",
     "})();"
   ].join("");
