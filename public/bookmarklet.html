@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>HouseHunter bookmarklet</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root { --blue: #2563eb; --blue-dark: #1d4ed8; --text: #1e293b; --muted: #64748b; --bg: #f8fafc; --border: #e2e8f0; }
+  * { box-sizing: border-box; }
+  body { font-family: ui-sans-serif, system-ui, -apple-system, sans-serif; max-width: 720px; margin: 0 auto; padding: 48px 24px 96px; color: var(--text); line-height: 1.6; background: var(--bg); }
+  h1 { font-size: 28px; margin: 0 0 8px; }
+  h2 { font-size: 16px; margin: 32px 0 12px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+  p { margin: 0 0 16px; }
+  a.bm { display: inline-block; padding: 12px 20px; background: var(--blue); color: white; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 15px; cursor: grab; user-select: none; }
+  a.bm:hover { background: var(--blue-dark); }
+  a.bm:active { cursor: grabbing; }
+  a.bm.dev { background: #64748b; }
+  a.bm.dev:hover { background: #475569; }
+  code { background: white; padding: 2px 6px; border-radius: 4px; font-size: 13px; border: 1px solid var(--border); }
+  ol { padding-left: 20px; }
+  ol li { margin-bottom: 8px; }
+  .card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-top: 16px; }
+  .muted { color: var(--muted); font-size: 14px; }
+</style>
+</head>
+<body>
+  <h1>HouseHunter bookmarklet</h1>
+  <p class="muted">Drag one of the buttons below onto your browser's bookmarks bar. Then, when you're on a Centris listing page, click the bookmark to add it to HouseHunter.</p>
+
+  <h2>Production</h2>
+  <div class="card">
+    <p><a id="bm-prod" class="bm" href="#">Add to HouseHunter</a></p>
+    <p class="muted">Adds to your live HouseHunter app at house-hunter-git-master-patrickdutremble-2492s-projects.vercel.app. This is the one you want for everyday use.</p>
+  </div>
+
+  <h2>Localhost (for testing)</h2>
+  <div class="card">
+    <p><a id="bm-local" class="bm dev" href="#">Add to HouseHunter (dev)</a></p>
+    <p class="muted">Only works when you have <code>npm run dev</code> running on port 3000.</p>
+  </div>
+
+  <h2>How to install</h2>
+  <ol>
+    <li>Make sure the bookmarks bar is visible (Chrome/Edge: <code>Ctrl+Shift+B</code>).</li>
+    <li>Click and hold one of the blue buttons above, then drag it up to the bookmarks bar and release.</li>
+    <li>You should see a new bookmark named "Add to HouseHunter".</li>
+    <li>Visit any Centris listing page and click the bookmark. A new tab will open confirming the listing was added.</li>
+  </ol>
+
+  <h2>What it captures</h2>
+  <p class="muted">Centris link, location (city), property type (Condo/House/...) and asking price. Everything else is filled in later.</p>
+
+<script>
+(function () {
+  // Source of the bookmarklet. Runs in the context of the Centris page.
+  // Uses a placeholder __APP__ that each button replaces with its own base URL.
+  var source = [
+    "(function(){",
+    "var APP=__APP__;",
+    "var url=window.location.href;",
+    "if(!/centris\\.ca\\//.test(url)){alert('HouseHunter: open a Centris listing page first.');return;}",
+    "var price=null;",
+    "var pe=document.querySelector('.price span.text-nowrap')||document.querySelector('.price span');",
+    "if(pe){var d=pe.textContent.replace(/[^\\d]/g,'');if(d)price=d;}",
+    "var type=null;",
+    "var h1s=document.querySelectorAll('h1');",
+    "for(var i=0;i<h1s.length;i++){var t=h1s[i].textContent.trim().replace(/\\s+/g,' ');var m=t.match(/^(.+?)\\s+(?:for sale|\\u00e0 vendre|for rent|\\u00e0 louer)/i);if(m){type=m[1].trim();break;}}",
+    "var loc=null;",
+    "var h2s=document.querySelectorAll('h2');",
+    "for(var j=0;j<h2s.length;j++){var s=h2s[j].textContent.trim().replace(/\\s+/g,' ');if(/^\\d+[\\s,]/.test(s)&&s.indexOf(',')>-1){var parts=s.split(',').map(function(x){return x.trim();}).filter(Boolean);loc=parts[parts.length-1]||null;break;}}",
+    "var p=new URLSearchParams();",
+    "p.set('url',url);",
+    "if(loc)p.set('location',loc);",
+    "if(type)p.set('type',type);",
+    "if(price)p.set('price',price);",
+    "window.open(APP+'/add-listing?'+p.toString(),'_blank');",
+    "})();"
+  ].join("");
+
+  function make(appBase) {
+    return "javascript:" + source.replace("__APP__", JSON.stringify(appBase));
+  }
+
+  document.getElementById("bm-prod").href = make("https://house-hunter-git-master-patrickdutremble-2492s-projects.vercel.app");
+  document.getElementById("bm-local").href = make("http://localhost:3000");
+})();
+</script>
+</body>
+</html>
