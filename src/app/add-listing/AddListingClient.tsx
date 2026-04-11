@@ -32,6 +32,24 @@ export function AddListingClient() {
   const yearParam = searchParams.get('year')
   const yearBuilt = yearParam ? Number(yearParam) : null
 
+  const priceNum = price != null && Number.isFinite(price) ? price : null
+  const taxesNum = taxes != null && Number.isFinite(taxes) ? taxes : null
+  const feesNum = fees != null && Number.isFinite(fees) ? fees : null
+  const areaNum = area != null && Number.isFinite(area) ? area : null
+
+  const downpayment = priceNum != null ? Math.round(priceNum * 0.2) : null
+  const monthlyMortgage = priceNum != null ? calcMonthlyMortgage(priceNum) : null
+  const totalMonthlyCost =
+    monthlyMortgage != null
+      ? monthlyMortgage +
+        (taxesNum != null ? Math.round(taxesNum / 12) : 0) +
+        (feesNum != null ? Math.round(feesNum / 12) : 0)
+      : null
+  const pricePerSqft =
+    priceNum != null && areaNum != null && areaNum > 0
+      ? Math.round(priceNum / areaNum)
+      : null
+
   useEffect(() => {
     if (didRun.current) return
     didRun.current = true
@@ -70,6 +88,10 @@ export function AddListingClient() {
           liveable_area_sqft: area != null && Number.isFinite(area) ? area : null,
           parking: parking || null,
           year_built: yearBuilt != null && Number.isFinite(yearBuilt) ? yearBuilt : null,
+          downpayment,
+          monthly_mortgage: monthlyMortgage,
+          total_monthly_cost: totalMonthlyCost,
+          price_per_sqft: pricePerSqft,
         })
         .select('id')
         .single()
@@ -82,7 +104,22 @@ export function AddListingClient() {
     }
 
     run()
-  }, [url, location, type, price, taxes, fees, bedrooms, area, parking, yearBuilt])
+  }, [
+    url,
+    location,
+    type,
+    price,
+    taxes,
+    fees,
+    bedrooms,
+    area,
+    parking,
+    yearBuilt,
+    downpayment,
+    monthlyMortgage,
+    totalMonthlyCost,
+    pricePerSqft,
+  ])
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
@@ -165,6 +202,15 @@ export function AddListingClient() {
       </div>
     </div>
   )
+}
+
+// 20% down, 3.99% annual, 25-year amortization.
+function calcMonthlyMortgage(price: number): number {
+  const principal = price * 0.8
+  const r = 0.0399 / 12
+  const n = 25 * 12
+  const factor = Math.pow(1 + r, n)
+  return Math.round((principal * (r * factor)) / (factor - 1))
 }
 
 function Field({ label, value, href }: { label: string; value: string | null; href?: string }) {
