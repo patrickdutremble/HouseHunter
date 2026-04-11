@@ -21,6 +21,10 @@ export function AddListingClient() {
   const type = searchParams.get('type')
   const priceParam = searchParams.get('price')
   const price = priceParam ? Number(priceParam) : null
+  const taxesParam = searchParams.get('taxes')
+  const taxes = taxesParam ? Number(taxesParam) : null
+  const feesParam = searchParams.get('fees')
+  const fees = feesParam ? Number(feesParam) : null
 
   useEffect(() => {
     if (didRun.current) return
@@ -54,6 +58,8 @@ export function AddListingClient() {
           location: location || null,
           property_type: type || null,
           price: price != null && Number.isFinite(price) ? price : null,
+          taxes_yearly: taxes != null && Number.isFinite(taxes) ? taxes : null,
+          common_fees_yearly: fees != null && Number.isFinite(fees) ? fees : null,
         })
         .select('id')
         .single()
@@ -66,7 +72,7 @@ export function AddListingClient() {
     }
 
     run()
-  }, [url, location, type, price])
+  }, [url, location, type, price, taxes, fees])
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
@@ -89,6 +95,8 @@ export function AddListingClient() {
               <Field label="Type" value={type} />
               <Field label="Location" value={location} />
               <Field label="Price" value={price != null ? `$${price.toLocaleString('en-CA')}` : null} />
+              <Field label="Taxes/yr" value={taxes != null ? `$${taxes.toLocaleString('en-CA')}` : null} />
+              <Field label="Fees/yr" value={fees != null ? `$${fees.toLocaleString('en-CA')}` : null} />
               <Field label="Centris link" value={url} href={url ?? undefined} />
             </dl>
             <Link
