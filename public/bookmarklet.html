@@ -82,6 +82,10 @@
     "var yearRaw=getCarac(/^(year built|ann\\u00e9e de construction)$/i);",
     "var yearBuilt=null;",
     "if(yearRaw){var ym=yearRaw.match(/\\d{4}/);if(ym)yearBuilt=ym[0];}",
+    "var latEl=document.querySelector('meta[itemprop=\"latitude\"]');",
+    "var lonEl=document.querySelector('meta[itemprop=\"longitude\"]');",
+    "var lat=latEl?latEl.getAttribute('content'):null;",
+    "var lon=lonEl?lonEl.getAttribute('content'):null;",
     "var p=new URLSearchParams();",
     "p.set('url',url);",
     "if(loc)p.set('location',loc);",
@@ -93,6 +97,8 @@
     "if(area)p.set('area',area);",
     "if(parking)p.set('parking',parking);",
     "if(yearBuilt)p.set('year',yearBuilt);",
+    "if(lat)p.set('lat',lat);",
+    "if(lon)p.set('lon',lon);",
     "window.open(APP+'/add-listing?'+p.toString(),'_blank');",
     "})();"
   ].join("");

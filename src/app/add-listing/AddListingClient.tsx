@@ -6,14 +6,20 @@ import { useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
 type Status =
-  | { kind: 'loading' }
-  | { kind: 'success'; id: string }
+  | { kind: 'loading'; stage: 'inserting' | 'commutes' }
+  | {
+      kind: 'success'
+      id: string
+      commuteSchool: string | null
+      commutePvm: string | null
+      commuteError: string | null
+    }
   | { kind: 'duplicate'; id: string }
   | { kind: 'error'; message: string }
 
 export function AddListingClient() {
   const searchParams = useSearchParams()
-  const [status, setStatus] = useState<Status>({ kind: 'loading' })
+  const [status, setStatus] = useState<Status>({ kind: 'loading', stage: 'inserting' })
   const didRun = useRef(false)
 
   const url = searchParams.get('url')
@@ -31,6 +37,10 @@ export function AddListingClient() {
   const parking = searchParams.get('parking')
   const yearParam = searchParams.get('year')
   const yearBuilt = yearParam ? Number(yearParam) : null
+  const latParam = searchParams.get('lat')
+  const lonParam = searchParams.get('lon')
+  const lat = latParam != null && latParam !== '' ? Number(latParam) : null
+  const lon = lonParam != null && lonParam !== '' ? Number(lonParam) : null
 
   const priceNum = price != null && Number.isFinite(price) ? price : null
   const taxesNum = taxes != null && Number.isFinite(taxes) ? taxes : null
@@ -100,7 +110,60 @@ export function AddListingClient() {
         setStatus({ kind: 'error', message: insErr?.message ?? 'Insert failed.' })
         return
       }
-      setStatus({ kind: 'success', id: created.id })
+
+      // Insert succeeded — now fetch commute times via our API route.
+      // If we don't have coordinates or the API call fails, we still report
+      // the listing as successfully added (just with no commute values).
+      if (lat == null || lon == null || !Number.isFinite(lat) || !Number.isFinite(lon)) {
+        setStatus({
+          kind: 'success',
+          id: created.id,
+          commuteSchool: null,
+          commutePvm: null,
+          commuteError: 'No coordinates captured from Centris — commute times not fetched.',
+        })
+        return
+      }
+
+      setStatus({ kind: 'loading', stage: 'commutes' })
+
+      try {
+        const res = await fetch('/api/commute', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ listingId: created.id, lat, lon }),
+        })
+        const payload = (await res.json()) as {
+          school?: string | null
+          pvm?: string | null
+          error?: string
+        }
+        if (!res.ok) {
+          setStatus({
+            kind: 'success',
+            id: created.id,
+            commuteSchool: null,
+            commutePvm: null,
+            commuteError: payload.error ?? `Commute API returned ${res.status}`,
+          })
+          return
+        }
+        setStatus({
+          kind: 'success',
+          id: created.id,
+          commuteSchool: payload.school ?? null,
+          commutePvm: payload.pvm ?? null,
+          commuteError: null,
+        })
+      } catch (e) {
+        setStatus({
+          kind: 'success',
+          id: created.id,
+          commuteSchool: null,
+          commutePvm: null,
+          commuteError: e instanceof Error ? e.message : 'Commute fetch failed.',
+        })
+      }
     }
 
     run()
@@ -119,6 +182,8 @@ export function AddListingClient() {
     monthlyMortgage,
     totalMonthlyCost,
     pricePerSqft,
+    lat,
+    lon,
   ])
 
   return (
@@ -126,7 +191,11 @@ export function AddListingClient() {
       <div className="w-full max-w-lg">
         {status.kind === 'loading' && (
           <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
-            <div className="text-slate-400 text-sm">Adding listing to HouseHunter...</div>
+            <div className="text-slate-400 text-sm">
+              {status.stage === 'inserting'
+                ? 'Adding listing to HouseHunter...'
+                : 'Calculating commute times...'}
+            </div>
           </div>
         )}
 
@@ -148,8 +217,15 @@ export function AddListingClient() {
               <Field label="Price" value={price != null ? `$${price.toLocaleString('en-CA')}` : null} />
               <Field label="Taxes/yr" value={taxes != null ? `$${taxes.toLocaleString('en-CA')}` : null} />
               <Field label="Fees/yr" value={fees != null ? `$${fees.toLocaleString('en-CA')}` : null} />
+              <Field label="School (car)" value={status.commuteSchool} />
+              <Field label="PVM (transit)" value={status.commutePvm} />
               <Field label="Centris link" value={url} href={url ?? undefined} />
             </dl>
+            {status.commuteError && (
+              <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-2 mb-4">
+                Commute times unavailable: {status.commuteError}
+              </p>
+            )}
             <Link
               href="/"
               className="inline-block px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
