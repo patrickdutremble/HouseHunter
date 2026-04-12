@@ -40,7 +40,7 @@ export function EditableCell({ value, format, editable, align, wrap = false, onS
       return
     }
 
-    if (format === 'currency' || format === 'integer') {
+    if (format === 'currency' || format === 'integer' || format === 'year') {
       const numeric = Number(trimmed.replace(/[$,\s]/g, ''))
       if (!isNaN(numeric)) {
         onSave(Math.round(numeric))
@@ -120,7 +120,7 @@ export function EditableCell({ value, format, editable, align, wrap = false, onS
 
   const displayValue = formatCellValue(value, format)
   const cursorClass = editable ? 'cursor-pointer hover:bg-blue-50 rounded px-1 -mx-1 transition-colors' : ''
-  const overflowClass = wrap ? 'break-words whitespace-normal' : 'truncate'
+  const overflowClass = wrap ? 'break-words whitespace-pre-wrap' : 'truncate'
 
   return (
     <span

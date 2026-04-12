@@ -1,6 +1,6 @@
 import { tableColumns } from '@/lib/columns'
 import { EditableCell } from './EditableCell'
-import { StatusBadge } from './StatusBadge'
+import { LocationCell } from './LocationCell'
 import type { Listing } from '@/types/listing'
 
 interface TableRowProps {
@@ -28,10 +28,19 @@ export function TableRow({ listing, isSelected, onSelect, onUpdate }: TableRowPr
       `}
     >
       {tableColumns.map(col => {
-        if (col.key === 'status') {
+        if (col.key === 'location') {
           return (
-            <td key={col.key} className="px-3 py-2.5" style={{ width: col.width }}>
-              <StatusBadge status={listing.status} />
+            <td
+              key={col.key}
+              className="px-3 py-2.5 text-sm text-slate-700"
+              style={{ width: col.width, minWidth: col.width }}
+            >
+              <LocationCell
+                text={listing.location}
+                mapQuery={listing.full_address ?? listing.location}
+                editable={col.editable}
+                onSave={(newValue) => onUpdate(listing.id, col.key, newValue)}
+              />
             </td>
           )
         }

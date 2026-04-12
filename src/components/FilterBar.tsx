@@ -6,10 +6,9 @@ export interface Filters {
   type: string
   minPrice: string
   maxPrice: string
-  status: string
 }
 
-const EMPTY_FILTERS: Filters = { type: '', minPrice: '', maxPrice: '', status: '' }
+const EMPTY_FILTERS: Filters = { type: '', minPrice: '', maxPrice: '' }
 
 interface FilterBarProps {
   propertyTypes: string[]
@@ -76,18 +75,6 @@ export function FilterBar({ propertyTypes, onFilterChange }: FilterBarProps) {
             onChange={e => update('maxPrice', e.target.value)}
             className="w-24 px-2 py-1.5 text-sm border border-slate-200 rounded-lg"
           />
-
-          <select
-            value={filters.status}
-            onChange={e => update('status', e.target.value)}
-            className="px-2 py-1.5 text-sm border border-slate-200 rounded-lg bg-white text-slate-700"
-          >
-            <option value="">All status</option>
-            <option value="complete">Complete</option>
-            <option value="partial">Partial</option>
-            <option value="pending">Pending</option>
-            <option value="error">Error</option>
-          </select>
 
           {hasActiveFilters && (
             <button
