@@ -114,6 +114,7 @@ A "javascript:" bookmarklet that runs on any Centris listing page, scrapes field
 |---|---|---|---|
 | `url` | `window.location.href` | `centris_link` | text |
 | `location` | last comma-separated part of the first `<h2>` that starts with digits + comma | `location` | text |
+| `addr` | full text of that same `<h2>` (e.g. "2020, Avenue de la Gare, Mascouche") | `full_address` | text |
 | `type` | first `<h1>` matching `/^(.+?) (for sale\|à vendre\|for rent\|à louer)/i` | `property_type` | text |
 | `price` | `.price span.text-nowrap` (fallback `.price span`), digits only | `price` | integer |
 | `taxes` | `.financial-details-table-yearly` whose `.financial-details-table-title` === `Taxes`, `.financial-details-table-total` digits | `taxes_yearly` | integer |

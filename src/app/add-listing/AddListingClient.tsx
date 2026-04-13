@@ -23,6 +23,8 @@ export function AddListingClient() {
   const didRun = useRef(false)
 
   const url = searchParams.get('url')
+  const addrParam = searchParams.get('addr')
+  const fullAddress = addrParam && addrParam.trim() !== '' ? addrParam : null
   const location = searchParams.get('location')
   const type = searchParams.get('type')
   const priceParam = searchParams.get('price')
@@ -92,6 +94,7 @@ export function AddListingClient() {
         .insert({
           centris_link: url,
           location: location || null,
+          full_address: fullAddress,
           property_type: type || null,
           price: price != null && Number.isFinite(price) ? price : null,
           taxes_yearly: taxes != null && Number.isFinite(taxes) ? taxes : null,
@@ -172,6 +175,7 @@ export function AddListingClient() {
     run()
   }, [
     url,
+    fullAddress,
     location,
     type,
     price,
@@ -220,6 +224,7 @@ export function AddListingClient() {
             )}
             <dl className="text-sm text-slate-600 space-y-1.5 mb-4">
               <Field label="Type" value={type} />
+              <Field label="Address" value={fullAddress} />
               <Field label="Location" value={location} />
               <Field label="Bedrooms" value={bedrooms} />
               <Field label="Area" value={area != null ? `${area.toLocaleString('en-CA')} sqft` : null} />
