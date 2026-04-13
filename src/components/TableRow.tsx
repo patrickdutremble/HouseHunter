@@ -1,13 +1,14 @@
 import { tableColumns } from '@/lib/columns'
 import { EditableCell } from './EditableCell'
 import { LocationCell } from './LocationCell'
+import { FavoriteButton } from './FavoriteButton'
 import type { Listing } from '@/types/listing'
 
 interface TableRowProps {
   listing: Listing
   isSelected: boolean
   onSelect: (id: string) => void
-  onUpdate: (id: string, field: string, value: string | number | null) => void
+  onUpdate: (id: string, field: string, value: string | number | boolean | null) => void
 }
 
 export function TableRow({ listing, isSelected, onSelect, onUpdate }: TableRowProps) {
@@ -23,11 +24,27 @@ export function TableRow({ listing, isSelected, onSelect, onUpdate }: TableRowPr
       onClick={() => onSelect(listing.id)}
       className={`
         border-b border-slate-100 cursor-pointer transition-colors
-        ${isSelected ? 'bg-blue-50 border-blue-200' : 'hover:bg-slate-50'}
+        ${isSelected ? 'bg-blue-50 border-blue-200' : listing.favorite ? 'bg-amber-50 hover:bg-amber-100' : 'hover:bg-slate-50'}
         ${hasFlags ? 'ring-1 ring-inset ring-amber-200' : ''}
       `}
     >
       {tableColumns.map(col => {
+        if (col.key === 'favorite') {
+          return (
+            <td
+              key={col.key}
+              className="px-3 py-2.5 text-sm text-center"
+              style={{ width: col.width, minWidth: col.width }}
+              onClick={e => e.stopPropagation()}
+            >
+              <FavoriteButton
+                value={listing.favorite}
+                onToggle={() => onUpdate(listing.id, 'favorite', !listing.favorite)}
+              />
+            </td>
+          )
+        }
+
         if (col.key === 'location') {
           return (
             <td

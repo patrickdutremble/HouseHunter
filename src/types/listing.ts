@@ -23,6 +23,7 @@ export interface Listing {
   notes: string | null
   personal_rating: string | null
   status: string | null
+  favorite: boolean
   created_at: string
   updated_at: string
 }

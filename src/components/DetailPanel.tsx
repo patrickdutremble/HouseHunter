@@ -3,12 +3,13 @@
 import { detailColumns } from '@/lib/columns'
 import { EditableCell } from './EditableCell'
 import { LocationField } from './LocationField'
+import { FavoriteButton } from './FavoriteButton'
 import type { Listing } from '@/types/listing'
 
 interface DetailPanelProps {
   listing: Listing
   onClose: () => void
-  onUpdate: (id: string, field: string, value: string | number | null) => void
+  onUpdate: (id: string, field: string, value: string | number | boolean | null) => void
   onDelete: (id: string) => void
 }
 
@@ -22,6 +23,12 @@ export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPane
             {listing.location ?? 'Unknown Location'}
           </h2>
         </div>
+        <div className="flex items-center gap-1">
+          <FavoriteButton
+            value={listing.favorite}
+            onToggle={() => onUpdate(listing.id, 'favorite', !listing.favorite)}
+            size={22}
+          />
         <button
           onClick={onClose}
           className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200 transition-colors"
@@ -31,6 +38,7 @@ export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPane
             <path d="M5 5l10 10M15 5L5 15" />
           </svg>
         </button>
+        </div>
       </div>
 
       {/* Body */}

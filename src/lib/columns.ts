@@ -9,6 +9,7 @@ export type ColumnFormat =
   | 'link'
   | 'link-icon'
   | 'location-link'
+  | 'favorite'
 
 export interface ColumnDef {
   key: string
@@ -22,6 +23,7 @@ export interface ColumnDef {
 }
 
 export const columns: ColumnDef[] = [
+  { key: 'favorite', label: '\u2605', align: 'left', format: 'favorite', editable: true, showInTable: true, showInDetail: false, width: '36px' },
   { key: 'created_at', label: 'Added', align: 'left', format: 'date', editable: false, showInTable: true, showInDetail: true, width: '100px' },
   { key: 'centris_link', label: 'Centris', align: 'left', format: 'link-icon', editable: true, showInTable: true, showInDetail: true, width: '60px' },
   { key: 'broker_link', label: 'Broker', align: 'left', format: 'link-icon', editable: true, showInTable: false, showInDetail: true, width: '60px' },

@@ -30,7 +30,7 @@ export function useListings() {
     fetchListings()
   }, [fetchListings])
 
-  const updateListing = async (id: string, field: string, value: unknown) => {
+  const updateListing = async (id: string, field: string, value: string | number | boolean | null) => {
     const updates: Record<string, unknown> = { [field]: value }
 
     // Recalculate derived fields if a source field changed

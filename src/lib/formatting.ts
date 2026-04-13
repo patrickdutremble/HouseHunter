@@ -63,6 +63,8 @@ export function formatCellValue(value: unknown, format: ColumnFormat): string {
       return formatDuration(value as string)
     case 'date':
       return formatDate(value as string)
+    case 'favorite':
+      return value ? '\u2605' : '\u2606'
     case 'link':
     case 'link-icon':
     case 'location-link':

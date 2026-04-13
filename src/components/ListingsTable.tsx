@@ -11,7 +11,7 @@ interface ListingsTableProps {
   listings: Listing[]
   selectedId: string | null
   onSelect: (id: string) => void
-  onUpdate: (id: string, field: string, value: string | number | null) => void
+  onUpdate: (id: string, field: string, value: string | number | boolean | null) => void
 }
 
 export function ListingsTable({ listings, selectedId, onSelect, onUpdate }: ListingsTableProps) {
