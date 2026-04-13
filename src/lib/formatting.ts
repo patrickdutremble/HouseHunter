@@ -40,6 +40,10 @@ export function formatDuration(value: string | null): string {
     mins = pureNum % 60
   }
 
+  // Normalize: carry minutes >= 60 into hours
+  hours += Math.floor(mins / 60)
+  mins = mins % 60
+
   return `${hours}:${mins.toString().padStart(2, '0')}`
 }
 

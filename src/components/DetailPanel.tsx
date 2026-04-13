@@ -83,7 +83,8 @@ export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPane
           </span>
           <div className="flex-1 text-sm text-slate-700 min-w-0">
             <LocationField
-              value={listing.full_address ?? listing.location}
+              displayValue={listing.full_address ?? listing.location}
+              mapQuery={listing.full_address ?? listing.location}
               onSave={(newValue) => onUpdate(listing.id, 'full_address', newValue)}
             />
           </div>

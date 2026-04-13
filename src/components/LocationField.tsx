@@ -3,11 +3,12 @@
 import { useState, useRef, useEffect } from 'react'
 
 interface LocationFieldProps {
-  value: string | null
+  displayValue: string | null
+  mapQuery: string | null
   onSave: (newValue: string | null) => void
 }
 
-export function LocationField({ value, onSave }: LocationFieldProps) {
+export function LocationField({ displayValue, mapQuery, onSave }: LocationFieldProps) {
   const [editing, setEditing] = useState(false)
   const [editValue, setEditValue] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
@@ -20,7 +21,7 @@ export function LocationField({ value, onSave }: LocationFieldProps) {
   }, [editing])
 
   const startEdit = () => {
-    setEditValue(value ?? '')
+    setEditValue(displayValue ?? '')
     setEditing(true)
   }
 
@@ -49,8 +50,9 @@ export function LocationField({ value, onSave }: LocationFieldProps) {
     )
   }
 
-  const mapHref = value && value.trim() !== ''
-    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(value)}`
+  const query = mapQuery && mapQuery.trim() !== '' ? mapQuery : null
+  const mapHref = query
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`
     : null
 
   return (
@@ -63,7 +65,7 @@ export function LocationField({ value, onSave }: LocationFieldProps) {
           className="flex-1 break-words text-blue-600 hover:text-blue-800 hover:underline"
           title="Open in Google Maps"
         >
-          {value}
+          {displayValue}
         </a>
       ) : (
         <span className="flex-1 text-slate-400">—</span>
@@ -71,11 +73,11 @@ export function LocationField({ value, onSave }: LocationFieldProps) {
       <button
         type="button"
         onClick={startEdit}
-        title={value ? 'Edit address' : 'Add address'}
+        title={displayValue ? 'Edit address' : 'Add address'}
         className="flex-shrink-0 text-slate-300 hover:text-blue-600 transition-colors pt-0.5"
       >
         <svg width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
-          {value ? (
+          {displayValue ? (
             <path d="M4 13.5V16h2.5L15 7.5 12.5 5 4 13.5z" strokeLinecap="round" strokeLinejoin="round" />
           ) : (
             <path d="M10 4v12M4 10h12" strokeLinecap="round" />
