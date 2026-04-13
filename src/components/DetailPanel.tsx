@@ -2,7 +2,7 @@
 
 import { detailColumns } from '@/lib/columns'
 import { EditableCell } from './EditableCell'
-import { StatusBadge } from './StatusBadge'
+import { LocationField } from './LocationField'
 import type { Listing } from '@/types/listing'
 
 interface DetailPanelProps {
@@ -13,10 +13,6 @@ interface DetailPanelProps {
 }
 
 export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPanelProps) {
-  const googleMapsUrl = listing.full_address
-    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(listing.full_address)}`
-    : null
-
   return (
     <div className="w-[420px] border-l border-slate-200 bg-white flex flex-col h-full shadow-lg">
       {/* Header */}
@@ -25,12 +21,6 @@ export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPane
           <h2 className="text-lg font-semibold text-slate-800">
             {listing.location ?? 'Unknown Location'}
           </h2>
-          <div className="flex items-center gap-2 mt-1">
-            <StatusBadge status={listing.status} />
-            {listing.mls_number && (
-              <span className="text-xs text-slate-400">MLS# {listing.mls_number}</span>
-            )}
-          </div>
         </div>
         <button
           onClick={onClose}
@@ -67,22 +57,25 @@ export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPane
               Broker site &#8599;
             </a>
           )}
-          {googleMapsUrl && (
-            <a
-              href={googleMapsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-3 py-1.5 text-xs font-medium bg-emerald-50 text-emerald-700 rounded-lg hover:bg-emerald-100 transition-colors"
-            >
-              Google Maps &#8599;
-            </a>
-          )}
+        </div>
+
+        {/* Location with full address + Maps link */}
+        <div className="flex items-start justify-between py-1.5 border-b border-slate-50 mb-3">
+          <span className="text-xs font-medium text-slate-400 uppercase tracking-wide w-32 shrink-0 pt-0.5">
+            Location
+          </span>
+          <div className="flex-1 text-sm text-slate-700 min-w-0">
+            <LocationField
+              value={listing.full_address ?? listing.location}
+              onSave={(newValue) => onUpdate(listing.id, 'full_address', newValue)}
+            />
+          </div>
         </div>
 
         {/* Fields */}
         <div className="space-y-3">
           {detailColumns.map(col => {
-            if (col.key === 'status') return null
+            if (col.key === 'location') return null
 
             const value = listing[col.key as keyof Listing]
 
@@ -98,6 +91,7 @@ export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPane
                     editable={col.editable}
                     align="left"
                     wrap
+                    multiline={col.key === 'notes'}
                     onSave={(newValue) => onUpdate(listing.id, col.key, newValue)}
                   />
                 </div>

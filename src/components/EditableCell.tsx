@@ -10,20 +10,29 @@ interface EditableCellProps {
   editable: boolean
   align: 'left' | 'right'
   wrap?: boolean
+  multiline?: boolean
   onSave: (newValue: string | number | null) => void
 }
 
-export function EditableCell({ value, format, editable, align, wrap = false, onSave }: EditableCellProps) {
+export function EditableCell({ value, format, editable, align, wrap = false, multiline = false, onSave }: EditableCellProps) {
   const [editing, setEditing] = useState(false)
   const [editValue, setEditValue] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
-    if (editing && inputRef.current) {
-      inputRef.current.focus()
-      inputRef.current.select()
+    if (editing) {
+      if (multiline && textareaRef.current) {
+        textareaRef.current.focus()
+        textareaRef.current.select()
+        textareaRef.current.style.height = 'auto'
+        textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px'
+      } else if (inputRef.current) {
+        inputRef.current.focus()
+        inputRef.current.select()
+      }
     }
-  }, [editing])
+  }, [editing, multiline])
 
   const handleClick = () => {
     if (!editable) return
@@ -52,13 +61,34 @@ export function EditableCell({ value, format, editable, align, wrap = false, onS
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') handleSave()
-    if (e.key === 'Escape') setEditing(false)
+    if (e.key === 'Escape') { setEditing(false); return }
+    if (multiline) {
+      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) handleSave()
+    } else {
+      if (e.key === 'Enter') handleSave()
+    }
   }
 
   const alignClass = align === 'right' ? 'text-right' : 'text-left'
 
   if (editing) {
+    if (multiline) {
+      return (
+        <textarea
+          ref={textareaRef}
+          value={editValue}
+          onChange={e => {
+            setEditValue(e.target.value)
+            e.target.style.height = 'auto'
+            e.target.style.height = e.target.scrollHeight + 'px'
+          }}
+          onBlur={handleSave}
+          onKeyDown={handleKeyDown}
+          className={`w-full px-2 py-1 text-sm border border-blue-400 rounded outline-none bg-white resize-none ${alignClass}`}
+          rows={3}
+        />
+      )
+    }
     return (
       <input
         ref={inputRef}

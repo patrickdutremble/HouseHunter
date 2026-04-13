@@ -41,11 +41,11 @@ export const columns: ColumnDef[] = [
   { key: 'total_monthly_cost', label: 'Total/mo', align: 'right', format: 'currency', editable: false, showInTable: true, showInDetail: true, width: '100px' },
   { key: 'commute_school_car', label: 'School', align: 'right', format: 'duration', editable: true, showInTable: true, showInDetail: true, width: '70px' },
   { key: 'commute_pvm_transit', label: 'PVM', align: 'right', format: 'duration', editable: true, showInTable: true, showInDetail: true, width: '70px' },
-  { key: 'personal_rating', label: 'Rating', align: 'left', format: 'text', editable: true, showInTable: false, showInDetail: true, width: '80px' },
+  { key: 'personal_rating', label: 'Rating', align: 'left', format: 'text', editable: true, showInTable: false, showInDetail: false, width: '80px' },
   { key: 'notes', label: 'Notes', align: 'left', format: 'text', editable: true, showInTable: false, showInDetail: true },
-  { key: 'full_address', label: 'Full Address', align: 'left', format: 'text', editable: true, showInTable: false, showInDetail: true },
-  { key: 'mls_number', label: 'MLS #', align: 'left', format: 'text', editable: false, showInTable: false, showInDetail: true },
-  { key: 'status', label: 'Status', align: 'left', format: 'text', editable: false, showInTable: false, showInDetail: true, width: '80px' },
+  { key: 'full_address', label: 'Full Address', align: 'left', format: 'text', editable: true, showInTable: false, showInDetail: false },
+  { key: 'mls_number', label: 'MLS #', align: 'left', format: 'text', editable: false, showInTable: false, showInDetail: false },
+  { key: 'status', label: 'Status', align: 'left', format: 'text', editable: false, showInTable: false, showInDetail: false, width: '80px' },
 ]
 
 export const tableColumns = columns.filter(c => c.showInTable)
