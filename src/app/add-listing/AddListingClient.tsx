@@ -41,6 +41,8 @@ export function AddListingClient() {
   const lonParam = searchParams.get('lon')
   const lat = latParam != null && latParam !== '' ? Number(latParam) : null
   const lon = lonParam != null && lonParam !== '' ? Number(lonParam) : null
+  const imgParam = searchParams.get('img')
+  const imageUrl = imgParam && imgParam.trim() !== '' ? imgParam : null
 
   const priceNum = price != null && Number.isFinite(price) ? price : null
   const taxesNum = taxes != null && Number.isFinite(taxes) ? taxes : null
@@ -102,6 +104,7 @@ export function AddListingClient() {
           monthly_mortgage: monthlyMortgage,
           total_monthly_cost: totalMonthlyCost,
           price_per_sqft: pricePerSqft,
+          image_url: imageUrl,
         })
         .select('id')
         .single()
@@ -184,6 +187,7 @@ export function AddListingClient() {
     pricePerSqft,
     lat,
     lon,
+    imageUrl,
   ])
 
   return (
@@ -207,6 +211,13 @@ export function AddListingClient() {
               </svg>
               Added to HouseHunter
             </div>
+            {imageUrl && (
+              <img
+                src={imageUrl}
+                alt="Listing photo"
+                className="w-full h-40 object-cover rounded-lg border border-slate-200 mb-4"
+              />
+            )}
             <dl className="text-sm text-slate-600 space-y-1.5 mb-4">
               <Field label="Type" value={type} />
               <Field label="Location" value={location} />

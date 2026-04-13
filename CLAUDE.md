@@ -40,11 +40,12 @@ Verify address + price + MLS# match between Centris and broker before trusting a
 | `parking` | text | e.g. "1 garage + 1 outdoor" |
 | `storey` | text | e.g. "1st floor", "2 storeys" |
 | `year_built` | integer | 4-digit year |
+| `image_url` | text | URL of the main listing photo. Grab from `<meta property="og:image">` if present, otherwise the first photo in the gallery. Full URL, no cropping. |
 | `notes` | text | Put flags here (see Step 5) + anything notable |
 
 **Leave blank** (NULL) any field missing from both Centris and the broker site. Do NOT fabricate. Do NOT fall back to other sources.
 
-**Fields you must NOT touch:** `commute_school_car`, `commute_pvm_transit`, `personal_rating`, `status`, `centris_link`, `broker_link`. The user fills these manually.
+**Fields you must NOT touch:** `commute_school_car`, `commute_pvm_transit`, `personal_rating`, `status`, `centris_link`, `broker_link`. The user fills `personal_rating` and `status` manually; `commute_school_car` / `commute_pvm_transit` are auto-populated at insert time by the bookmarklet → `/api/commute` flow (see bookmarklet section below). During extraction you're cleaning up rows the bookmarklet couldn't fully fill, so leave the commute columns alone — don't overwrite or recompute them.
 
 ### Step 4 — Calculate derived fields
 
@@ -78,10 +79,11 @@ UPDATE listings SET
   location = $1, full_address = $2, mls_number = $3, property_type = $4,
   price = $5, taxes_yearly = $6, common_fees_yearly = $7, bedrooms = $8,
   liveable_area_sqft = $9, parking = $10, storey = $11, year_built = $12,
-  downpayment = $13, monthly_mortgage = $14, total_monthly_cost = $15,
-  price_per_sqft = $16, notes = $17, status = 'extracted',
+  image_url = $13,
+  downpayment = $14, monthly_mortgage = $15, total_monthly_cost = $16,
+  price_per_sqft = $17, notes = $18, status = 'extracted',
   updated_at = now()
-WHERE id = $18;
+WHERE id = $19;
 ```
 
 **Never INSERT.** The web app creates rows. You only UPDATE existing ones.
@@ -100,10 +102,11 @@ Brief summary per listing: address, price, any flags. Do NOT paste the extracted
 
 A "javascript:" bookmarklet that runs on any Centris listing page, scrapes fields from the DOM, and opens `<APP>/add-listing?...` in a new tab. The add-listing page (in the HouseHunter app) does the duplicate check and the Supabase insert. This two-piece split exists because centris.ca's CSP blocks direct `fetch()` to Supabase from the page itself.
 
-### Files (these two only — do not touch anything else for bookmarklet work)
+### Files (these only — do not touch anything else for bookmarklet work)
 
 - `public/bookmarklet.html` — helper page with drag-and-drop install buttons. Contains the bookmarklet **source as a JS string array** that gets stitched together with `__APP__` replaced per button (production Vercel URL + `http://localhost:3000`). Edit the `source` array inside the `<script>` block.
-- `src/app/add-listing/page.tsx` + `src/app/add-listing/AddListingClient.tsx` — client component that reads query params, checks Supabase for existing `centris_link`, and inserts. Uses the existing `@/lib/supabase` client and the public anon key that's already in the app bundle. No API route, no server action.
+- `src/app/add-listing/page.tsx` + `src/app/add-listing/AddListingClient.tsx` — client component that reads query params, checks Supabase for existing `centris_link`, inserts the row, then calls `/api/commute` to populate commute fields. Uses the existing `@/lib/supabase` client and the public anon key that's already in the app bundle.
+- `src/app/api/commute/route.ts` — server-side POST route that takes `{ listingId, lat, lon }`, calls the Google Directions API twice (driving to school, transit to PVM arriving 9 AM next Monday Montreal local time), and writes the durations to `commute_school_car` / `commute_pvm_transit`. Has an early-return guard if the row already has both commute values (prevents double-billing). Uses `GOOGLE_MAPS_API_KEY` env var (server-side only — never exposed to the client bundle).
 
 ### Fields currently captured
 
@@ -119,6 +122,20 @@ A "javascript:" bookmarklet that runs on any Centris listing page, scrapes field
 | `area` | `.carac-container` where title matches `^(net area\|living area\|superficie (nette\|habitable))$`, parse number; if `m²`/`m2` convert × 10.764 and round | `liveable_area_sqft` | integer |
 | `parking` | `.carac-container` where title matches `^(parking \(total\)\|stationnement \(total\))$`, raw text | `parking` | text |
 | `year` | `.carac-container` where title matches `^(year built\|année de construction)$`, first 4-digit group | `year_built` | integer |
+| `lat` | `<meta itemprop="latitude">` content | (transient — used by `/api/commute` only, not stored) | — |
+| `lon` | `<meta itemprop="longitude">` content | (transient — used by `/api/commute` only, not stored) | — |
+| `img` | `<meta property="og:image">` content (fallback: first `.main-img img` / `.photo-gallery img` / `img[src*="mspublic.centris.ca"]`) | `image_url` | text |
+
+### Commute auto-fetch
+
+After the insert succeeds, the add-listing client POSTs `{ listingId, lat, lon }` to `/api/commute`. That server route hits the Google Directions API twice:
+
+- **Driving → Secondary School Leblanc, Terrebonne** → stored in `commute_school_car`
+- **Transit → 1 Place Ville Marie, Montreal**, with `arrival_time = next Monday 9:00 AM Montreal local` (DST-safe computation in the route) → stored in `commute_pvm_transit`
+
+Both are stored as strings like `"32 min"`. **Each successful insert-with-coords costs ~$0.01 against the Google Maps Platform free tier** ($200/month credit — comfortably free under normal usage). If the API call fails or `lat`/`lon` are missing, the listing is still reported as successfully added, with an amber note in the success panel.
+
+The API key lives in `GOOGLE_MAPS_API_KEY` (server-side env var, set in `.env.local` + all three Vercel environments). It's restricted in Google Cloud to the Directions API only.
 
 ### DOM quirks that matter
 
@@ -146,6 +163,13 @@ The add-listing page does a `SELECT id FROM listings WHERE centris_link = $1` fi
 ### How to test without re-clicking the bookmarklet
 
 The bookmarklet just builds a URL and opens a tab. You can skip the Centris page entirely by navigating directly to `http://localhost:3000/add-listing?url=<encoded>&...`. Use the Brossard condo for a full-field test case: `https://www.centris.ca/en/condos~for-sale~brossard/16342283` (bedrooms=1, area=527, parking="Garage (1)", year=2018, taxes=1691, fees=1572, price=339000, location=Brossard, type=Condo).
+
+**IMPORTANT — avoid burning Google Directions API quota during testing:**
+
+- **Omit `lat` and `lon` from the test URL** unless you're specifically testing the commute flow. The route handles missing coordinates gracefully (shows success with a "No coordinates captured" note, no Google API call made).
+- The `/api/commute` route has an early-return guard: if the row already has both `commute_school_car` and `commute_pvm_transit` set, it returns the stored values without calling Google. So hitting the same listing twice is free — but hitting many fresh test inserts with coords each time is not.
+- If you need to test the full commute path, do it once per iteration, and use the Brossard coords (45.4553, -73.4649) so results are consistent. Clean up the test row with `DELETE FROM listings WHERE id = '...'` when done.
+- You can also test the route in isolation without going through add-listing: `curl -X POST http://localhost:3000/api/commute -H "Content-Type: application/json" -d '{"listingId":"<uuid>","lat":45.4553,"lon":-73.4649}'` — if the UUID doesn't match a real row, the Supabase update no-ops but the response still contains the fetched durations (one API charge).
 
 ### Commit convention
 

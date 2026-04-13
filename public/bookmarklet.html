@@ -48,7 +48,7 @@
   </ol>
 
   <h2>What it captures</h2>
-  <p class="muted">Centris link, location (city), property type (Condo/House/...) and asking price. Everything else is filled in later.</p>
+  <p class="muted">Centris link, location (city), property type (Condo/House/...), asking price, taxes, fees, bedrooms, area, parking, year built, coordinates (for commute calc), and listing photo. Everything else is filled in later.</p>
 
 <script>
 (function () {
@@ -86,6 +86,10 @@
     "var lonEl=document.querySelector('meta[itemprop=\"longitude\"]');",
     "var lat=latEl?latEl.getAttribute('content'):null;",
     "var lon=lonEl?lonEl.getAttribute('content'):null;",
+    "var img=null;",
+    "var ogEl=document.querySelector('meta[property=\"og:image\"]');",
+    "if(ogEl)img=ogEl.getAttribute('content');",
+    "if(!img){var imgEl=document.querySelector('.main-img img, .photo-gallery img, .primary-photo img, img[src*=\"mspublic.centris.ca\"]');if(imgEl)img=imgEl.src;}",
     "var p=new URLSearchParams();",
     "p.set('url',url);",
     "if(loc)p.set('location',loc);",
@@ -99,6 +103,7 @@
     "if(yearBuilt)p.set('year',yearBuilt);",
     "if(lat)p.set('lat',lat);",
     "if(lon)p.set('lon',lon);",
+    "if(img)p.set('img',img);",
     "window.open(APP+'/add-listing?'+p.toString(),'_blank');",
     "})();"
   ].join("");

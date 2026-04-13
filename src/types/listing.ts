@@ -24,6 +24,7 @@ export interface Listing {
   personal_rating: string | null
   status: string | null
   favorite: boolean
+  image_url: string | null
   created_at: string
   updated_at: string
 }

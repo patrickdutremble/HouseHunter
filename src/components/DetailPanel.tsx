@@ -67,6 +67,15 @@ export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPane
           )}
         </div>
 
+        {/* Listing image */}
+        {listing.image_url && (
+          <img
+            src={listing.image_url}
+            alt="Listing photo"
+            className="w-full h-48 object-cover rounded-lg border border-slate-200 mb-5"
+          />
+        )}
+
         {/* Location with full address + Maps link */}
         <div className="flex items-start justify-between py-1.5 border-b border-slate-50 mb-3">
           <span className="text-xs font-medium text-slate-400 uppercase tracking-wide w-32 shrink-0 pt-0.5">
