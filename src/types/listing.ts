@@ -13,7 +13,6 @@ export interface Listing {
   liveable_area_sqft: number | null
   price_per_sqft: number | null
   parking: string | null
-  storey: string | null
   year_built: number | null
   downpayment: number | null
   monthly_mortgage: number | null

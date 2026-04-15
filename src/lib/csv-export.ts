@@ -12,7 +12,6 @@ const CSV_COLUMNS: { key: keyof Listing; label: string }[] = [
   { key: 'liveable_area_sqft', label: 'Area (sqft)' },
   { key: 'price_per_sqft', label: '$/sqft' },
   { key: 'parking', label: 'Parking' },
-  { key: 'storey', label: 'Storey' },
   { key: 'year_built', label: 'Year Built' },
   { key: 'downpayment', label: 'Downpayment' },
   { key: 'monthly_mortgage', label: 'Monthly Mortgage' },
