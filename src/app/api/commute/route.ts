@@ -39,6 +39,23 @@ export async function POST(req: Request) {
     )
   }
 
+  // Guard: if this listing already has commute values, skip the Google call.
+  // Prevents double-billing if the route is hit twice for the same listing
+  // (e.g. during testing, or a retried add-listing flow).
+  const { data: existing } = await supabase
+    .from('listings')
+    .select('commute_school_car, commute_pvm_transit')
+    .eq('id', listingId)
+    .maybeSingle()
+
+  if (existing?.commute_school_car && existing?.commute_pvm_transit) {
+    return NextResponse.json({
+      school: existing.commute_school_car,
+      pvm: existing.commute_pvm_transit,
+      skipped: true,
+    })
+  }
+
   const origin = `${lat},${lon}`
   const arrivalSec = nextMonday9amMontrealUnixSec()
 
