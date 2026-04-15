@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 import { parseCentrisHtml } from '@/lib/centris-parser'
 import { recalculateListing } from '@/lib/calculations'
+import { calculateAndStoreCommute } from '@/lib/commute'
 
 export async function POST(req: Request) {
   let body: { url?: string }
@@ -107,26 +108,11 @@ export async function POST(req: Request) {
     )
   }
 
-  // --- Commute (fire-and-forget style — don't block the response) ---
+  // --- Commute ---
   let commuteNote: string | null = null
   if (parsed.lat != null && parsed.lon != null) {
-    try {
-      const origin = new URL(req.url).origin
-      const commuteRes = await fetch(`${origin}/api/commute`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          listingId: inserted.id,
-          lat: parsed.lat,
-          lon: parsed.lon,
-        }),
-      })
-      if (!commuteRes.ok) {
-        commuteNote = 'Commute calculation failed'
-      }
-    } catch {
-      commuteNote = 'Commute calculation failed'
-    }
+    const result = await calculateAndStoreCommute(inserted.id, parsed.lat, parsed.lon)
+    if (!result.ok) commuteNote = 'Commute calculation failed'
   } else {
     commuteNote = 'No coordinates found — commute not calculated'
   }
