@@ -4,8 +4,6 @@ import { useState } from 'react'
 import { ListingsTable } from '@/components/ListingsTable'
 import { DetailPanel } from '@/components/DetailPanel'
 import { useListings } from '@/hooks/useListings'
-import { listingsToCSV } from '@/lib/csv-export'
-
 type ScrapeStatus = 'idle' | 'loading' | 'success' | 'error' | 'duplicate'
 
 export default function Home() {
@@ -74,16 +72,6 @@ export default function Home() {
       setScrapeStatus('error')
       setScrapeMessage('Network error — check your connection')
     }
-  }
-
-  const handleExport = () => {
-    const csv = listingsToCSV(listings)
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-    const a = document.createElement('a')
-    a.href = URL.createObjectURL(blob)
-    a.download = `househunter-${new Date().toISOString().split('T')[0]}.csv`
-    a.click()
-    URL.revokeObjectURL(a.href)
   }
 
   if (loading) {
@@ -163,17 +151,6 @@ export default function Home() {
           </span>
         )}
 
-        {/* Spacer */}
-        <div className="flex-shrink-0 w-px h-5 bg-slate-200 mx-1" />
-
-        {/* Export */}
-        <button
-          onClick={handleExport}
-          disabled={listings.length === 0}
-          className="px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors whitespace-nowrap"
-        >
-          Export CSV
-        </button>
       </div>
 
       <div className="flex-1 flex overflow-hidden">

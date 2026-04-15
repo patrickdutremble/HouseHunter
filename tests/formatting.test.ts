@@ -1,33 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { formatCurrency, formatInteger, formatCellValue } from '@/lib/formatting'
-
-describe('formatCurrency', () => {
-  it('formats with dollar sign and commas', () => {
-    expect(formatCurrency(500000)).toBe('$500,000')
-  })
-
-  it('formats large numbers', () => {
-    expect(formatCurrency(1250000)).toBe('$1,250,000')
-  })
-
-  it('returns em dash for null', () => {
-    expect(formatCurrency(null)).toBe('—')
-  })
-
-  it('formats small numbers', () => {
-    expect(formatCurrency(750)).toBe('$750')
-  })
-})
-
-describe('formatInteger', () => {
-  it('formats with commas', () => {
-    expect(formatInteger(1200)).toBe('1,200')
-  })
-
-  it('returns em dash for null', () => {
-    expect(formatInteger(null)).toBe('—')
-  })
-})
+import { formatCellValue } from '@/lib/formatting'
 
 describe('formatCellValue', () => {
   it('formats currency columns', () => {

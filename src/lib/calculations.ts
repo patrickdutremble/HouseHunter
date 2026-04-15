@@ -3,12 +3,12 @@ const ANNUAL_INTEREST_RATE = 0.0399
 const MONTHLY_INTEREST_RATE = ANNUAL_INTEREST_RATE / 12
 const AMORTIZATION_MONTHS = 25 * 12
 
-export function calculateDownpayment(price: number | null): number | null {
+function calculateDownpayment(price: number | null): number | null {
   if (price === null) return null
   return Math.round(price * DOWNPAYMENT_RATE)
 }
 
-export function calculateMonthlyMortgage(price: number | null): number | null {
+function calculateMonthlyMortgage(price: number | null): number | null {
   if (price === null) return null
   const principal = price * (1 - DOWNPAYMENT_RATE)
   const r = MONTHLY_INTEREST_RATE
@@ -17,7 +17,7 @@ export function calculateMonthlyMortgage(price: number | null): number | null {
   return Math.round(payment)
 }
 
-export function calculateTotalMonthlyCost(
+function calculateTotalMonthlyCost(
   monthlyMortgage: number | null,
   taxesYearly: number | null,
   commonFeesYearly: number | null,
@@ -30,7 +30,7 @@ export function calculateTotalMonthlyCost(
   return monthlyMortgage + monthlyTaxes + monthlyFees + monthlyHydro
 }
 
-export function calculatePricePerSqft(
+function calculatePricePerSqft(
   price: number | null,
   area: number | null
 ): number | null {
@@ -38,7 +38,7 @@ export function calculatePricePerSqft(
   return Math.round(price / area)
 }
 
-export interface RecalculateInput {
+interface RecalculateInput {
   price: number | null
   taxes_yearly: number | null
   common_fees_yearly: number | null
@@ -46,7 +46,7 @@ export interface RecalculateInput {
   liveable_area_sqft: number | null
 }
 
-export interface RecalculateOutput {
+interface RecalculateOutput {
   downpayment: number | null
   monthly_mortgage: number | null
   total_monthly_cost: number | null

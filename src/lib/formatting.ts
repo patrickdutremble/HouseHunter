@@ -6,22 +6,22 @@ function formatWithCommas(n: number): string {
   return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
 
-export function formatCurrency(value: number | null): string {
+function formatCurrency(value: number | null): string {
   if (value === null) return EM_DASH
   return '$' + formatWithCommas(value)
 }
 
-export function formatInteger(value: number | null): string {
+function formatInteger(value: number | null): string {
   if (value === null) return EM_DASH
   return formatWithCommas(value)
 }
 
-export function formatYear(value: number | null): string {
+function formatYear(value: number | null): string {
   if (value === null) return EM_DASH
   return String(Math.trunc(value))
 }
 
-export function formatDuration(value: string | null): string {
+function formatDuration(value: string | null): string {
   if (value === null || value === undefined || value === '') return EM_DASH
   const s = String(value).trim()
 
@@ -47,7 +47,7 @@ export function formatDuration(value: string | null): string {
   return `${hours}:${mins.toString().padStart(2, '0')}`
 }
 
-export function formatDate(value: string | null): string {
+function formatDate(value: string | null): string {
   if (!value) return EM_DASH
   const d = new Date(value)
   if (isNaN(d.getTime())) return EM_DASH
