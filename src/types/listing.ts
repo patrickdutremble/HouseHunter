@@ -14,6 +14,7 @@ export interface Listing {
   price_per_sqft: number | null
   parking: string | null
   year_built: number | null
+  hydro_yearly: number | null
   downpayment: number | null
   monthly_mortgage: number | null
   total_monthly_cost: number | null

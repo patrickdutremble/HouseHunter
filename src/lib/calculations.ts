@@ -20,12 +20,14 @@ export function calculateMonthlyMortgage(price: number | null): number | null {
 export function calculateTotalMonthlyCost(
   monthlyMortgage: number | null,
   taxesYearly: number | null,
-  commonFeesYearly: number | null
+  commonFeesYearly: number | null,
+  hydroYearly: number | null = null
 ): number | null {
   if (monthlyMortgage === null) return null
   const monthlyTaxes = taxesYearly ? Math.round(taxesYearly / 12) : 0
   const monthlyFees = commonFeesYearly ? Math.round(commonFeesYearly / 12) : 0
-  return monthlyMortgage + monthlyTaxes + monthlyFees
+  const monthlyHydro = hydroYearly ? Math.round(hydroYearly / 12) : 0
+  return monthlyMortgage + monthlyTaxes + monthlyFees + monthlyHydro
 }
 
 export function calculatePricePerSqft(
@@ -40,6 +42,7 @@ export interface RecalculateInput {
   price: number | null
   taxes_yearly: number | null
   common_fees_yearly: number | null
+  hydro_yearly: number | null
   liveable_area_sqft: number | null
 }
 
@@ -56,7 +59,8 @@ export function recalculateListing(input: RecalculateInput): RecalculateOutput {
   const total_monthly_cost = calculateTotalMonthlyCost(
     monthly_mortgage,
     input.taxes_yearly,
-    input.common_fees_yearly
+    input.common_fees_yearly,
+    input.hydro_yearly
   )
   const price_per_sqft = calculatePricePerSqft(input.price, input.liveable_area_sqft)
   return { downpayment, monthly_mortgage, total_monthly_cost, price_per_sqft }

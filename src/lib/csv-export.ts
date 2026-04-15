@@ -15,6 +15,7 @@ const CSV_COLUMNS: { key: keyof Listing; label: string }[] = [
   { key: 'year_built', label: 'Year Built' },
   { key: 'downpayment', label: 'Downpayment' },
   { key: 'monthly_mortgage', label: 'Monthly Mortgage' },
+  { key: 'hydro_yearly', label: 'Hydro (yearly)' },
   { key: 'total_monthly_cost', label: 'Total Monthly Cost' },
   { key: 'commute_school_car', label: 'Commute to School (car)' },
   { key: 'commute_pvm_transit', label: 'Commute to PVM (transit)' },

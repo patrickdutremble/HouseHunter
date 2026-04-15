@@ -43,6 +43,11 @@ describe('calculateTotalMonthlyCost', () => {
     expect(result).toBe(2739)
   })
 
+  it('includes hydro when provided', () => {
+    const result = calculateTotalMonthlyCost(2106, 4000, 3600, 1200)
+    expect(result).toBe(2839)
+  })
+
   it('handles null taxes and fees', () => {
     const result = calculateTotalMonthlyCost(2106, null, null)
     expect(result).toBe(2106)
@@ -77,6 +82,7 @@ describe('recalculateListing', () => {
       price: 500000,
       taxes_yearly: 4000,
       common_fees_yearly: 3600,
+      hydro_yearly: null,
       liveable_area_sqft: 1200,
     })
     expect(result.downpayment).toBe(100000)
@@ -90,6 +96,7 @@ describe('recalculateListing', () => {
       price: 300000,
       taxes_yearly: null,
       common_fees_yearly: null,
+      hydro_yearly: null,
       liveable_area_sqft: null,
     })
     expect(result.downpayment).toBe(60000)

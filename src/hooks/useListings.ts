@@ -34,7 +34,7 @@ export function useListings() {
     const updates: Record<string, unknown> = { [field]: value }
 
     // Recalculate derived fields if a source field changed
-    const recalcFields = ['price', 'taxes_yearly', 'common_fees_yearly', 'liveable_area_sqft']
+    const recalcFields = ['price', 'taxes_yearly', 'common_fees_yearly', 'hydro_yearly', 'liveable_area_sqft']
     if (recalcFields.includes(field)) {
       const current = listings.find(l => l.id === id)
       if (current) {
@@ -42,6 +42,7 @@ export function useListings() {
           price: field === 'price' ? (value as number) : current.price,
           taxes_yearly: field === 'taxes_yearly' ? (value as number) : current.taxes_yearly,
           common_fees_yearly: field === 'common_fees_yearly' ? (value as number) : current.common_fees_yearly,
+          hydro_yearly: field === 'hydro_yearly' ? (value as number) : current.hydro_yearly,
           liveable_area_sqft: field === 'liveable_area_sqft' ? (value as number) : current.liveable_area_sqft,
         }
         const calculated = recalculateListing(input)
