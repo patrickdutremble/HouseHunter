@@ -123,7 +123,7 @@ export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPane
       <div className="px-5 py-3 border-t border-slate-200 bg-slate-50">
         <button
           onClick={() => {
-            if (confirm('Delete this listing? This cannot be undone.')) {
+            if (confirm('Move this listing to the trash?')) {
               onDelete(listing.id)
             }
           }}

@@ -9,12 +9,14 @@ export function useListings() {
   const [listings, setListings] = useState<Listing[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [trashCount, setTrashCount] = useState(0)
 
   const fetchListings = useCallback(async () => {
     setLoading(true)
     const { data, error: fetchError } = await supabase
       .from('listings')
       .select('*')
+      .is('deleted_at', null)
       .order('created_at', { ascending: false })
 
     if (fetchError) {
@@ -26,9 +28,21 @@ export function useListings() {
     setLoading(false)
   }, [])
 
+  const fetchTrashCount = useCallback(async () => {
+    const { count, error: countError } = await supabase
+      .from('listings')
+      .select('*', { count: 'exact', head: true })
+      .not('deleted_at', 'is', null)
+
+    if (!countError && count !== null) {
+      setTrashCount(count)
+    }
+  }, [])
+
   useEffect(() => {
     fetchListings()
-  }, [fetchListings])
+    fetchTrashCount()
+  }, [fetchListings, fetchTrashCount])
 
   const updateListing = async (id: string, field: string, value: string | number | boolean | null) => {
     const updates: Record<string, unknown> = { [field]: value }
@@ -70,7 +84,7 @@ export function useListings() {
   const deleteListing = async (id: string) => {
     const { error: deleteError } = await supabase
       .from('listings')
-      .delete()
+      .update({ deleted_at: new Date().toISOString() })
       .eq('id', id)
 
     if (deleteError) {
@@ -79,8 +93,9 @@ export function useListings() {
     }
 
     setListings(prev => prev.filter(l => l.id !== id))
+    fetchTrashCount()
     return true
   }
 
-  return { listings, loading, error, fetchListings, updateListing, deleteListing }
+  return { listings, loading, error, fetchListings, updateListing, deleteListing, trashCount }
 }
