@@ -48,12 +48,13 @@ function CompareContent() {
       }
 
       const ids = idsParam.split(',').slice(0, 5)
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('listings')
         .select('*')
         .in('id', ids)
         .is('deleted_at', null)
 
+      if (error) console.error('Failed to fetch listings for comparison:', error)
       setListings(data ?? [])
       setLoading(false)
     }
