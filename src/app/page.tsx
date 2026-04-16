@@ -47,7 +47,7 @@ export default function Home() {
   }
 
   const openCompare = () => {
-    const ids = Array.from(compareIds).join(',')
+    const ids = encodeURIComponent(Array.from(compareIds).join(','))
     window.open(`/compare?ids=${ids}`, '_blank')
   }
 

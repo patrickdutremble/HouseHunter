@@ -1,6 +1,21 @@
 import type { Listing } from '@/types/listing'
 
-type BestMap = Record<string, Set<string>>
+export type BestMap = {
+  price: Set<string>
+  bedrooms: Set<string>
+  liveable_area_sqft: Set<string>
+  price_per_sqft: Set<string>
+  parking: Set<string>
+  year_built: Set<string>
+  taxes_yearly: Set<string>
+  common_fees_yearly: Set<string>
+  hydro_yearly: Set<string>
+  downpayment: Set<string>
+  monthly_mortgage: Set<string>
+  total_monthly_cost: Set<string>
+  commute_school_car: Set<string>
+  commute_pvm_transit: Set<string>
+}
 
 /** Parse bedroom strings like "2+1" into a number (3). */
 function parseBedrooms(value: string | null): number | null {

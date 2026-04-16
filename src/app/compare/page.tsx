@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
-import { getBestValues } from '@/lib/comparison'
+import { getBestValues, type BestMap } from '@/lib/comparison'
 import { formatCellValue } from '@/lib/formatting'
 import type { ColumnFormat } from '@/lib/columns'
 import type { Listing } from '@/types/listing'
@@ -156,7 +156,8 @@ function CompareContent() {
               <div className="divide-y divide-slate-50">
                 {compareFields.map(field => {
                   const value = listing[field.key as keyof Listing]
-                  const isBest = bestValues[field.key]?.has(listing.id) ?? false
+                  const isBest = field.key in bestValues
+                    && (bestValues as Record<string, Set<string>>)[field.key].has(listing.id)
                   const formatted = formatCellValue(value, field.format)
 
                   return (
