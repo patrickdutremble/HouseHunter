@@ -12,9 +12,11 @@ interface ListingsTableProps {
   selectedId: string | null
   onSelect: (id: string) => void
   onUpdate: (id: string, field: string, value: string | number | boolean | null) => void
+  compareIds: Set<string>
+  onToggleCompare: (id: string) => void
 }
 
-export function ListingsTable({ listings, selectedId, onSelect, onUpdate }: ListingsTableProps) {
+export function ListingsTable({ listings, selectedId, onSelect, onUpdate, compareIds, onToggleCompare }: ListingsTableProps) {
   const [filters, setFilters] = useState<Filters>({ type: '', minPrice: '', maxPrice: '' })
 
   const filtered = useMemo(() => {
@@ -50,7 +52,7 @@ export function ListingsTable({ listings, selectedId, onSelect, onUpdate }: List
 
       <div className="flex-1 overflow-auto">
         <table className="w-full border-collapse">
-          <TableHeader sort={sort} onSort={toggleSort} />
+          <TableHeader sort={sort} onSort={toggleSort} hasCompare />
           <tbody>
             {sorted.map(listing => (
               <TableRow
@@ -59,6 +61,8 @@ export function ListingsTable({ listings, selectedId, onSelect, onUpdate }: List
                 isSelected={listing.id === selectedId}
                 onSelect={onSelect}
                 onUpdate={onUpdate}
+                isCompared={compareIds.has(listing.id)}
+                onToggleCompare={onToggleCompare}
               />
             ))}
             {sorted.length === 0 && (

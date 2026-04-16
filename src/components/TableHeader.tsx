@@ -4,12 +4,19 @@ import type { SortState } from '@/hooks/useSort'
 interface TableHeaderProps {
   sort: SortState
   onSort: (column: string) => void
+  hasCompare?: boolean
 }
 
-export function TableHeader({ sort, onSort }: TableHeaderProps) {
+export function TableHeader({ sort, onSort, hasCompare }: TableHeaderProps) {
   return (
     <thead>
       <tr className="border-b border-slate-200">
+        {hasCompare && (
+          <th
+            className="sticky top-0 z-10 bg-slate-50 px-1 py-2.5 border-b border-slate-200"
+            style={{ width: '32px', minWidth: '32px' }}
+          />
+        )}
         {tableColumns.map(col => {
           const isSorted = sort.column === col.key
           const arrow = isSorted
