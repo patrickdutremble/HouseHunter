@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { ListingsTable } from '@/components/ListingsTable'
 import { DetailPanel } from '@/components/DetailPanel'
@@ -18,22 +18,28 @@ export default function Home() {
 
   const toggleCompare = (id: string) => {
     setCompareIds(prev => {
-      const next = new Set(prev)
-      if (next.has(id)) {
+      if (prev.has(id)) {
+        const next = new Set(prev)
         next.delete(id)
         setCompareMaxWarning(false)
-      } else {
-        if (next.size >= 5) {
-          setCompareMaxWarning(true)
-          setTimeout(() => setCompareMaxWarning(false), 2000)
-          return prev
-        }
-        next.add(id)
-        setCompareMaxWarning(false)
+        return next
       }
+      if (prev.size >= 5) {
+        setCompareMaxWarning(true)
+        return prev
+      }
+      const next = new Set(prev)
+      next.add(id)
+      setCompareMaxWarning(false)
       return next
     })
   }
+
+  useEffect(() => {
+    if (!compareMaxWarning) return
+    const timer = setTimeout(() => setCompareMaxWarning(false), 2000)
+    return () => clearTimeout(timer)
+  }, [compareMaxWarning])
 
   const clearCompare = () => {
     setCompareIds(new Set())
