@@ -40,6 +40,7 @@ export const columns: ColumnDef[] = [
   { key: 'monthly_mortgage', label: 'Mortgage/mo', align: 'right', format: 'currency', editable: false, showInTable: true, showInDetail: true, width: '110px' },
   { key: 'hydro_yearly', label: 'Hydro/yr', align: 'right', format: 'currency', editable: true, showInTable: true, showInDetail: true, width: '90px' },
   { key: 'total_monthly_cost', label: 'Total/mo', align: 'right', format: 'currency', editable: false, showInTable: true, showInDetail: true, width: '100px' },
+  { key: 'criteria_count', label: 'Criteria', align: 'right', format: 'text', editable: false, showInTable: true, showInDetail: false, width: '70px' },
   { key: 'commute_school_car', label: 'School', align: 'right', format: 'duration', editable: true, showInTable: true, showInDetail: true, width: '70px' },
   { key: 'commute_pvm_transit', label: 'PVM', align: 'right', format: 'duration', editable: true, showInTable: true, showInDetail: true, width: '70px' },
   { key: 'created_at', label: 'Added', align: 'left', format: 'date', editable: false, showInTable: true, showInDetail: true, width: '100px' },
