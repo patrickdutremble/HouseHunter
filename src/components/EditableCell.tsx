@@ -11,10 +11,11 @@ interface EditableCellProps {
   align: 'left' | 'right'
   wrap?: boolean
   multiline?: boolean
+  isSelected?: boolean
   onSave: (newValue: string | number | null) => void
 }
 
-export function EditableCell({ value, format, editable, align, wrap = false, multiline = false, onSave }: EditableCellProps) {
+export function EditableCell({ value, format, editable, align, wrap = false, multiline = false, isSelected = false, onSave }: EditableCellProps) {
   const [editing, setEditing] = useState(false)
   const [editValue, setEditValue] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
@@ -36,6 +37,7 @@ export function EditableCell({ value, format, editable, align, wrap = false, mul
 
   const handleClick = () => {
     if (!editable) return
+    if (!isSelected) return
     setEditValue(value === null || value === undefined ? '' : String(value))
     setEditing(true)
   }
@@ -105,11 +107,11 @@ export function EditableCell({ value, format, editable, align, wrap = false, mul
   if (format === 'link-icon') {
     const href = typeof value === 'string' && value.trim() !== '' ? value : null
     const handleIconClick = (e: React.MouseEvent) => {
-      // Let the anchor navigate; also stop row-select bubbling
       e.stopPropagation()
     }
     const handleEditClick = (e: React.MouseEvent) => {
       e.stopPropagation()
+      if (!isSelected) return
       handleClick()
     }
     return (
@@ -132,7 +134,7 @@ export function EditableCell({ value, format, editable, align, wrap = false, mul
           <button
             type="button"
             onClick={handleEditClick}
-            title={href ? 'Edit URL' : 'Paste URL'}
+            title={isSelected ? (href ? 'Edit URL' : 'Paste URL') : undefined}
             className="text-slate-300 hover:text-blue-600 transition-colors"
           >
             <svg width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
@@ -149,14 +151,16 @@ export function EditableCell({ value, format, editable, align, wrap = false, mul
   }
 
   const displayValue = formatCellValue(value, format)
-  const cursorClass = editable ? 'cursor-pointer hover:bg-blue-50 rounded px-1 -mx-1 transition-colors' : ''
+  const cursorClass = editable && isSelected
+    ? 'cursor-pointer hover:border hover:border-dashed hover:border-blue-300 hover:rounded px-1 -mx-1 transition-colors'
+    : ''
   const overflowClass = wrap ? 'break-words whitespace-pre-wrap' : 'truncate'
 
   return (
     <span
       onClick={handleClick}
       className={`block ${overflowClass} ${alignClass} ${cursorClass}`}
-      title={editable ? 'Click to edit' : undefined}
+      title={editable && isSelected ? 'Click to edit' : undefined}
     >
       {displayValue}
     </span>
