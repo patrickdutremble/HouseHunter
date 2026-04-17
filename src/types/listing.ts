@@ -28,4 +28,5 @@ export interface Listing {
   created_at: string
   updated_at: string
   deleted_at: string | null
+  criteria: Record<string, boolean> | null
 }
