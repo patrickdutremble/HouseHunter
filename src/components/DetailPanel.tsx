@@ -9,7 +9,7 @@ import type { Listing } from '@/types/listing'
 interface DetailPanelProps {
   listing: Listing
   onClose: () => void
-  onUpdate: (id: string, field: string, value: string | number | boolean | null) => void
+  onUpdate: (id: string, field: string, value: string | number | boolean | null | Record<string, boolean>) => void
   onDelete: (id: string) => void
 }
 

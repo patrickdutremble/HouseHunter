@@ -44,7 +44,7 @@ export function useListings() {
     fetchTrashCount()
   }, [fetchListings, fetchTrashCount])
 
-  const updateListing = async (id: string, field: string, value: string | number | boolean | null) => {
+  const updateListing = async (id: string, field: string, value: string | number | boolean | null | Record<string, boolean>) => {
     const updates: Record<string, unknown> = { [field]: value }
 
     // Recalculate derived fields if a source field changed

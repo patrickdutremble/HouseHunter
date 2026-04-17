@@ -8,7 +8,7 @@ interface TableRowProps {
   listing: Listing
   isSelected: boolean
   onSelect: (id: string) => void
-  onUpdate: (id: string, field: string, value: string | number | boolean | null) => void
+  onUpdate: (id: string, field: string, value: string | number | boolean | null | Record<string, boolean>) => void
   isCompared: boolean
   onToggleCompare: (id: string) => void
 }
