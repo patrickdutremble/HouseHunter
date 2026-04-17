@@ -1,4 +1,5 @@
 import { tableColumns } from '@/lib/columns'
+import { criteria, countChecked } from '@/lib/criteria'
 import { EditableCell } from './EditableCell'
 import { LocationCell } from './LocationCell'
 import { FavoriteButton } from './FavoriteButton'
@@ -56,6 +57,19 @@ export function TableRow({ listing, isSelected, onSelect, onUpdate, isCompared, 
                 value={listing.favorite}
                 onToggle={() => onUpdate(listing.id, 'favorite', !listing.favorite)}
               />
+            </td>
+          )
+        }
+
+        if (col.key === 'criteria_count') {
+          const checked = countChecked(listing.criteria)
+          return (
+            <td
+              key={col.key}
+              className="px-3 py-2.5 text-sm text-slate-700 text-right"
+              style={{ width: col.width, minWidth: col.width }}
+            >
+              {checked}/{criteria.length}
             </td>
           )
         }
