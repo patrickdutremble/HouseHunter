@@ -6,10 +6,11 @@ interface LocationCellProps {
   text: string | null
   mapQuery: string | null
   editable: boolean
+  isSelected?: boolean
   onSave: (newValue: string | null) => void
 }
 
-export function LocationCell({ text, mapQuery, editable, onSave }: LocationCellProps) {
+export function LocationCell({ text, mapQuery, editable, isSelected = false, onSave }: LocationCellProps) {
   const [editing, setEditing] = useState(false)
   const [editValue, setEditValue] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
@@ -24,6 +25,7 @@ export function LocationCell({ text, mapQuery, editable, onSave }: LocationCellP
   const startEdit = (e: React.MouseEvent) => {
     e.stopPropagation()
     if (!editable) return
+    if (!isSelected) return
     setEditValue(text ?? '')
     setEditing(true)
   }
@@ -78,8 +80,8 @@ export function LocationCell({ text, mapQuery, editable, onSave }: LocationCellP
         <button
           type="button"
           onClick={startEdit}
-          title="Edit location"
-          className="flex-shrink-0 text-slate-300 hover:text-blue-600 transition-colors"
+          title={isSelected ? 'Edit location' : undefined}
+          className={`flex-shrink-0 transition-colors ${isSelected ? 'text-slate-300 hover:text-blue-600' : 'text-slate-200 cursor-default'}`}
         >
           <svg width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M4 13.5V16h2.5L15 7.5 12.5 5 4 13.5z" strokeLinecap="round" strokeLinejoin="round" />
