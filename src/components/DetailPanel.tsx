@@ -110,6 +110,7 @@ export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPane
                     align="left"
                     wrap
                     multiline={col.key === 'notes'}
+                    isSelected={true}
                     onSave={(newValue) => onUpdate(listing.id, col.key, newValue)}
                   />
                 </div>
