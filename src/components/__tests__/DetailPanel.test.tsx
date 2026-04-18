@@ -125,4 +125,55 @@ describe('DetailPanel — Good-to-have criteria section', () => {
       no_above_neighbors: false,
     })
   })
+
+  it('merges rapid consecutive clicks without losing prior updates', () => {
+    const onUpdate = vi.fn()
+    render(
+      <DetailPanel
+        listing={makeListing({ criteria: null })}
+        onClose={() => {}}
+        onUpdate={onUpdate}
+        onDelete={() => {}}
+      />
+    )
+    // Two clicks in quick succession — listing prop does not change between them
+    // (simulates the real app, where parent state update is async)
+    fireEvent.click(screen.getByLabelText('No above neighbors'))
+    fireEvent.click(screen.getByLabelText('3 bedrooms'))
+
+    expect(onUpdate).toHaveBeenNthCalledWith(1, 'test-id', 'criteria', {
+      no_above_neighbors: true,
+    })
+    expect(onUpdate).toHaveBeenNthCalledWith(2, 'test-id', 'criteria', {
+      no_above_neighbors: true,
+      three_bedrooms: true,
+    })
+  })
+
+  it('resets pending state when switching to a different listing', () => {
+    const onUpdate = vi.fn()
+    const { rerender } = render(
+      <DetailPanel
+        listing={makeListing({ id: 'a', criteria: null })}
+        onClose={() => {}}
+        onUpdate={onUpdate}
+        onDelete={() => {}}
+      />
+    )
+    fireEvent.click(screen.getByLabelText('No above neighbors'))
+    // Switch to different listing whose criteria is empty
+    rerender(
+      <DetailPanel
+        listing={makeListing({ id: 'b', criteria: null })}
+        onClose={() => {}}
+        onUpdate={onUpdate}
+        onDelete={() => {}}
+      />
+    )
+    fireEvent.click(screen.getByLabelText('3 bedrooms'))
+    // Second call should reflect listing 'b's fresh state, NOT merge with 'a's pending
+    expect(onUpdate).toHaveBeenLastCalledWith('b', 'criteria', {
+      three_bedrooms: true,
+    })
+  })
 })

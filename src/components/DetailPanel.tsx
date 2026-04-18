@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { detailColumns } from '@/lib/columns'
 import { EditableCell } from './EditableCell'
 import { LocationField } from './LocationField'
@@ -15,6 +16,11 @@ interface DetailPanelProps {
 }
 
 export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPanelProps) {
+  const [pendingCriteria, setPendingCriteria] = useState<Record<string, boolean>>(listing.criteria ?? {})
+
+  useEffect(() => {
+    setPendingCriteria(listing.criteria ?? {})
+  }, [listing.id])
   return (
     <div className="w-[420px] border-l border-slate-200 bg-white flex flex-col h-full shadow-lg">
       {/* Header */}
@@ -75,15 +81,18 @@ export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPane
           </div>
           <div className="grid grid-cols-2 gap-x-4 gap-y-2">
             {criteria.map(c => {
-              const checked = listing.criteria?.[c.key] === true
+              const checked = pendingCriteria[c.key] === true
               return (
                 <label key={c.key} className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={checked}
                     onChange={() => {
-                      const next = { ...(listing.criteria ?? {}), [c.key]: !checked }
-                      onUpdate(listing.id, 'criteria', next)
+                      setPendingCriteria(prev => {
+                        const next = { ...prev, [c.key]: !(prev[c.key] === true) }
+                        onUpdate(listing.id, 'criteria', next)
+                        return next
+                      })
                     }}
                     className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                   />
