@@ -4,6 +4,7 @@ import { detailColumns } from '@/lib/columns'
 import { EditableCell } from './EditableCell'
 import { LocationField } from './LocationField'
 import { FavoriteButton } from './FavoriteButton'
+import { criteria } from '@/lib/criteria'
 import type { Listing } from '@/types/listing'
 
 interface DetailPanelProps {
@@ -65,6 +66,32 @@ export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPane
               Broker site &#8599;
             </a>
           )}
+        </div>
+
+        {/* Good-to-have criteria */}
+        <div className="mb-5">
+          <div className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-2">
+            Good-to-have criteria
+          </div>
+          <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+            {criteria.map(c => {
+              const checked = listing.criteria?.[c.key] === true
+              return (
+                <label key={c.key} className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() => {
+                      const next = { ...(listing.criteria ?? {}), [c.key]: !checked }
+                      onUpdate(listing.id, 'criteria', next)
+                    }}
+                    className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                  />
+                  <span>{c.label}</span>
+                </label>
+              )
+            })}
+          </div>
         </div>
 
         {/* Listing image */}
