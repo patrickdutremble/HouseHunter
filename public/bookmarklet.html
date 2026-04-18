@@ -67,7 +67,7 @@
     "for(var i=0;i<h1s.length;i++){var t=h1s[i].textContent.trim().replace(/\\s+/g,' ');var m=t.match(/^(.+?)\\s+(?:for sale|\\u00e0 vendre|for rent|\\u00e0 louer)/i);if(m){type=m[1].trim();break;}}",
     "var loc=null;var addr=null;",
     "var h2s=document.querySelectorAll('h2');",
-    "for(var j=0;j<h2s.length;j++){var s=h2s[j].textContent.trim().replace(/\\s+/g,' ');if(/^\\d+[\\s,]/.test(s)&&s.indexOf(',')>-1){addr=s;var parts=s.split(',').map(function(x){return x.trim();}).filter(Boolean);loc=parts[parts.length-1]||null;break;}}",
+    "for(var j=0;j<h2s.length;j++){var s=h2s[j].textContent.trim().replace(/\\s+/g,' ');if(/^\\d+[A-Za-z0-9-]*[\\s,]/.test(s)&&s.indexOf(',')>-1){addr=s;var parts=s.split(',').map(function(x){return x.trim();}).filter(Boolean);loc=parts[parts.length-1]||null;break;}}",
     "function extractYearly(rx){var tables=document.querySelectorAll('.financial-details-table-yearly');for(var k=0;k<tables.length;k++){var tbl=tables[k];var titleEl=tbl.querySelector('.financial-details-table-title');if(!titleEl)continue;if(!rx.test(titleEl.textContent.trim()))continue;var totalEl=tbl.querySelector('.financial-details-table-total');if(!totalEl)continue;var digits=totalEl.textContent.replace(/[^\\d]/g,'');if(digits)return digits;}return null;}",
     "var taxes=extractYearly(/^taxes$/i);",
     "var fees=extractYearly(/^(fees|frais)$/i);",
