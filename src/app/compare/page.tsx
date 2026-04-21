@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo, Suspense } from 'react'
+import { useState, useEffect, useMemo, useRef, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
@@ -38,6 +38,8 @@ const compareFields: CompareField[] = [
 function CompareContent() {
   const searchParams = useSearchParams()
   const [listings, setListings] = useState<Listing[]>([])
+  const listingsRef = useRef(listings)
+  listingsRef.current = listings
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -64,15 +66,14 @@ function CompareContent() {
   }, [searchParams])
 
   async function toggleCriterion(id: string, key: string, value: boolean) {
-    let next: Record<string, boolean> | null = null
-    setListings(prev =>
-      prev.map(l => {
-        if (l.id !== id) return l
-        next = { ...(l.criteria ?? {}), [key]: value }
-        return { ...l, criteria: next }
-      })
+    const current = listingsRef.current.find(l => l.id === id)?.criteria ?? {}
+    const next = { ...current, [key]: value }
+    const updated = listingsRef.current.map(l =>
+      l.id === id ? { ...l, criteria: next } : l
     )
-    if (next === null) return
+    listingsRef.current = updated
+    setListings(updated)
+
     const { error } = await supabase
       .from('listings')
       .update({ criteria: next })
