@@ -1,3 +1,4 @@
+import { criteria, countChecked } from '@/lib/criteria'
 import type { Listing } from '@/types/listing'
 
 export type BestMap = {
@@ -15,6 +16,9 @@ export type BestMap = {
   total_monthly_cost: Set<string>
   commute_school_car: Set<string>
   commute_pvm_transit: Set<string>
+  criteria_count: Set<string>
+  // One entry per criterion key — see src/lib/criteria.ts
+  [criterionKey: string]: Set<string>
 }
 
 /** Parse bedroom strings like "2+1" into a number (3). */
@@ -61,8 +65,35 @@ function findBest(
   return new Set(entries.filter(e => e.value === bestValue).map(e => e.id))
 }
 
+/**
+ * Highlight listings where a criterion is checked, but only when at least one
+ * other listing does not have it checked. If all listings agree (all checked
+ * or all unchecked/missing), nothing is highlighted.
+ */
+function findBestBinary(
+  listings: Listing[],
+  criterionKey: string,
+): Set<string> {
+  if (listings.length < 2) return new Set()
+
+  const checkedIds: string[] = []
+  let anyUnchecked = false
+
+  for (const l of listings) {
+    const isChecked = l.criteria?.[criterionKey] === true
+    if (isChecked) {
+      checkedIds.push(l.id)
+    } else {
+      anyUnchecked = true
+    }
+  }
+
+  if (checkedIds.length === 0 || !anyUnchecked) return new Set()
+  return new Set(checkedIds)
+}
+
 export function getBestValues(listings: Listing[]): BestMap {
-  return {
+  const base = {
     price: findBest(listings, l => l.price, 'min'),
     bedrooms: findBest(listings, l => parseBedrooms(l.bedrooms), 'max'),
     liveable_area_sqft: findBest(listings, l => l.liveable_area_sqft, 'max'),
@@ -77,5 +108,12 @@ export function getBestValues(listings: Listing[]): BestMap {
     total_monthly_cost: findBest(listings, l => l.total_monthly_cost, 'min'),
     commute_school_car: findBest(listings, l => parseDuration(l.commute_school_car), 'min'),
     commute_pvm_transit: findBest(listings, l => parseDuration(l.commute_pvm_transit), 'min'),
+    criteria_count: findBest(listings, l => countChecked(l.criteria), 'max'),
+  } as BestMap
+
+  for (const c of criteria) {
+    base[c.key] = findBestBinary(listings, c.key)
   }
+
+  return base
 }

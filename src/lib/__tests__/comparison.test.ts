@@ -122,3 +122,61 @@ describe('getBestValues', () => {
     expect(best.parking).toEqual(new Set(['b']))
   })
 })
+
+describe('getBestValues — criteria', () => {
+  it('picks listing with highest criteria_count', () => {
+    const listings = [
+      makeListing({ id: 'a', criteria: { no_above_neighbors: true, three_bedrooms: true } }),
+      makeListing({ id: 'b', criteria: { no_above_neighbors: true, three_bedrooms: true, has_garage: true } }),
+      makeListing({ id: 'c', criteria: { no_above_neighbors: true } }),
+    ]
+    const best = getBestValues(listings)
+    expect(best.criteria_count).toEqual(new Set(['b']))
+  })
+
+  it('treats missing criteria as zero checked', () => {
+    const listings = [
+      makeListing({ id: 'a', criteria: null }),
+      makeListing({ id: 'b', criteria: { no_above_neighbors: true } }),
+    ]
+    const best = getBestValues(listings)
+    expect(best.criteria_count).toEqual(new Set(['b']))
+  })
+
+  it('ties on criteria_count highlight all tied listings', () => {
+    const listings = [
+      makeListing({ id: 'a', criteria: { no_above_neighbors: true, three_bedrooms: true } }),
+      makeListing({ id: 'b', criteria: { no_above_neighbors: true, has_garage: true } }),
+    ]
+    const best = getBestValues(listings)
+    expect(best.criteria_count).toEqual(new Set(['a', 'b']))
+  })
+
+  it('per-criterion: highlights listings with criterion checked when others do not', () => {
+    const listings = [
+      makeListing({ id: 'a', criteria: { no_above_neighbors: true } }),
+      makeListing({ id: 'b', criteria: { no_above_neighbors: false } }),
+      makeListing({ id: 'c', criteria: null }),
+    ]
+    const best = getBestValues(listings)
+    expect(best.no_above_neighbors).toEqual(new Set(['a']))
+  })
+
+  it('per-criterion: no highlight when all listings have the criterion checked', () => {
+    const listings = [
+      makeListing({ id: 'a', criteria: { has_garage: true } }),
+      makeListing({ id: 'b', criteria: { has_garage: true } }),
+    ]
+    const best = getBestValues(listings)
+    expect(best.has_garage).toEqual(new Set())
+  })
+
+  it('per-criterion: no highlight when no listing has the criterion checked', () => {
+    const listings = [
+      makeListing({ id: 'a', criteria: { has_garage: false } }),
+      makeListing({ id: 'b', criteria: null }),
+    ]
+    const best = getBestValues(listings)
+    expect(best.has_garage).toEqual(new Set())
+  })
+})
