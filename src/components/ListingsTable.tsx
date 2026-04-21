@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { TableHeader } from './TableHeader'
 import { TableRow } from './TableRow'
 import { FilterBar, type Filters } from './FilterBar'
@@ -55,6 +55,12 @@ export function ListingsTable({ listings, selectedId, onSelect, onUpdate, compar
     setFocusedId(id)
     onSelect(id)
   }
+
+  useEffect(() => {
+    if (focusedId !== null && !sorted.some(l => l.id === focusedId)) {
+      setFocusedId(null)
+    }
+  }, [sorted, focusedId])
 
   const propertyTypes = useMemo(() => {
     const types = new Set(listings.map(l => l.property_type).filter(Boolean) as string[])
