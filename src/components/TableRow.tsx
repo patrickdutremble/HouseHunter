@@ -4,6 +4,7 @@ import { criteria, countChecked, deriveCriteria } from '@/lib/criteria'
 import { EditableCell } from './EditableCell'
 import { LocationCell } from './LocationCell'
 import { FavoriteButton } from './FavoriteButton'
+import { FlagButton } from './FlagButton'
 import type { Listing } from '@/types/listing'
 
 interface TableRowProps {
@@ -67,7 +68,7 @@ export function TableRow({ listing, isSelected, isFocused = false, onSelect, onU
       onClick={() => onSelect(listing.id)}
       className={`
         border-b border-slate-100 cursor-pointer transition-colors
-        ${isSelected ? 'bg-blue-50 border-blue-200' : listing.favorite ? 'bg-amber-50 hover:bg-amber-100' : 'hover:bg-slate-50'}
+        ${isSelected ? 'bg-blue-50 border-blue-200' : listing.flagged_for_deletion ? 'bg-red-50 hover:bg-red-100' : listing.favorite ? 'bg-amber-50 hover:bg-amber-100' : 'hover:bg-slate-50'}
         ${hasFlags ? 'ring-1 ring-inset ring-amber-200' : ''}
         ${isFocused ? 'ring-2 ring-inset ring-blue-400' : ''}
         ${isCompared ? 'border-l-2 border-l-blue-400' : ''}
@@ -95,10 +96,16 @@ export function TableRow({ listing, isSelected, isFocused = false, onSelect, onU
               style={{ width: col.width, minWidth: col.width }}
               onClick={e => e.stopPropagation()}
             >
-              <FavoriteButton
-                value={listing.favorite}
-                onToggle={() => onUpdate(listing.id, 'favorite', !listing.favorite)}
-              />
+              <div className="inline-flex items-center gap-1">
+                <FavoriteButton
+                  value={listing.favorite}
+                  onToggle={() => onUpdate(listing.id, 'favorite', !listing.favorite)}
+                />
+                <FlagButton
+                  value={listing.flagged_for_deletion}
+                  onToggle={() => onUpdate(listing.id, 'flagged_for_deletion', !listing.flagged_for_deletion)}
+                />
+              </div>
             </td>
           )
         }

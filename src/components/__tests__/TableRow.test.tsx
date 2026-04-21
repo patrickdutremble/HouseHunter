@@ -123,4 +123,44 @@ describe('TableRow', () => {
     const row = screen.getByRole('row')
     expect(row.className).not.toMatch(/ring-blue-400/)
   })
+
+  it('applies red background when flagged but not selected', () => {
+    const { container } = renderRow({ ...BASE, flagged_for_deletion: true })
+    const tr = container.querySelector('tr')!
+    expect(tr.className).toMatch(/bg-red-50/)
+    expect(tr.className).not.toMatch(/bg-amber-50/)
+  })
+
+  it('flagged beats favorite for row background', () => {
+    const { container } = renderRow({
+      ...BASE,
+      favorite: true,
+      flagged_for_deletion: true,
+    })
+    const tr = container.querySelector('tr')!
+    expect(tr.className).toMatch(/bg-red-50/)
+    expect(tr.className).not.toMatch(/bg-amber-50/)
+  })
+
+  it('selected beats flagged for row background', () => {
+    const { container } = renderRow(
+      { ...BASE, flagged_for_deletion: true },
+      { isSelected: true },
+    )
+    const tr = container.querySelector('tr')!
+    expect(tr.className).toMatch(/bg-blue-50/)
+    expect(tr.className).not.toMatch(/bg-red-50/)
+  })
+
+  it('renders a flag button in the favorite cell', () => {
+    const { container } = renderRow({ ...BASE, flagged_for_deletion: false })
+    const flagBtn = container.querySelector('button[title="Flag for deletion"]')
+    expect(flagBtn).not.toBeNull()
+  })
+
+  it('flag button shows unflag title when flagged', () => {
+    const { container } = renderRow({ ...BASE, flagged_for_deletion: true })
+    const flagBtn = container.querySelector('button[title="Unflag"]')
+    expect(flagBtn).not.toBeNull()
+  })
 })
