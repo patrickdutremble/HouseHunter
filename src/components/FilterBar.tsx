@@ -6,9 +6,10 @@ export interface Filters {
   type: string
   minPrice: string
   maxPrice: string
+  favoritesOnly: boolean
 }
 
-const EMPTY_FILTERS: Filters = { type: '', minPrice: '', maxPrice: '' }
+const EMPTY_FILTERS: Filters = { type: '', minPrice: '', maxPrice: '', favoritesOnly: false }
 
 interface FilterBarProps {
   propertyTypes: string[]
@@ -19,7 +20,7 @@ export function FilterBar({ propertyTypes, onFilterChange }: FilterBarProps) {
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS)
   const [open, setOpen] = useState(false)
 
-  const update = (field: keyof Filters, value: string) => {
+  const update = <K extends keyof Filters>(field: K, value: Filters[K]) => {
     const next = { ...filters, [field]: value }
     setFilters(next)
     onFilterChange(next)
@@ -30,7 +31,11 @@ export function FilterBar({ propertyTypes, onFilterChange }: FilterBarProps) {
     onFilterChange(EMPTY_FILTERS)
   }
 
-  const hasActiveFilters = Object.values(filters).some(v => v !== '')
+  const hasActiveFilters =
+    filters.type !== '' ||
+    filters.minPrice !== '' ||
+    filters.maxPrice !== '' ||
+    filters.favoritesOnly
 
   return (
     <div className="flex items-center gap-2">
@@ -45,6 +50,21 @@ export function FilterBar({ propertyTypes, onFilterChange }: FilterBarProps) {
         `}
       >
         Filters{hasActiveFilters ? ' \u25cf' : ''}
+      </button>
+
+      <button
+        onClick={() => update('favoritesOnly', !filters.favoritesOnly)}
+        aria-pressed={filters.favoritesOnly}
+        title={filters.favoritesOnly ? 'Showing favorites only' : 'Show favorites only'}
+        className={`
+          px-3 py-1.5 text-sm rounded-lg border transition-colors
+          ${filters.favoritesOnly
+            ? 'bg-amber-50 border-amber-300 text-amber-700'
+            : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+          }
+        `}
+      >
+        {filters.favoritesOnly ? '\u2605' : '\u2606'} Favorites
       </button>
 
       {open && (

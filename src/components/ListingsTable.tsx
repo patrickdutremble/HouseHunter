@@ -17,10 +17,11 @@ interface ListingsTableProps {
 }
 
 export function ListingsTable({ listings, selectedId, onSelect, onUpdate, compareIds, onToggleCompare }: ListingsTableProps) {
-  const [filters, setFilters] = useState<Filters>({ type: '', minPrice: '', maxPrice: '' })
+  const [filters, setFilters] = useState<Filters>({ type: '', minPrice: '', maxPrice: '', favoritesOnly: false })
 
   const filtered = useMemo(() => {
     return listings.filter(l => {
+      if (filters.favoritesOnly && !l.favorite) return false
       if (filters.type && l.property_type !== filters.type) return false
       if (filters.minPrice) {
         const min = Number(filters.minPrice.replace(/[$,\s]/g, ''))
