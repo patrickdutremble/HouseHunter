@@ -77,14 +77,14 @@ describe('ListingsTable flagStatus filtering', () => {
 
   it('shows only flagged listings when Flagged only is active', () => {
     renderTable([flagged('a'), unflagged('b')])
-    fireEvent.click(screen.getByRole('button', { name: /Flagged only/ }))
+    fireEvent.click(screen.getByRole('radio', { name: /Flagged only/ }))
     expect(screen.getByText('F-a')).toBeInTheDocument()
     expect(screen.queryByText('U-b')).not.toBeInTheDocument()
   })
 
   it('hides flagged listings when Hide flagged is active', () => {
     renderTable([flagged('a'), unflagged('b')])
-    fireEvent.click(screen.getByRole('button', { name: /Hide flagged/ }))
+    fireEvent.click(screen.getByRole('radio', { name: /Hide flagged/ }))
     expect(screen.queryByText('F-a')).not.toBeInTheDocument()
     expect(screen.getByText('U-b')).toBeInTheDocument()
   })

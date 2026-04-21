@@ -83,27 +83,30 @@ export function FilterBar({ propertyTypes, onFilterChange }: FilterBarProps) {
         {filters.favoritesOnly ? '\u2605' : '\u2606'} Favorites
       </button>
 
-      <div className="inline-flex rounded-lg overflow-hidden border border-slate-200">
+      <div role="radiogroup" aria-label="Flag status" className="inline-flex rounded-lg overflow-hidden border border-slate-200">
         <button
           type="button"
+          role="radio"
           onClick={() => update('flagStatus', 'all')}
-          aria-pressed={filters.flagStatus === 'all'}
+          aria-checked={filters.flagStatus === 'all'}
           className={`${flagBtnBase} border-0 border-r border-slate-200 ${filters.flagStatus === 'all' ? flagBtnAllActive : flagBtnIdle}`}
         >
           All
         </button>
         <button
           type="button"
+          role="radio"
           onClick={() => update('flagStatus', 'only')}
-          aria-pressed={filters.flagStatus === 'only'}
+          aria-checked={filters.flagStatus === 'only'}
           className={`${flagBtnBase} border-0 border-r border-slate-200 ${filters.flagStatus === 'only' ? flagBtnActive : flagBtnIdle}`}
         >
           Flagged only
         </button>
         <button
           type="button"
+          role="radio"
           onClick={() => update('flagStatus', 'hide')}
-          aria-pressed={filters.flagStatus === 'hide'}
+          aria-checked={filters.flagStatus === 'hide'}
           className={`${flagBtnBase} border-0 ${filters.flagStatus === 'hide' ? flagBtnHideActive : flagBtnIdle}`}
         >
           Hide flagged
