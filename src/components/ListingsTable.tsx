@@ -12,7 +12,7 @@ import type { Listing } from '@/types/listing'
 interface ListingsTableProps {
   listings: Listing[]
   selectedId: string | null
-  onSelect: (id: string) => void
+  onSelect: (id: string | null) => void
   onUpdate: (id: string, field: string, value: string | number | boolean | null | Record<string, boolean>) => void
   compareIds: Set<string>
   onToggleCompare: (id: string) => void
