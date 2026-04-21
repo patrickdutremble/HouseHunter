@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { countChecked } from '@/lib/criteria'
+import { countChecked, deriveCriteria } from '@/lib/criteria'
 import type { Listing } from '@/types/listing'
 
 export type SortDirection = 'asc' | 'desc' | null
@@ -30,8 +30,8 @@ export function useSort(listings: Listing[]) {
       let bVal: unknown
 
       if (sort.column === 'criteria_count') {
-        aVal = countChecked(a.criteria)
-        bVal = countChecked(b.criteria)
+        aVal = countChecked(deriveCriteria(a))
+        bVal = countChecked(deriveCriteria(b))
       } else {
         aVal = a[sort.column as keyof Listing]
         bVal = b[sort.column as keyof Listing]

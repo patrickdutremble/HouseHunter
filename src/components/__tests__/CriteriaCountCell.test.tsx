@@ -67,27 +67,33 @@ describe('Criteria count cell', () => {
     expect(screen.getByText('0/5')).toBeInTheDocument()
   })
 
-  it('renders 3/5 when three criteria are checked', () => {
+  it('renders 3/5 when three criteria are met (manual + derived)', () => {
     renderRow(makeListing({
-      criteria: {
-        no_above_neighbors: true,
-        school_within_20min: true,
-        pvm_within_1h: true,
-      },
+      commute_school_car: '15 min',
+      commute_pvm_transit: '45 min',
+      criteria: { no_above_neighbors: true },
     }))
     expect(screen.getByText('3/5')).toBeInTheDocument()
   })
 
-  it('renders 5/5 when all criteria are checked', () => {
+  it('renders 5/5 when all criteria are met', () => {
     renderRow(makeListing({
-      criteria: {
-        no_above_neighbors: true,
-        school_within_20min: true,
-        pvm_within_1h: true,
-        three_bedrooms: true,
-        has_garage: true,
-      },
+      bedrooms: '3',
+      parking: 'Garage (1)',
+      commute_school_car: '15 min',
+      commute_pvm_transit: '45 min',
+      criteria: { no_above_neighbors: true },
     }))
     expect(screen.getByText('5/5')).toBeInTheDocument()
+  })
+
+  it('derives three_bedrooms from the bedrooms field', () => {
+    renderRow(makeListing({ bedrooms: '3' }))
+    expect(screen.getByText('1/5')).toBeInTheDocument()
+  })
+
+  it('derives has_garage from the parking field', () => {
+    renderRow(makeListing({ parking: 'Driveway (2), Garage (1)' }))
+    expect(screen.getByText('1/5')).toBeInTheDocument()
   })
 })

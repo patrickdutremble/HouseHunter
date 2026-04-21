@@ -68,7 +68,7 @@ describe('DetailPanel — Good-to-have criteria section', () => {
     expect(screen.getByLabelText('At least 1 garage')).toBeInTheDocument()
   })
 
-  it('shows checkboxes as checked based on the criteria object', () => {
+  it('shows no_above_neighbors checkbox as checked based on the criteria object', () => {
     render(
       <DetailPanel
         listing={makeListing({ criteria: { no_above_neighbors: true } })}
@@ -78,7 +78,6 @@ describe('DetailPanel — Good-to-have criteria section', () => {
       />
     )
     expect(screen.getByLabelText('No above neighbors')).toBeChecked()
-    expect(screen.getByLabelText('3 bedrooms')).not.toBeChecked()
   })
 
   it('treats null criteria as all unchecked', () => {
@@ -93,11 +92,63 @@ describe('DetailPanel — Good-to-have criteria section', () => {
     expect(screen.getByLabelText('No above neighbors')).not.toBeChecked()
   })
 
-  it('calls onUpdate with the merged criteria object when a checkbox is toggled on', () => {
+  it('derives three_bedrooms from the bedrooms field', () => {
+    render(
+      <DetailPanel
+        listing={makeListing({ bedrooms: '3' })}
+        onClose={() => {}}
+        onUpdate={() => {}}
+        onDelete={() => {}}
+      />
+    )
+    expect(screen.getByLabelText('3 bedrooms')).toBeChecked()
+    expect(screen.getByLabelText('3 bedrooms')).toBeDisabled()
+  })
+
+  it('derives has_garage from the parking field', () => {
+    render(
+      <DetailPanel
+        listing={makeListing({ parking: 'Driveway (2), Garage (1)' })}
+        onClose={() => {}}
+        onUpdate={() => {}}
+        onDelete={() => {}}
+      />
+    )
+    expect(screen.getByLabelText('At least 1 garage')).toBeChecked()
+  })
+
+  it('derives commute criteria from the commute fields', () => {
+    render(
+      <DetailPanel
+        listing={makeListing({ commute_school_car: '15 min', commute_pvm_transit: '45 min' })}
+        onClose={() => {}}
+        onUpdate={() => {}}
+        onDelete={() => {}}
+      />
+    )
+    expect(screen.getByLabelText('<20 min from school')).toBeChecked()
+    expect(screen.getByLabelText('<1 hour from PVM')).toBeChecked()
+  })
+
+  it('does not call onUpdate when a derived checkbox is clicked', () => {
     const onUpdate = vi.fn()
     render(
       <DetailPanel
-        listing={makeListing({ criteria: { school_within_20min: true } })}
+        listing={makeListing({ bedrooms: '3' })}
+        onClose={() => {}}
+        onUpdate={onUpdate}
+        onDelete={() => {}}
+      />
+    )
+    fireEvent.click(screen.getByLabelText('3 bedrooms'))
+    expect(onUpdate).not.toHaveBeenCalled()
+  })
+
+  it('calls onUpdate with no_above_neighbors set to true when toggled on', () => {
+    const onUpdate = vi.fn()
+    render(
+      <DetailPanel
+        listing={makeListing({ criteria: null })}
         onClose={() => {}}
         onUpdate={onUpdate}
         onDelete={() => {}}
@@ -105,12 +156,11 @@ describe('DetailPanel — Good-to-have criteria section', () => {
     )
     fireEvent.click(screen.getByLabelText('No above neighbors'))
     expect(onUpdate).toHaveBeenCalledWith('test-id', 'criteria', {
-      school_within_20min: true,
       no_above_neighbors: true,
     })
   })
 
-  it('calls onUpdate with the criterion set to false when a checked box is toggled off', () => {
+  it('calls onUpdate with no_above_neighbors set to false when toggled off', () => {
     const onUpdate = vi.fn()
     render(
       <DetailPanel
@@ -126,30 +176,6 @@ describe('DetailPanel — Good-to-have criteria section', () => {
     })
   })
 
-  it('merges rapid consecutive clicks without losing prior updates', () => {
-    const onUpdate = vi.fn()
-    render(
-      <DetailPanel
-        listing={makeListing({ criteria: null })}
-        onClose={() => {}}
-        onUpdate={onUpdate}
-        onDelete={() => {}}
-      />
-    )
-    // Two clicks in quick succession — listing prop does not change between them
-    // (simulates the real app, where parent state update is async)
-    fireEvent.click(screen.getByLabelText('No above neighbors'))
-    fireEvent.click(screen.getByLabelText('3 bedrooms'))
-
-    expect(onUpdate).toHaveBeenNthCalledWith(1, 'test-id', 'criteria', {
-      no_above_neighbors: true,
-    })
-    expect(onUpdate).toHaveBeenNthCalledWith(2, 'test-id', 'criteria', {
-      no_above_neighbors: true,
-      three_bedrooms: true,
-    })
-  })
-
   it('resets pending state when switching to a different listing', () => {
     const onUpdate = vi.fn()
     const { rerender } = render(
@@ -161,7 +187,6 @@ describe('DetailPanel — Good-to-have criteria section', () => {
       />
     )
     fireEvent.click(screen.getByLabelText('No above neighbors'))
-    // Switch to different listing whose criteria is empty
     rerender(
       <DetailPanel
         listing={makeListing({ id: 'b', criteria: null })}
@@ -170,10 +195,9 @@ describe('DetailPanel — Good-to-have criteria section', () => {
         onDelete={() => {}}
       />
     )
-    fireEvent.click(screen.getByLabelText('3 bedrooms'))
-    // Second call should reflect listing 'b's fresh state, NOT merge with 'a's pending
+    fireEvent.click(screen.getByLabelText('No above neighbors'))
     expect(onUpdate).toHaveBeenLastCalledWith('b', 'criteria', {
-      three_bedrooms: true,
+      no_above_neighbors: true,
     })
   })
 })

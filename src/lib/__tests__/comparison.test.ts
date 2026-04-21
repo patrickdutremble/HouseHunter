@@ -126,8 +126,8 @@ describe('getBestValues', () => {
 describe('getBestValues — criteria', () => {
   it('picks listing with highest criteria_count', () => {
     const listings = [
-      makeListing({ id: 'a', criteria: { no_above_neighbors: true, three_bedrooms: true } }),
-      makeListing({ id: 'b', criteria: { no_above_neighbors: true, three_bedrooms: true, has_garage: true } }),
+      makeListing({ id: 'a', bedrooms: '3', criteria: { no_above_neighbors: true } }),
+      makeListing({ id: 'b', bedrooms: '3', parking: 'Garage (1)', criteria: { no_above_neighbors: true } }),
       makeListing({ id: 'c', criteria: { no_above_neighbors: true } }),
     ]
     const best = getBestValues(listings)
@@ -145,8 +145,8 @@ describe('getBestValues — criteria', () => {
 
   it('ties on criteria_count highlight all tied listings', () => {
     const listings = [
-      makeListing({ id: 'a', criteria: { no_above_neighbors: true, three_bedrooms: true } }),
-      makeListing({ id: 'b', criteria: { no_above_neighbors: true, has_garage: true } }),
+      makeListing({ id: 'a', bedrooms: '3', criteria: { no_above_neighbors: true } }),
+      makeListing({ id: 'b', parking: 'Garage (1)', criteria: { no_above_neighbors: true } }),
     ]
     const best = getBestValues(listings)
     expect(best.criteria_count).toEqual(new Set(['a', 'b']))
@@ -164,8 +164,8 @@ describe('getBestValues — criteria', () => {
 
   it('per-criterion: no highlight when all listings have the criterion checked', () => {
     const listings = [
-      makeListing({ id: 'a', criteria: { has_garage: true } }),
-      makeListing({ id: 'b', criteria: { has_garage: true } }),
+      makeListing({ id: 'a', parking: 'Garage (1)' }),
+      makeListing({ id: 'b', parking: 'Garage (2)' }),
     ]
     const best = getBestValues(listings)
     expect(best.has_garage).toEqual(new Set())
@@ -173,10 +173,28 @@ describe('getBestValues — criteria', () => {
 
   it('per-criterion: no highlight when no listing has the criterion checked', () => {
     const listings = [
-      makeListing({ id: 'a', criteria: { has_garage: false } }),
-      makeListing({ id: 'b', criteria: null }),
+      makeListing({ id: 'a', parking: 'Driveway (2)' }),
+      makeListing({ id: 'b', parking: null }),
     ]
     const best = getBestValues(listings)
     expect(best.has_garage).toEqual(new Set())
+  })
+
+  it('per-criterion: derives three_bedrooms from the bedrooms field', () => {
+    const listings = [
+      makeListing({ id: 'a', bedrooms: '3' }),
+      makeListing({ id: 'b', bedrooms: '2' }),
+    ]
+    const best = getBestValues(listings)
+    expect(best.three_bedrooms).toEqual(new Set(['a']))
+  })
+
+  it('per-criterion: derives school_within_20min from commute_school_car', () => {
+    const listings = [
+      makeListing({ id: 'a', commute_school_car: '15 min' }),
+      makeListing({ id: 'b', commute_school_car: '25 min' }),
+    ]
+    const best = getBestValues(listings)
+    expect(best.school_within_20min).toEqual(new Set(['a']))
   })
 })

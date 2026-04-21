@@ -47,7 +47,7 @@ function makeListing(overrides: Partial<Listing>): Listing {
 }
 
 const seedListings: Listing[] = [
-  makeListing({ id: 'id-a', location: 'A' }),
+  makeListing({ id: 'id-a', location: 'A', bedrooms: '3' }),
   makeListing({ id: 'id-b', location: 'B' }),
 ]
 
@@ -79,24 +79,34 @@ beforeEach(() => {
   updateSpy.mockClear()
 })
 
-describe('ComparePage — rapid criteria toggles', () => {
-  it('merges rapid consecutive toggles without losing prior updates', async () => {
+describe('ComparePage — criteria toggles', () => {
+  it('persists toggles on the editable criterion to Supabase', async () => {
     render(<ComparePage />)
 
     const noAbove = await screen.findAllByRole('checkbox', {
       name: 'No above neighbors',
     })
-    const threeBed = screen.getAllByRole('checkbox', { name: '3 bedrooms' })
 
     fireEvent.click(noAbove[0])
-    fireEvent.click(threeBed[0])
 
-    await waitFor(() => expect(updateSpy).toHaveBeenCalledTimes(2))
-    expect(updateSpy).toHaveBeenNthCalledWith(1, {
+    await waitFor(() => expect(updateSpy).toHaveBeenCalledTimes(1))
+    expect(updateSpy).toHaveBeenCalledWith({
       criteria: { no_above_neighbors: true },
     })
-    expect(updateSpy).toHaveBeenNthCalledWith(2, {
-      criteria: { no_above_neighbors: true, three_bedrooms: true },
-    })
+  })
+
+  it('does not persist or toggle clicks on derived (disabled) criteria', async () => {
+    render(<ComparePage />)
+
+    const threeBed = await screen.findAllByRole('checkbox', { name: '3 bedrooms' })
+    expect(threeBed[0]).toBeDisabled()
+    // listing id-a has bedrooms '3' so its checkbox is checked; id-b is unchecked
+    expect(threeBed[0]).toBeChecked()
+    expect(threeBed[1]).not.toBeChecked()
+
+    fireEvent.click(threeBed[0])
+    fireEvent.click(threeBed[1])
+
+    expect(updateSpy).not.toHaveBeenCalled()
   })
 })

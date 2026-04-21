@@ -5,7 +5,7 @@ import { detailColumns } from '@/lib/columns'
 import { EditableCell } from './EditableCell'
 import { LocationField } from './LocationField'
 import { FavoriteButton } from './FavoriteButton'
-import { criteria } from '@/lib/criteria'
+import { criteria, deriveCriteria, isDerivedCriterion } from '@/lib/criteria'
 import type { Listing } from '@/types/listing'
 
 interface DetailPanelProps {
@@ -81,22 +81,29 @@ export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPane
           </div>
           <div className="grid grid-cols-2 gap-x-4 gap-y-2">
             {criteria.map(c => {
-              const checked = pendingCriteria[c.key] === true
+              const isDerived = isDerivedCriterion(c.key)
+              const checked = isDerived
+                ? deriveCriteria({ ...listing, criteria: pendingCriteria })[c.key]
+                : pendingCriteria[c.key] === true
+              const cursor = isDerived ? 'cursor-not-allowed' : 'cursor-pointer'
               return (
-                <label key={c.key} className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
+                <label key={c.key} className={`flex items-center gap-2 text-sm text-slate-700 ${cursor}`}>
                   <input
                     type="checkbox"
+                    aria-label={c.label}
                     checked={checked}
-                    onChange={() => {
+                    disabled={isDerived}
+                    title={isDerived ? 'Auto-derived from listing data' : undefined}
+                    onChange={isDerived ? undefined : () => {
                       setPendingCriteria(prev => {
                         const next = { ...prev, [c.key]: !(prev[c.key] === true) }
                         onUpdate(listing.id, 'criteria', next)
                         return next
                       })
                     }}
-                    className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                    className={`w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 ${cursor} ${isDerived ? 'opacity-70' : ''}`}
                   />
-                  <span>{c.label}</span>
+                  <span className={isDerived ? 'text-slate-500' : ''}>{c.label}</span>
                 </label>
               )
             })}

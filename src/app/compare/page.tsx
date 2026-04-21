@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { getBestValues, type BestMap } from '@/lib/comparison'
-import { criteria, countChecked, type CriterionKey } from '@/lib/criteria'
+import { criteria, countChecked, deriveCriteria, isDerivedCriterion, type CriterionKey } from '@/lib/criteria'
 import { formatCellValue } from '@/lib/formatting'
 import type { ColumnFormat } from '@/lib/columns'
 import type { Listing } from '@/types/listing'
@@ -180,11 +180,13 @@ function CompareContent() {
                     Criteria met
                   </span>
                   <span className={`text-sm text-right ${bestValues.criteria_count.has(listing.id) ? 'text-green-700 font-medium' : 'text-slate-700'}`}>
-                    {countChecked(listing.criteria ?? null)} / {criteria.length}
+                    {countChecked(deriveCriteria(listing))} / {criteria.length}
                   </span>
                 </div>
                 {criteria.map(c => {
-                  const checked = listing.criteria?.[c.key] === true
+                  const derived = deriveCriteria(listing)
+                  const checked = derived[c.key]
+                  const isDerived = isDerivedCriterion(c.key)
                   const rowIsBest = bestValues[c.key]?.has(listing.id) ?? false
                   return (
                     <div
@@ -198,10 +200,12 @@ function CompareContent() {
                         type="checkbox"
                         aria-label={c.label}
                         checked={checked}
-                        onChange={() => {
+                        disabled={isDerived}
+                        title={isDerived ? 'Auto-derived from listing data' : undefined}
+                        onChange={isDerived ? undefined : () => {
                           toggleCriterion(listing.id, c.key, !checked)
                         }}
-                        className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                        className={`w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 ${isDerived ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'}`}
                       />
                     </div>
                   )

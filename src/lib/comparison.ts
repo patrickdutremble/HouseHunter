@@ -1,4 +1,4 @@
-import { criteria, countChecked, type CriterionKey } from '@/lib/criteria'
+import { criteria, countChecked, deriveCriteria, type CriterionKey } from '@/lib/criteria'
 import type { Listing } from '@/types/listing'
 
 export type BestMap = {
@@ -78,7 +78,7 @@ function findBestBinary(
   let anyUnchecked = false
 
   for (const l of listings) {
-    const isChecked = l.criteria?.[criterionKey] === true
+    const isChecked = deriveCriteria(l)[criterionKey]
     if (isChecked) {
       checkedIds.push(l.id)
     } else {
@@ -106,7 +106,7 @@ export function getBestValues(listings: Listing[]): BestMap {
     total_monthly_cost: findBest(listings, l => l.total_monthly_cost, 'min'),
     commute_school_car: findBest(listings, l => parseDuration(l.commute_school_car), 'min'),
     commute_pvm_transit: findBest(listings, l => parseDuration(l.commute_pvm_transit), 'min'),
-    criteria_count: findBest(listings, l => countChecked(l.criteria), 'max'),
+    criteria_count: findBest(listings, l => countChecked(deriveCriteria(l)), 'max'),
   } as BestMap
 
   for (const c of criteria) {

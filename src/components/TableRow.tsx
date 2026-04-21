@@ -1,5 +1,5 @@
 import { tableColumns } from '@/lib/columns'
-import { criteria, countChecked } from '@/lib/criteria'
+import { criteria, countChecked, deriveCriteria } from '@/lib/criteria'
 import { EditableCell } from './EditableCell'
 import { LocationCell } from './LocationCell'
 import { FavoriteButton } from './FavoriteButton'
@@ -62,7 +62,7 @@ export function TableRow({ listing, isSelected, onSelect, onUpdate, isCompared, 
         }
 
         if (col.key === 'criteria_count') {
-          const checked = countChecked(listing.criteria)
+          const checked = countChecked(deriveCriteria(listing))
           return (
             <td
               key={col.key}
