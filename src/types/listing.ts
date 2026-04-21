@@ -22,7 +22,10 @@ export interface Listing {
   commute_pvm_transit: string | null
   notes: string | null
   personal_rating: string | null
-  status: string | null
+  status: 'active' | 'unavailable'
+  status_checked_at: string | null
+  previous_price: number | null
+  price_changed_at: string | null
   favorite: boolean
   image_url: string | null
   latitude: number | null
