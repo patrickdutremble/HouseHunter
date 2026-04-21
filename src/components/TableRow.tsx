@@ -86,6 +86,7 @@ export function TableRow({ listing, isSelected, onSelect, onUpdate, isCompared, 
                 mapQuery={listing.full_address ?? listing.location}
                 editable={col.editable}
                 isSelected={isSelected}
+                imageUrl={listing.image_url}
                 onSave={(newValue) => onUpdate(listing.id, col.key, newValue)}
               />
             </td>
