@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { getBestValues, type BestMap } from '@/lib/comparison'
-import { criteria, countChecked } from '@/lib/criteria'
+import { criteria, countChecked, type CriterionKey } from '@/lib/criteria'
 import { formatCellValue } from '@/lib/formatting'
 import type { ColumnFormat } from '@/lib/columns'
 import type { Listing } from '@/types/listing'
@@ -65,7 +65,7 @@ function CompareContent() {
     fetchListings()
   }, [searchParams])
 
-  async function toggleCriterion(id: string, key: string, value: boolean) {
+  async function toggleCriterion(id: string, key: CriterionKey, value: boolean) {
     const current = listingsRef.current.find(l => l.id === id)?.criteria ?? {}
     const next = { ...current, [key]: value }
     const updated = listingsRef.current.map(l =>

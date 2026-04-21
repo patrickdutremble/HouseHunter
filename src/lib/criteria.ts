@@ -1,5 +1,12 @@
+export type CriterionKey =
+  | 'no_above_neighbors'
+  | 'school_within_20min'
+  | 'pvm_within_1h'
+  | 'three_bedrooms'
+  | 'has_garage'
+
 export interface CriterionDef {
-  key: string
+  key: CriterionKey
   label: string
 }
 

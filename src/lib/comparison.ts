@@ -1,4 +1,4 @@
-import { criteria, countChecked } from '@/lib/criteria'
+import { criteria, countChecked, type CriterionKey } from '@/lib/criteria'
 import type { Listing } from '@/types/listing'
 
 export type BestMap = {
@@ -17,9 +17,7 @@ export type BestMap = {
   commute_school_car: Set<string>
   commute_pvm_transit: Set<string>
   criteria_count: Set<string>
-  // One entry per criterion key — see src/lib/criteria.ts
-  [criterionKey: string]: Set<string>
-}
+} & Record<CriterionKey, Set<string>>
 
 /** Parse bedroom strings like "2+1" into a number (3). */
 function parseBedrooms(value: string | null): number | null {
@@ -72,7 +70,7 @@ function findBest(
  */
 function findBestBinary(
   listings: Listing[],
-  criterionKey: string,
+  criterionKey: CriterionKey,
 ): Set<string> {
   if (listings.length < 2) return new Set()
 
