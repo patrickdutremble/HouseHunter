@@ -80,9 +80,17 @@ export function ListingsTable({ listings, selectedId, onSelect, onUpdate, compar
             <span className="text-xs text-slate-500">Last checked: {lastCheckedAgo}</span>
           )}
         </div>
-        <span className="text-sm text-slate-500">
-          {sorted.length} listing{sorted.length !== 1 ? 's' : ''}
-        </span>
+        <div className="flex items-center gap-4">
+          <span className="hidden md:inline text-xs text-slate-400" title="Keyboard shortcuts: Arrow keys to navigate, Enter to open, Esc to close, c to toggle compare">
+            <kbd className="px-1 py-0.5 text-[10px] font-mono bg-slate-100 border border-slate-200 rounded">↑↓</kbd>{' '}
+            <kbd className="px-1 py-0.5 text-[10px] font-mono bg-slate-100 border border-slate-200 rounded">Enter</kbd>{' '}
+            <kbd className="px-1 py-0.5 text-[10px] font-mono bg-slate-100 border border-slate-200 rounded">Esc</kbd>{' '}
+            <kbd className="px-1 py-0.5 text-[10px] font-mono bg-slate-100 border border-slate-200 rounded">c</kbd>
+          </span>
+          <span className="text-sm text-slate-500">
+            {sorted.length} listing{sorted.length !== 1 ? 's' : ''}
+          </span>
+        </div>
       </div>
 
       <div className="flex-1 overflow-auto">
