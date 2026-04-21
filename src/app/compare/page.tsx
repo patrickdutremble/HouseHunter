@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { getBestValues, type BestMap } from '@/lib/comparison'
+import { criteria, countChecked } from '@/lib/criteria'
 import { formatCellValue } from '@/lib/formatting'
 import type { ColumnFormat } from '@/lib/columns'
 import type { Listing } from '@/types/listing'
@@ -61,6 +62,17 @@ function CompareContent() {
 
     fetchListings()
   }, [searchParams])
+
+  async function updateCriteria(id: string, next: Record<string, boolean>) {
+    setListings(prev =>
+      prev.map(l => (l.id === id ? { ...l, criteria: next } : l))
+    )
+    const { error } = await supabase
+      .from('listings')
+      .update({ criteria: next })
+      .eq('id', id)
+    if (error) console.error('Failed to update criteria:', error)
+  }
 
   const bestValues = useMemo(() => getBestValues(listings), [listings])
 
@@ -150,6 +162,50 @@ function CompareContent() {
                     Centris &#8599;
                   </a>
                 )}
+              </div>
+
+              {/* Criteria section */}
+              <div className="divide-y divide-slate-50">
+                {(() => {
+                  const checkedCount = countChecked(listing.criteria ?? null)
+                  const countIsBest = bestValues.criteria_count.has(listing.id)
+                  return (
+                    <div
+                      className={`flex items-start justify-between px-4 py-2 ${countIsBest ? 'bg-green-50' : ''}`}
+                    >
+                      <span className="text-xs font-medium text-slate-400 uppercase tracking-wide shrink-0">
+                        Criteria met
+                      </span>
+                      <span className={`text-sm text-right ${countIsBest ? 'text-green-700 font-medium' : 'text-slate-700'}`}>
+                        {checkedCount} / {criteria.length}
+                      </span>
+                    </div>
+                  )
+                })()}
+                {criteria.map(c => {
+                  const checked = listing.criteria?.[c.key] === true
+                  const rowIsBest = bestValues[c.key]?.has(listing.id) ?? false
+                  return (
+                    <div
+                      key={`crit-${c.key}`}
+                      className={`flex items-center justify-between px-4 py-2 ${rowIsBest ? 'bg-green-50' : ''}`}
+                    >
+                      <span className={`text-xs font-medium uppercase tracking-wide shrink-0 ${rowIsBest ? 'text-green-700' : 'text-slate-400'}`}>
+                        {c.label}
+                      </span>
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => {
+                          const current = listing.criteria ?? {}
+                          const next = { ...current, [c.key]: !checked }
+                          updateCriteria(listing.id, next)
+                        }}
+                        className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                      />
+                    </div>
+                  )
+                })}
               </div>
 
               {/* Data rows */}
