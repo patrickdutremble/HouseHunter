@@ -173,22 +173,16 @@ function CompareContent() {
 
               {/* Criteria section */}
               <div className="divide-y divide-slate-50">
-                {(() => {
-                  const checkedCount = countChecked(listing.criteria ?? null)
-                  const countIsBest = bestValues.criteria_count.has(listing.id)
-                  return (
-                    <div
-                      className={`flex items-start justify-between px-4 py-2 ${countIsBest ? 'bg-green-50' : ''}`}
-                    >
-                      <span className="text-xs font-medium text-slate-400 uppercase tracking-wide shrink-0">
-                        Criteria met
-                      </span>
-                      <span className={`text-sm text-right ${countIsBest ? 'text-green-700 font-medium' : 'text-slate-700'}`}>
-                        {checkedCount} / {criteria.length}
-                      </span>
-                    </div>
-                  )
-                })()}
+                <div
+                  className={`flex items-start justify-between px-4 py-2 ${bestValues.criteria_count.has(listing.id) ? 'bg-green-50' : ''}`}
+                >
+                  <span className="text-xs font-medium text-slate-400 uppercase tracking-wide shrink-0">
+                    Criteria met
+                  </span>
+                  <span className={`text-sm text-right ${bestValues.criteria_count.has(listing.id) ? 'text-green-700 font-medium' : 'text-slate-700'}`}>
+                    {countChecked(listing.criteria ?? null)} / {criteria.length}
+                  </span>
+                </div>
                 {criteria.map(c => {
                   const checked = listing.criteria?.[c.key] === true
                   const rowIsBest = bestValues[c.key]?.has(listing.id) ?? false
