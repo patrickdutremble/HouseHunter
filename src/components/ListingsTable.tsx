@@ -7,6 +7,7 @@ import { FilterBar, type Filters } from './FilterBar'
 import { RefreshStatusesButton } from './RefreshStatusesButton'
 import { timeAgo } from '@/lib/time-ago'
 import { useSort } from '@/hooks/useSort'
+import { useTableKeyboard } from '@/hooks/useTableKeyboard'
 import type { Listing } from '@/types/listing'
 
 interface ListingsTableProps {
@@ -21,6 +22,7 @@ interface ListingsTableProps {
 
 export function ListingsTable({ listings, selectedId, onSelect, onUpdate, compareIds, onToggleCompare, onRefreshed }: ListingsTableProps) {
   const [filters, setFilters] = useState<Filters>({ type: '', minPrice: '', maxPrice: '', favoritesOnly: false })
+  const [focusedId, setFocusedId] = useState<string | null>(null)
 
   const filtered = useMemo(() => {
     return listings.filter(l => {
@@ -39,6 +41,20 @@ export function ListingsTable({ listings, selectedId, onSelect, onUpdate, compar
   }, [listings, filters])
 
   const { sorted, sort, toggleSort } = useSort(filtered)
+
+  useTableKeyboard({
+    listings: sorted,
+    focusedId,
+    selectedId,
+    setFocusedId,
+    setSelectedId: onSelect,
+    onToggleCompare,
+  })
+
+  const handleRowSelect = (id: string) => {
+    setFocusedId(id)
+    onSelect(id)
+  }
 
   const propertyTypes = useMemo(() => {
     const types = new Set(listings.map(l => l.property_type).filter(Boolean) as string[])
@@ -78,7 +94,8 @@ export function ListingsTable({ listings, selectedId, onSelect, onUpdate, compar
                 key={listing.id}
                 listing={listing}
                 isSelected={listing.id === selectedId}
-                onSelect={onSelect}
+                isFocused={listing.id === focusedId}
+                onSelect={handleRowSelect}
                 onUpdate={onUpdate}
                 isCompared={compareIds.has(listing.id)}
                 onToggleCompare={onToggleCompare}
