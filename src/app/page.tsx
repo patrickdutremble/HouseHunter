@@ -2,9 +2,21 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
+import dynamic from 'next/dynamic'
 import { ListingsTable } from '@/components/ListingsTable'
 import { DetailPanel } from '@/components/DetailPanel'
+import { ViewToggle, type ViewMode } from '@/components/ViewToggle'
 import { useListings } from '@/hooks/useListings'
+
+const MapView = dynamic(() => import('@/components/MapView'), {
+  ssr: false,
+  loading: () => (
+    <div className="h-full flex items-center justify-center text-slate-400 text-sm">
+      Loading map…
+    </div>
+  ),
+})
 type ScrapeStatus = 'idle' | 'loading' | 'success' | 'error' | 'duplicate'
 
 export default function Home() {
@@ -15,6 +27,18 @@ export default function Home() {
   const [scrapeMessage, setScrapeMessage] = useState<string | null>(null)
   const [compareIds, setCompareIds] = useState<Set<string>>(new Set())
   const [compareMaxWarning, setCompareMaxWarning] = useState(false)
+
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const view: ViewMode = searchParams.get('view') === 'map' ? 'map' : 'table'
+
+  const handleViewChange = (next: ViewMode) => {
+    const params = new URLSearchParams(searchParams.toString())
+    if (next === 'map') params.set('view', 'map')
+    else params.delete('view')
+    const query = params.toString()
+    router.replace(query ? `/?${query}` : '/')
+  }
 
   const toggleCompare = (id: string) => {
     setCompareIds(prev => {
@@ -189,18 +213,24 @@ export default function Home() {
           </span>
         )}
 
+        <ViewToggle current={view} onChange={handleViewChange} />
+
       </div>
 
       <div className="flex-1 flex overflow-hidden">
         <div className="flex-1 overflow-hidden">
-          <ListingsTable
-            listings={listings}
-            selectedId={selectedId}
-            onSelect={setSelectedId}
-            onUpdate={updateListing}
-            compareIds={compareIds}
-            onToggleCompare={toggleCompare}
-          />
+          {view === 'map' ? (
+            <MapView listings={listings} onSelect={setSelectedId} />
+          ) : (
+            <ListingsTable
+              listings={listings}
+              selectedId={selectedId}
+              onSelect={setSelectedId}
+              onUpdate={updateListing}
+              compareIds={compareIds}
+              onToggleCompare={toggleCompare}
+            />
+          )}
         </div>
 
         {selectedListing && (
