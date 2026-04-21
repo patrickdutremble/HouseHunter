@@ -196,6 +196,7 @@ function CompareContent() {
                       </span>
                       <input
                         type="checkbox"
+                        aria-label={c.label}
                         checked={checked}
                         onChange={() => {
                           toggleCriterion(listing.id, c.key, !checked)

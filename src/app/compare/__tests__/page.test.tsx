@@ -1,0 +1,102 @@
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { vi } from 'vitest'
+import type { Listing } from '@/types/listing'
+
+vi.mock('next/navigation', () => ({
+  useSearchParams: () => ({
+    get: (key: string) => (key === 'ids' ? 'id-a,id-b' : null),
+  }),
+}))
+
+const updateSpy = vi.fn()
+
+function makeListing(overrides: Partial<Listing>): Listing {
+  return {
+    id: 'default',
+    centris_link: null,
+    broker_link: null,
+    location: null,
+    full_address: null,
+    mls_number: null,
+    property_type: null,
+    price: null,
+    taxes_yearly: null,
+    common_fees_yearly: null,
+    bedrooms: null,
+    liveable_area_sqft: null,
+    price_per_sqft: null,
+    parking: null,
+    year_built: null,
+    hydro_yearly: null,
+    downpayment: null,
+    monthly_mortgage: null,
+    total_monthly_cost: null,
+    commute_school_car: null,
+    commute_pvm_transit: null,
+    notes: null,
+    personal_rating: null,
+    status: null,
+    favorite: false,
+    image_url: null,
+    created_at: '2026-01-01T00:00:00Z',
+    updated_at: '2026-01-01T00:00:00Z',
+    deleted_at: null,
+    criteria: null,
+    ...overrides,
+  }
+}
+
+const seedListings: Listing[] = [
+  makeListing({ id: 'id-a', location: 'A' }),
+  makeListing({ id: 'id-b', location: 'B' }),
+]
+
+vi.mock('@/lib/supabase', () => ({
+  supabase: {
+    from: () => ({
+      select: () => ({
+        in: () => ({
+          is: () =>
+            Promise.resolve({
+              data: seedListings,
+              error: null,
+            }),
+        }),
+      }),
+      update: (payload: { criteria: Record<string, boolean> }) => {
+        updateSpy(payload)
+        return {
+          eq: () => Promise.resolve({ data: null, error: null }),
+        }
+      },
+    }),
+  },
+}))
+
+import ComparePage from '../page'
+
+beforeEach(() => {
+  updateSpy.mockClear()
+})
+
+describe('ComparePage — rapid criteria toggles', () => {
+  it('merges rapid consecutive toggles without losing prior updates', async () => {
+    render(<ComparePage />)
+
+    const noAbove = await screen.findAllByRole('checkbox', {
+      name: 'No above neighbors',
+    })
+    const threeBed = screen.getAllByRole('checkbox', { name: '3 bedrooms' })
+
+    fireEvent.click(noAbove[0])
+    fireEvent.click(threeBed[0])
+
+    await waitFor(() => expect(updateSpy).toHaveBeenCalledTimes(2))
+    expect(updateSpy).toHaveBeenNthCalledWith(1, {
+      criteria: { no_above_neighbors: true },
+    })
+    expect(updateSpy).toHaveBeenNthCalledWith(2, {
+      criteria: { no_above_neighbors: true, three_bedrooms: true },
+    })
+  })
+})
