@@ -30,3 +30,48 @@ describe('LocationCell two-click behaviour', () => {
     expect(screen.getByRole('textbox')).toBeInTheDocument()
   })
 })
+
+describe('LocationCell thumbnail', () => {
+  it('renders the listing image when imageUrl is provided', () => {
+    render(
+      <LocationCell
+        text="Montréal"
+        mapQuery="Montréal"
+        editable
+        imageUrl="https://example.com/house.jpg"
+        onSave={() => {}}
+      />
+    )
+    const img = screen.getByRole('img') as HTMLImageElement
+    expect(img.src).toBe('https://example.com/house.jpg')
+  })
+
+  it('renders a placeholder icon when imageUrl is null', () => {
+    const { container } = render(
+      <LocationCell
+        text="Montréal"
+        mapQuery="Montréal"
+        editable
+        imageUrl={null}
+        onSave={() => {}}
+      />
+    )
+    expect(screen.queryByRole('img')).toBeNull()
+    expect(container.querySelector('svg')).not.toBeNull()
+  })
+
+  it('hides a broken image after onError fires', () => {
+    render(
+      <LocationCell
+        text="Montréal"
+        mapQuery="Montréal"
+        editable
+        imageUrl="https://example.com/broken.jpg"
+        onSave={() => {}}
+      />
+    )
+    const img = screen.getByRole('img') as HTMLImageElement
+    fireEvent.error(img)
+    expect(img.style.visibility).toBe('hidden')
+  })
+})
