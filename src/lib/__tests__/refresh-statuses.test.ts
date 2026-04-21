@@ -7,6 +7,7 @@ type Row = {
   centris_link: string | null
   price: number | null
   status: string
+  deleted_at?: string | null
 }
 
 function makeSupabaseStub(rows: Row[]) {
@@ -14,7 +15,12 @@ function makeSupabaseStub(rows: Row[]) {
   const client = {
     from: (_table: string) => ({
       select: () => ({
-        eq: async () => ({ data: rows, error: null }),
+        eq: () => ({
+          is: async (_col: string, _val: unknown) => {
+            const filtered = rows.filter(r => (r.deleted_at ?? null) === null)
+            return { data: filtered, error: null }
+          },
+        }),
       }),
       update: (patch: Record<string, unknown>) => ({
         eq: async (_col: string, id: string) => {
@@ -106,5 +112,18 @@ describe('refreshAllStatuses', () => {
     const summary = await refreshAllStatuses(client as never)
     expect(summary).toEqual({ checked: 3, unavailable: 1, priceChanged: 1, errors: 0 })
     expect(updates).toHaveLength(3)
+  })
+
+  it('skips soft-deleted listings (deleted_at not null)', async () => {
+    const spy = vi.spyOn(statusCheck, 'checkListingStatus').mockResolvedValue({ status: 'unavailable' })
+    const { client, updates } = makeSupabaseStub([
+      { id: 'live', centris_link: 'https://x/1', price: 100000, status: 'active', deleted_at: null },
+      { id: 'trashed', centris_link: 'https://x/2', price: 200000, status: 'active', deleted_at: '2026-03-01T00:00:00Z' },
+    ])
+    const summary = await refreshAllStatuses(client as never)
+    expect(summary.checked).toBe(1)
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(updates).toHaveLength(1)
+    expect(updates[0].id).toBe('live')
   })
 })

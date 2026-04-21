@@ -29,6 +29,7 @@ export async function refreshAllStatuses(supabase: SupabaseClient): Promise<Refr
     .from('listings')
     .select('id, centris_link, price, status')
     .eq('status', 'active')
+    .is('deleted_at', null)
 
   if (error) throw error
 

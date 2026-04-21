@@ -1,13 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-
-export interface RefreshSummary {
-  checked: number
-  unavailable: number
-  priceChanged: number
-  errors: number
-}
+import type { RefreshSummary } from '@/lib/refresh-statuses'
 
 interface Props {
   onRefreshed: (summary: RefreshSummary) => void
