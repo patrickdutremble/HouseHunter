@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useEffect } from 'react'
 import { MapContainer, TileLayer, Marker, Circle, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -35,22 +35,25 @@ const schoolIcon = L.divIcon({
 
 function FitBounds({ listings }: { listings: Listing[] }) {
   const map = useMap()
-  const points = useMemo(() => {
+  // Key on the set of listing IDs so the fit only runs when listings are
+  // loaded, added, or removed — not on every parent re-render (e.g. opening
+  // the detail panel, which would otherwise snap the map back to fit bounds).
+  const idsKey = listings.map((l) => l.id).join(',')
+
+  useEffect(() => {
     const pts: [number, number][] = [SCHOOL_COORDS]
     for (const l of listings) {
       if (l.latitude != null && l.longitude != null) pts.push([l.latitude, l.longitude])
     }
-    return pts
-  }, [listings])
-
-  useMemo(() => {
-    if (points.length <= 1) {
+    if (pts.length <= 1) {
       map.setView(DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM)
       return
     }
-    const bounds = L.latLngBounds(points.map(([lat, lon]) => L.latLng(lat, lon)))
+    const bounds = L.latLngBounds(pts.map(([lat, lon]) => L.latLng(lat, lon)))
     map.fitBounds(bounds, { padding: [48, 48], maxZoom: 13 })
-  }, [points, map])
+    // listings content is captured via idsKey
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idsKey, map])
 
   return null
 }
