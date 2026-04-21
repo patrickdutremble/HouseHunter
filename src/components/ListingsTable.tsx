@@ -4,6 +4,8 @@ import { useMemo, useState } from 'react'
 import { TableHeader } from './TableHeader'
 import { TableRow } from './TableRow'
 import { FilterBar, type Filters } from './FilterBar'
+import { RefreshStatusesButton } from './RefreshStatusesButton'
+import { timeAgo } from '@/lib/time-ago'
 import { useSort } from '@/hooks/useSort'
 import type { Listing } from '@/types/listing'
 
@@ -14,9 +16,10 @@ interface ListingsTableProps {
   onUpdate: (id: string, field: string, value: string | number | boolean | null | Record<string, boolean>) => void
   compareIds: Set<string>
   onToggleCompare: (id: string) => void
+  onRefreshed?: () => void
 }
 
-export function ListingsTable({ listings, selectedId, onSelect, onUpdate, compareIds, onToggleCompare }: ListingsTableProps) {
+export function ListingsTable({ listings, selectedId, onSelect, onUpdate, compareIds, onToggleCompare, onRefreshed }: ListingsTableProps) {
   const [filters, setFilters] = useState<Filters>({ type: '', minPrice: '', maxPrice: '', favoritesOnly: false })
 
   const filtered = useMemo(() => {
@@ -42,10 +45,25 @@ export function ListingsTable({ listings, selectedId, onSelect, onUpdate, compar
     return Array.from(types).sort()
   }, [listings])
 
+  const lastCheckedAgo = useMemo(() => {
+    const latest = listings
+      .map(l => l.status_checked_at)
+      .filter((x): x is string => !!x)
+      .sort()
+      .at(-1)
+    return timeAgo(latest ?? null)
+  }, [listings])
+
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-white">
-        <FilterBar propertyTypes={propertyTypes} onFilterChange={setFilters} />
+      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-white gap-4">
+        <div className="flex items-center gap-3 flex-wrap">
+          <FilterBar propertyTypes={propertyTypes} onFilterChange={setFilters} />
+          <RefreshStatusesButton onRefreshed={() => onRefreshed?.()} />
+          {lastCheckedAgo && (
+            <span className="text-xs text-slate-500">Last checked: {lastCheckedAgo}</span>
+          )}
+        </div>
         <span className="text-sm text-slate-500">
           {sorted.length} listing{sorted.length !== 1 ? 's' : ''}
         </span>

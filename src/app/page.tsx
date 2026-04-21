@@ -229,6 +229,7 @@ function HomeContent() {
               onUpdate={updateListing}
               compareIds={compareIds}
               onToggleCompare={toggleCompare}
+              onRefreshed={fetchListings}
             />
           )}
         </div>
