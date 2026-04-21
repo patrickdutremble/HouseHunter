@@ -25,8 +25,11 @@ function buildPillIcon(listing: Listing): L.DivIcon {
     ? `<span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full ${dotBg} border border-white"></span>`
     : ''
 
+  const isUnavailable = listing.status === 'unavailable'
+  const dimStyle = isUnavailable ? 'opacity:0.5;filter:grayscale(1);' : ''
+
   const html = `
-    <div class="relative inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold shadow-sm ${pill}">
+    <div class="relative inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold shadow-sm ${pill}" style="${dimStyle}">
       <span class="${text}">${priceText}</span>
       ${dotHtml}
     </div>
