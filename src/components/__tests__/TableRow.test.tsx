@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, beforeAll, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { TableRow } from '../TableRow'
 import type { Listing } from '@/types/listing'
@@ -41,12 +41,13 @@ const BASE: Listing = {
   criteria: null,
 }
 
-function renderRow(listing: Listing) {
+function renderRow(listing: Listing, opts: { isFocused?: boolean; isSelected?: boolean } = {}) {
   return render(
     <table><tbody>
       <TableRow
         listing={listing}
-        isSelected={false}
+        isSelected={opts.isSelected ?? false}
+        isFocused={opts.isFocused ?? false}
         onSelect={() => {}}
         onUpdate={() => {}}
         isCompared={false}
@@ -55,6 +56,10 @@ function renderRow(listing: Listing) {
     </tbody></table>,
   )
 }
+
+beforeAll(() => {
+  Element.prototype.scrollIntoView = vi.fn()
+})
 
 describe('TableRow', () => {
   it('renders no Unavailable pill when active', () => {
@@ -103,5 +108,18 @@ describe('TableRow', () => {
       price_changed_at: old,
     })
     expect(screen.queryByTestId('price-change-badge')).toBeNull()
+  })
+
+  it('applies a focus ring class when isFocused is true', () => {
+    renderRow({ ...BASE, id: 'f1' }, { isFocused: true })
+    const row = screen.getByRole('row')
+    expect(row.className).toMatch(/ring-2/)
+    expect(row.className).toMatch(/ring-blue-400/)
+  })
+
+  it('does not apply the focus ring when isFocused is false', () => {
+    renderRow({ ...BASE, id: 'f2' }, { isFocused: false })
+    const row = screen.getByRole('row')
+    expect(row.className).not.toMatch(/ring-blue-400/)
   })
 })

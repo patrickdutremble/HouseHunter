@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { tableColumns } from '@/lib/columns'
 import { criteria, countChecked, deriveCriteria } from '@/lib/criteria'
 import { EditableCell } from './EditableCell'
@@ -8,6 +9,7 @@ import type { Listing } from '@/types/listing'
 interface TableRowProps {
   listing: Listing
   isSelected: boolean
+  isFocused?: boolean
   onSelect: (id: string) => void
   onUpdate: (id: string, field: string, value: string | number | boolean | null | Record<string, boolean>) => void
   isCompared: boolean
@@ -42,7 +44,8 @@ function computePriceChangeBadge(listing: Listing): PriceChangeBadge | null {
   }
 }
 
-export function TableRow({ listing, isSelected, onSelect, onUpdate, isCompared, onToggleCompare }: TableRowProps) {
+export function TableRow({ listing, isSelected, isFocused = false, onSelect, onUpdate, isCompared, onToggleCompare }: TableRowProps) {
+  const rowRef = useRef<HTMLTableRowElement>(null)
   const hasHighFees = (listing.common_fees_yearly ?? 0) > 6000
   const hasFlags = listing.notes && (
     listing.notes.toLowerCase().includes('foundation') ||
@@ -52,13 +55,21 @@ export function TableRow({ listing, isSelected, onSelect, onUpdate, isCompared, 
   const isUnavailable = listing.status === 'unavailable'
   const priceBadge = computePriceChangeBadge(listing)
 
+  useEffect(() => {
+    if (isFocused && rowRef.current) {
+      rowRef.current.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+    }
+  }, [isFocused])
+
   return (
     <tr
+      ref={rowRef}
       onClick={() => onSelect(listing.id)}
       className={`
         border-b border-slate-100 cursor-pointer transition-colors
         ${isSelected ? 'bg-blue-50 border-blue-200' : listing.favorite ? 'bg-amber-50 hover:bg-amber-100' : 'hover:bg-slate-50'}
         ${hasFlags ? 'ring-1 ring-inset ring-amber-200' : ''}
+        ${isFocused ? 'ring-2 ring-inset ring-blue-400' : ''}
         ${isCompared ? 'border-l-2 border-l-blue-400' : ''}
         ${isUnavailable ? 'opacity-50' : ''}
       `}
