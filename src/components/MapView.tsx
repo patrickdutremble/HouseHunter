@@ -42,7 +42,6 @@ function FitBounds({ listings }: { listings: Listing[] }) {
     return pts
   }, [listings])
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useMemo(() => {
     if (points.length <= 1) {
       map.setView(DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM)
