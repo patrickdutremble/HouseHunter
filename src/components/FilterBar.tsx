@@ -2,14 +2,23 @@
 
 import { useState } from 'react'
 
+export type FlagStatus = 'all' | 'only' | 'hide'
+
 export interface Filters {
   type: string
   minPrice: string
   maxPrice: string
   favoritesOnly: boolean
+  flagStatus: FlagStatus
 }
 
-const EMPTY_FILTERS: Filters = { type: '', minPrice: '', maxPrice: '', favoritesOnly: false }
+const EMPTY_FILTERS: Filters = {
+  type: '',
+  minPrice: '',
+  maxPrice: '',
+  favoritesOnly: false,
+  flagStatus: 'all',
+}
 
 interface FilterBarProps {
   propertyTypes: string[]
@@ -35,7 +44,14 @@ export function FilterBar({ propertyTypes, onFilterChange }: FilterBarProps) {
     filters.type !== '' ||
     filters.minPrice !== '' ||
     filters.maxPrice !== '' ||
-    filters.favoritesOnly
+    filters.favoritesOnly ||
+    filters.flagStatus !== 'all'
+
+  const flagBtnBase = 'px-3 py-1.5 text-sm border transition-colors'
+  const flagBtnActive = 'bg-red-50 border-red-300 text-red-700'
+  const flagBtnHideActive = 'bg-slate-100 border-slate-300 text-slate-700'
+  const flagBtnAllActive = 'bg-white border-slate-300 text-slate-700'
+  const flagBtnIdle = 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
 
   return (
     <div className="flex items-center gap-2">
@@ -66,6 +82,33 @@ export function FilterBar({ propertyTypes, onFilterChange }: FilterBarProps) {
       >
         {filters.favoritesOnly ? '\u2605' : '\u2606'} Favorites
       </button>
+
+      <div className="inline-flex rounded-lg overflow-hidden border border-slate-200">
+        <button
+          type="button"
+          onClick={() => update('flagStatus', 'all')}
+          aria-pressed={filters.flagStatus === 'all'}
+          className={`${flagBtnBase} border-0 border-r border-slate-200 ${filters.flagStatus === 'all' ? flagBtnAllActive : flagBtnIdle}`}
+        >
+          All
+        </button>
+        <button
+          type="button"
+          onClick={() => update('flagStatus', 'only')}
+          aria-pressed={filters.flagStatus === 'only'}
+          className={`${flagBtnBase} border-0 border-r border-slate-200 ${filters.flagStatus === 'only' ? flagBtnActive : flagBtnIdle}`}
+        >
+          Flagged only
+        </button>
+        <button
+          type="button"
+          onClick={() => update('flagStatus', 'hide')}
+          aria-pressed={filters.flagStatus === 'hide'}
+          className={`${flagBtnBase} border-0 ${filters.flagStatus === 'hide' ? flagBtnHideActive : flagBtnIdle}`}
+        >
+          Hide flagged
+        </button>
+      </div>
 
       {open && (
         <div className="flex items-center gap-3">
