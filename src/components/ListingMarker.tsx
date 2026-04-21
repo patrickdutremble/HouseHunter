@@ -12,11 +12,17 @@ interface ListingMarkerProps {
 }
 
 function buildPillIcon(listing: Listing): L.DivIcon {
-  const { pill, text, showDot } = getPillClasses(listing)
+  const { pill, text, dotColor } = getPillClasses(listing)
   const priceText = formatPillPrice(listing.price)
 
-  const dotHtml = showDot
-    ? '<span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-teal-500 border border-white"></span>'
+  const dotBg =
+    dotColor === 'teal'
+      ? 'bg-teal-500'
+      : dotColor === 'yellow'
+        ? 'bg-yellow-400'
+        : ''
+  const dotHtml = dotColor
+    ? `<span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full ${dotBg} border border-white"></span>`
     : ''
 
   const html = `

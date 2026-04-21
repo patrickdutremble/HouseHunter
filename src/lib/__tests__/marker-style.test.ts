@@ -1,46 +1,66 @@
 import { describe, it, expect } from 'vitest'
-import { getPillClasses, formatPillPrice, isCloseToSchool } from '../marker-style'
+import { getPillClasses, formatPillPrice, getDotColor } from '../marker-style'
+import { SCHOOL_COORDS } from '../map-config'
 
-describe('isCloseToSchool', () => {
-  it('returns true when commute_school_car is under 20 minutes', () => {
-    expect(isCloseToSchool('15 min')).toBe(true)
-    expect(isCloseToSchool('19 min')).toBe(true)
+// A point ~N km due east of the school at this latitude.
+function pointKmEast(km: number): { latitude: number; longitude: number } {
+  const [lat, lon] = SCHOOL_COORDS
+  const degPerKm = 1 / (111.32 * Math.cos((lat * Math.PI) / 180))
+  return { latitude: lat, longitude: lon + km * degPerKm }
+}
+
+describe('getDotColor', () => {
+  it('returns teal for points within the inner zone', () => {
+    const p = pointKmEast(5)
+    expect(getDotColor(p.latitude, p.longitude)).toBe('teal')
   })
-  it('returns false at or above 20 minutes', () => {
-    expect(isCloseToSchool('20 min')).toBe(false)
-    expect(isCloseToSchool('45 min')).toBe(false)
+  it('returns yellow for points between the inner and outer zone', () => {
+    const p = pointKmEast(12)
+    expect(getDotColor(p.latitude, p.longitude)).toBe('yellow')
   })
-  it('returns false when commute is null or unparseable', () => {
-    expect(isCloseToSchool(null)).toBe(false)
-    expect(isCloseToSchool('')).toBe(false)
-    expect(isCloseToSchool('unknown')).toBe(false)
+  it('returns null for points outside the outer zone', () => {
+    const p = pointKmEast(20)
+    expect(getDotColor(p.latitude, p.longitude)).toBeNull()
+  })
+  it('returns null when coordinates are missing', () => {
+    expect(getDotColor(null, null)).toBeNull()
+    expect(getDotColor(45, null)).toBeNull()
   })
 })
 
 describe('getPillClasses', () => {
-  it('returns the regular far-from-school classes', () => {
-    const c = getPillClasses({ favorite: false, commute_school_car: '30 min' })
+  it('returns far-from-school classes with no dot', () => {
+    const p = pointKmEast(20)
+    const c = getPillClasses({ favorite: false, latitude: p.latitude, longitude: p.longitude })
     expect(c.pill).toContain('bg-white')
     expect(c.pill).toContain('border-slate-400')
     expect(c.text).toContain('text-slate-900')
-    expect(c.showDot).toBe(false)
+    expect(c.dotColor).toBeNull()
   })
-  it('adds the teal corner dot when close to school', () => {
-    const c = getPillClasses({ favorite: false, commute_school_car: '15 min' })
-    expect(c.showDot).toBe(true)
+  it('adds a teal dot when inside the inner zone', () => {
+    const p = pointKmEast(5)
+    const c = getPillClasses({ favorite: false, latitude: p.latitude, longitude: p.longitude })
+    expect(c.dotColor).toBe('teal')
+  })
+  it('adds a yellow dot when between inner and outer zones', () => {
+    const p = pointKmEast(12)
+    const c = getPillClasses({ favorite: false, latitude: p.latitude, longitude: p.longitude })
+    expect(c.dotColor).toBe('yellow')
   })
   it('uses amber fill and white text for favorites', () => {
-    const c = getPillClasses({ favorite: true, commute_school_car: '30 min' })
+    const p = pointKmEast(20)
+    const c = getPillClasses({ favorite: true, latitude: p.latitude, longitude: p.longitude })
     expect(c.pill).toContain('bg-amber-500')
     expect(c.pill).toContain('border-amber-500')
     expect(c.text).toContain('text-white')
-    expect(c.showDot).toBe(false)
+    expect(c.dotColor).toBeNull()
   })
-  it('combines amber fill with the dot for a close favorite', () => {
-    const c = getPillClasses({ favorite: true, commute_school_car: '15 min' })
+  it('combines amber fill with a teal dot for a close favorite', () => {
+    const p = pointKmEast(5)
+    const c = getPillClasses({ favorite: true, latitude: p.latitude, longitude: p.longitude })
     expect(c.pill).toContain('bg-amber-500')
     expect(c.text).toContain('text-white')
-    expect(c.showDot).toBe(true)
+    expect(c.dotColor).toBe('teal')
   })
 })
 

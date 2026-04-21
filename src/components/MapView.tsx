@@ -7,7 +7,8 @@ import 'leaflet/dist/leaflet.css'
 import type { Listing } from '@/types/listing'
 import {
   SCHOOL_COORDS,
-  COMMUTE_ZONE_KM,
+  INNER_COMMUTE_ZONE_KM,
+  OUTER_COMMUTE_ZONE_KM,
   DEFAULT_MAP_CENTER,
   DEFAULT_MAP_ZOOM,
 } from '@/lib/map-config'
@@ -74,12 +75,22 @@ export default function MapView({ listings, onSelect }: MapViewProps) {
         />
         <Circle
           center={SCHOOL_COORDS}
-          radius={COMMUTE_ZONE_KM * 1000}
+          radius={OUTER_COMMUTE_ZONE_KM * 1000}
+          pathOptions={{
+            color: '#eab308',
+            weight: 1,
+            fillColor: '#eab308',
+            fillOpacity: 0.13,
+          }}
+        />
+        <Circle
+          center={SCHOOL_COORDS}
+          radius={INNER_COMMUTE_ZONE_KM * 1000}
           pathOptions={{
             color: '#14b8a6',
             weight: 1,
             fillColor: '#14b8a6',
-            fillOpacity: 0.06,
+            fillOpacity: 0.13,
           }}
         />
         <Marker position={SCHOOL_COORDS} icon={schoolIcon} />

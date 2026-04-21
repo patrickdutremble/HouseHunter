@@ -1,35 +1,48 @@
+import {
+  SCHOOL_COORDS,
+  INNER_COMMUTE_ZONE_KM,
+  OUTER_COMMUTE_ZONE_KM,
+  distanceKm,
+} from './map-config'
+
 export interface PillInputs {
   favorite: boolean
-  commute_school_car: string | null
+  latitude: number | null
+  longitude: number | null
 }
+
+export type DotColor = 'teal' | 'yellow' | null
 
 export interface PillClasses {
   pill: string
   text: string
-  showDot: boolean
+  dotColor: DotColor
 }
 
-export function isCloseToSchool(commute: string | null): boolean {
-  if (!commute) return false
-  const match = commute.match(/-?\d+/)
-  if (!match) return false
-  const minutes = parseInt(match[0], 10)
-  return Number.isFinite(minutes) && minutes < 20
+export function getDotColor(
+  latitude: number | null,
+  longitude: number | null
+): DotColor {
+  if (latitude == null || longitude == null) return null
+  const km = distanceKm(SCHOOL_COORDS, [latitude, longitude])
+  if (km <= INNER_COMMUTE_ZONE_KM) return 'teal'
+  if (km <= OUTER_COMMUTE_ZONE_KM) return 'yellow'
+  return null
 }
 
 export function getPillClasses(listing: PillInputs): PillClasses {
-  const close = isCloseToSchool(listing.commute_school_car)
+  const dotColor = getDotColor(listing.latitude, listing.longitude)
   if (listing.favorite) {
     return {
       pill: 'bg-amber-500 border-2 border-amber-500',
       text: 'text-white',
-      showDot: close,
+      dotColor,
     }
   }
   return {
     pill: 'bg-white border-2 border-slate-400',
     text: 'text-slate-900',
-    showDot: close,
+    dotColor,
   }
 }
 
