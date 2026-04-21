@@ -31,6 +31,8 @@ function makeListing(overrides: Partial<Listing> = {}): Listing {
     status: null,
     favorite: false,
     image_url: null,
+    latitude: null,
+    longitude: null,
     created_at: '2026-04-17T00:00:00Z',
     updated_at: '2026-04-17T00:00:00Z',
     deleted_at: null,
