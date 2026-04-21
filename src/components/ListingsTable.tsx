@@ -21,11 +21,13 @@ interface ListingsTableProps {
 }
 
 export function ListingsTable({ listings, selectedId, onSelect, onUpdate, compareIds, onToggleCompare, onRefreshed }: ListingsTableProps) {
-  const [filters, setFilters] = useState<Filters>({ type: '', minPrice: '', maxPrice: '', favoritesOnly: false })
+  const [filters, setFilters] = useState<Filters>({ type: '', minPrice: '', maxPrice: '', favoritesOnly: false, flagStatus: 'all' })
   const [focusedId, setFocusedId] = useState<string | null>(null)
 
   const filtered = useMemo(() => {
     return listings.filter(l => {
+      if (filters.flagStatus === 'only' && !l.flagged_for_deletion) return false
+      if (filters.flagStatus === 'hide' && l.flagged_for_deletion) return false
       if (filters.favoritesOnly && !l.favorite) return false
       if (filters.type && l.property_type !== filters.type) return false
       if (filters.minPrice) {
