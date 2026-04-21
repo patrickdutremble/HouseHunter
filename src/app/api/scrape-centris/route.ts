@@ -93,6 +93,8 @@ export async function POST(req: Request) {
       parking: parsed.parking,
       year_built: parsed.year_built,
       image_url: parsed.image_url,
+      latitude: parsed.lat,
+      longitude: parsed.lon,
       downpayment: calculated.downpayment,
       monthly_mortgage: calculated.monthly_mortgage,
       total_monthly_cost: calculated.total_monthly_cost,
