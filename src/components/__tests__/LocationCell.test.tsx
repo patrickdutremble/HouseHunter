@@ -60,8 +60,8 @@ describe('LocationCell thumbnail', () => {
     expect(container.querySelector('svg')).not.toBeNull()
   })
 
-  it('hides a broken image after onError fires', () => {
-    render(
+  it('falls back to the placeholder when the image fails to load', () => {
+    const { container } = render(
       <LocationCell
         text="Montréal"
         mapQuery="Montréal"
@@ -72,6 +72,7 @@ describe('LocationCell thumbnail', () => {
     )
     const img = screen.getByRole('img') as HTMLImageElement
     fireEvent.error(img)
-    expect(img.style.visibility).toBe('hidden')
+    expect(screen.queryByRole('img')).toBeNull()
+    expect(container.querySelector('svg')).not.toBeNull()
   })
 })

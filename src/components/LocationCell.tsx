@@ -14,6 +14,7 @@ interface LocationCellProps {
 export function LocationCell({ text, mapQuery, editable, isSelected = false, imageUrl, onSave }: LocationCellProps) {
   const [editing, setEditing] = useState(false)
   const [editValue, setEditValue] = useState('')
+  const [imgError, setImgError] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -22,6 +23,10 @@ export function LocationCell({ text, mapQuery, editable, isSelected = false, ima
       inputRef.current.select()
     }
   }, [editing])
+
+  useEffect(() => {
+    setImgError(false)
+  }, [imageUrl])
 
   const startEdit = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -63,14 +68,13 @@ export function LocationCell({ text, mapQuery, editable, isSelected = false, ima
 
   return (
     <span className="flex items-center gap-2 min-w-0">
-      {imageUrl ? (
+      {imageUrl && !imgError ? (
         <img
           src={imageUrl}
-          alt=""
-          role="img"
+          alt={text ? `${text} listing photo` : 'Listing photo'}
           loading="lazy"
           className="shrink-0 w-11 h-9 rounded-md object-cover bg-slate-100"
-          onError={e => { (e.currentTarget as HTMLImageElement).style.visibility = 'hidden' }}
+          onError={() => setImgError(true)}
         />
       ) : (
         <span
