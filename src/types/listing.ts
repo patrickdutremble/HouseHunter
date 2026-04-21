@@ -27,6 +27,7 @@ export interface Listing {
   previous_price: number | null
   price_changed_at: string | null
   favorite: boolean
+  flagged_for_deletion: boolean
   image_url: string | null
   latitude: number | null
   longitude: number | null

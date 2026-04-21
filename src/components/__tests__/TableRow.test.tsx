@@ -32,6 +32,7 @@ const BASE: Listing = {
   previous_price: null,
   price_changed_at: null,
   favorite: false,
+  flagged_for_deletion: false,
   image_url: null,
   latitude: null,
   longitude: null,

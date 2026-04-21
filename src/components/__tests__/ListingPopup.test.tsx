@@ -33,6 +33,7 @@ function make(partial: Partial<Listing> = {}): Listing {
     previous_price: null,
     price_changed_at: null,
     favorite: false,
+    flagged_for_deletion: false,
     image_url: 'https://example.com/house.jpg',
     latitude: 45.7,
     longitude: -73.6,
