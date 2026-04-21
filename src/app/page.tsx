@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import dynamic from 'next/dynamic'
@@ -19,7 +19,7 @@ const MapView = dynamic(() => import('@/components/MapView'), {
 })
 type ScrapeStatus = 'idle' | 'loading' | 'success' | 'error' | 'duplicate'
 
-export default function Home() {
+function HomeContent() {
   const { listings, loading, error, fetchListings, updateListing, deleteListing, trashCount } = useListings()
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [centrisUrl, setCentrisUrl] = useState('')
@@ -288,5 +288,13 @@ export default function Home() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div className="h-screen flex items-center justify-center bg-slate-50"><div className="text-slate-400 text-sm">Loading...</div></div>}>
+      <HomeContent />
+    </Suspense>
   )
 }
