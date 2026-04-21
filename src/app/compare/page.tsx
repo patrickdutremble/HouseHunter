@@ -63,10 +63,16 @@ function CompareContent() {
     fetchListings()
   }, [searchParams])
 
-  async function updateCriteria(id: string, next: Record<string, boolean>) {
+  async function toggleCriterion(id: string, key: string, value: boolean) {
+    let next: Record<string, boolean> | null = null
     setListings(prev =>
-      prev.map(l => (l.id === id ? { ...l, criteria: next } : l))
+      prev.map(l => {
+        if (l.id !== id) return l
+        next = { ...(l.criteria ?? {}), [key]: value }
+        return { ...l, criteria: next }
+      })
     )
+    if (next === null) return
     const { error } = await supabase
       .from('listings')
       .update({ criteria: next })
@@ -197,9 +203,7 @@ function CompareContent() {
                         type="checkbox"
                         checked={checked}
                         onChange={() => {
-                          const current = listing.criteria ?? {}
-                          const next = { ...current, [c.key]: !checked }
-                          updateCriteria(listing.id, next)
+                          toggleCriterion(listing.id, c.key, !checked)
                         }}
                         className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                       />
