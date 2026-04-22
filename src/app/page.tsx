@@ -176,7 +176,7 @@ function HomeContent() {
         <button
           onClick={handlePaste}
           disabled={scrapeStatus === 'loading'}
-          className="px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="hidden sm:block px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           title="Paste from clipboard"
         >
           Paste
@@ -208,9 +208,38 @@ function HomeContent() {
 
         {/* Status message */}
         {scrapeStatus !== 'idle' && scrapeStatus !== 'loading' && scrapeMessage && (
-          <span className={`text-sm font-medium whitespace-nowrap ${statusColor}`}>
+          <span className={`text-sm font-medium truncate min-w-0 ${statusColor}`}>
             {scrapeMessage}
           </span>
+        )}
+
+        {/* Compare cluster — appears when 2+ listings selected */}
+        {compareIds.size >= 2 && (
+          <div className="relative flex items-center gap-1.5">
+            <button
+              onClick={openCompare}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors"
+            >
+              <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M2 3.75A.75.75 0 012.75 3h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 3.75zm0 4.167a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75a.75.75 0 01-.75-.75zm0 4.166a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75a.75.75 0 01-.75-.75zm0 4.167a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75a.75.75 0 01-.75-.75z" clipRule="evenodd" />
+              </svg>
+              <span><span className="hidden sm:inline">Compare </span>({compareIds.size})</span>
+            </button>
+            <button
+              onClick={clearCompare}
+              className="p-1.5 text-slate-400 bg-white border border-slate-200 rounded-lg hover:text-slate-600 hover:bg-slate-50 transition-colors"
+              title="Clear selection"
+            >
+              <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M5 5l10 10M15 5L5 15" />
+              </svg>
+            </button>
+            {compareMaxWarning && (
+              <span className="absolute top-full right-0 mt-1 px-3 py-2 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-lg shadow-lg whitespace-nowrap z-30">
+                Maximum 5 listings
+              </span>
+            )}
+          </div>
         )}
 
         <ViewToggle current={view} onChange={handleViewChange} />
@@ -261,33 +290,6 @@ function HomeContent() {
         )}
       </Link>
 
-      {compareIds.size >= 2 && (
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
-          <button
-            onClick={openCompare}
-            className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg shadow-lg hover:bg-blue-700 active:bg-blue-800 transition-colors"
-          >
-            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M2 3.75A.75.75 0 012.75 3h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 3.75zm0 4.167a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75a.75.75 0 01-.75-.75zm0 4.166a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75a.75.75 0 01-.75-.75zm0 4.167a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75a.75.75 0 01-.75-.75z" clipRule="evenodd" />
-            </svg>
-            Compare ({compareIds.size})
-          </button>
-          <button
-            onClick={clearCompare}
-            className="p-2 text-slate-400 bg-white border border-slate-200 rounded-lg shadow-lg hover:text-slate-600 hover:bg-slate-50 transition-colors"
-            title="Clear selection"
-          >
-            <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M5 5l10 10M15 5L5 15" />
-            </svg>
-          </button>
-          {compareMaxWarning && (
-            <span className="px-3 py-2 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-lg shadow-lg">
-              Maximum 5 listings
-            </span>
-          )}
-        </div>
-      )}
     </div>
   )
 }
