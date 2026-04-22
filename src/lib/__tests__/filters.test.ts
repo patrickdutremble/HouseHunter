@@ -94,3 +94,59 @@ describe('applyFilters — minBeds', () => {
     expect(applyFilters(ls, { ...EMPTY_FILTERS, minBeds: '' })).toHaveLength(1)
   })
 })
+
+describe('applyFilters — commute', () => {
+  it('maxCommuteSchool: includes rows at or below the threshold', () => {
+    const ls = [
+      mk({ id: 'a', commute_school_car: '15 min' }),
+      mk({ id: 'b', commute_school_car: '30 min' }),
+      mk({ id: 'c', commute_school_car: '45 min' }),
+    ]
+    const out = applyFilters(ls, { ...EMPTY_FILTERS, maxCommuteSchool: '30' })
+    expect(out.map(l => l.id)).toEqual(['a', 'b'])
+  })
+
+  it('maxCommuteSchool excludes rows with null commute', () => {
+    const ls = [
+      mk({ id: 'a', commute_school_car: '20 min' }),
+      mk({ id: 'b', commute_school_car: null }),
+    ]
+    const out = applyFilters(ls, { ...EMPTY_FILTERS, maxCommuteSchool: '60' })
+    expect(out.map(l => l.id)).toEqual(['a'])
+  })
+
+  it('maxCommuteSchool excludes rows with unparseable commute strings', () => {
+    const ls = [
+      mk({ id: 'a', commute_school_car: 'unknown' }),
+      mk({ id: 'b', commute_school_car: '25 min' }),
+    ]
+    const out = applyFilters(ls, { ...EMPTY_FILTERS, maxCommuteSchool: '60' })
+    expect(out.map(l => l.id)).toEqual(['b'])
+  })
+
+  it('maxCommutePvm applies the same rule to commute_pvm_transit', () => {
+    const ls = [
+      mk({ id: 'a', commute_pvm_transit: '40 min' }),
+      mk({ id: 'b', commute_pvm_transit: '70 min' }),
+      mk({ id: 'c', commute_pvm_transit: null }),
+    ]
+    const out = applyFilters(ls, { ...EMPTY_FILTERS, maxCommutePvm: '60' })
+    expect(out.map(l => l.id)).toEqual(['a'])
+  })
+
+  it('school and PVM filters are independent (AND)', () => {
+    const ls = [
+      mk({ id: 'a', commute_school_car: '20 min', commute_pvm_transit: '40 min' }),
+      mk({ id: 'b', commute_school_car: '20 min', commute_pvm_transit: '80 min' }),
+      mk({ id: 'c', commute_school_car: '50 min', commute_pvm_transit: '40 min' }),
+    ]
+    const out = applyFilters(ls, { ...EMPTY_FILTERS, maxCommuteSchool: '30', maxCommutePvm: '60' })
+    expect(out.map(l => l.id)).toEqual(['a'])
+  })
+
+  it('empty commute fields = no filtering', () => {
+    const ls = [mk({ id: 'a', commute_school_car: null })]
+    expect(applyFilters(ls, { ...EMPTY_FILTERS, maxCommuteSchool: '', maxCommutePvm: '' }))
+      .toHaveLength(1)
+  })
+})

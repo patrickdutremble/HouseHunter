@@ -9,6 +9,8 @@ export interface Filters {
   favoritesOnly: boolean
   flagStatus: FlagStatus
   minBeds: string
+  maxCommuteSchool: string
+  maxCommutePvm: string
 }
 
 export const EMPTY_FILTERS: Filters = {
@@ -18,6 +20,14 @@ export const EMPTY_FILTERS: Filters = {
   favoritesOnly: false,
   flagStatus: 'all',
   minBeds: '',
+  maxCommuteSchool: '',
+  maxCommutePvm: '',
+}
+
+function parseCommuteMinutes(s: string | null): number | null {
+  if (!s) return null
+  const n = parseInt(s, 10)
+  return isNaN(n) ? null : n
 }
 
 export function applyFilters(listings: Listing[], filters: Filters): Listing[] {
@@ -39,6 +49,20 @@ export function applyFilters(listings: Listing[], filters: Filters): Listing[] {
       if (!isNaN(min)) {
         const beds = parseInt(l.bedrooms ?? '', 10)
         if (isNaN(beds) || beds < min) return false
+      }
+    }
+    if (filters.maxCommuteSchool) {
+      const max = parseInt(filters.maxCommuteSchool, 10)
+      if (!isNaN(max)) {
+        const mins = parseCommuteMinutes(l.commute_school_car)
+        if (mins == null || mins > max) return false
+      }
+    }
+    if (filters.maxCommutePvm) {
+      const max = parseInt(filters.maxCommutePvm, 10)
+      if (!isNaN(max)) {
+        const mins = parseCommuteMinutes(l.commute_pvm_transit)
+        if (mins == null || mins > max) return false
       }
     }
     return true
