@@ -53,4 +53,10 @@ describe('/ mobile redirect', () => {
     render(<HomePage />)
     expect(replaceMock).not.toHaveBeenCalled()
   })
+
+  it('renders nothing on narrow viewports (no desktop flash)', () => {
+    mockMatchMedia(true)
+    const { container } = render(<HomePage />)
+    expect(container.querySelector('input[type="url"]')).toBeNull()
+  })
 })

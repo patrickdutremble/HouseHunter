@@ -27,6 +27,10 @@ function HomeContent() {
   const [scrapeMessage, setScrapeMessage] = useState<string | null>(null)
   const [compareIds, setCompareIds] = useState<Set<string>>(new Set())
   const [compareMaxWarning, setCompareMaxWarning] = useState(false)
+  const [isRedirecting, setIsRedirecting] = useState(() => {
+    if (typeof window === 'undefined') return false
+    return window.matchMedia('(max-width: 767px)').matches
+  })
 
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -68,6 +72,7 @@ function HomeContent() {
   useEffect(() => {
     if (typeof window === 'undefined') return
     if (window.matchMedia('(max-width: 767px)').matches) {
+      setIsRedirecting(true)
       router.replace('/recent')
     }
   }, [router])
@@ -165,6 +170,8 @@ function HomeContent() {
       </div>
     )
   }
+
+  if (isRedirecting) return null
 
   const statusColor =
     scrapeStatus === 'success' ? 'text-green-600' :
