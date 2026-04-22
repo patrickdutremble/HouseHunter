@@ -41,6 +41,17 @@ function CompareContent() {
   const listingsRef = useRef(listings)
   listingsRef.current = listings
   const [loading, setLoading] = useState(true)
+  const [copied, setCopied] = useState(false)
+
+  async function copyCompareLink() {
+    try {
+      await navigator.clipboard.writeText(window.location.href)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy link:', err)
+    }
+  }
 
   useEffect(() => {
     async function fetchListings() {
@@ -125,6 +136,18 @@ function CompareContent() {
               ({listings.length} listings)
             </span>
           </h1>
+          <button
+            type="button"
+            onClick={copyCompareLink}
+            className={`ml-auto px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+              copied
+                ? 'text-green-700 bg-green-50'
+                : 'text-slate-600 hover:text-slate-800 hover:bg-slate-100'
+            }`}
+            title="Copy shareable comparison link"
+          >
+            {copied ? 'Copied!' : 'Copy link'}
+          </button>
         </div>
       </div>
 
