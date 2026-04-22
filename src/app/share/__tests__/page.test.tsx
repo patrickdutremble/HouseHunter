@@ -113,6 +113,33 @@ describe('/share page', () => {
     await waitFor(() => expect(deleteListingMock).toHaveBeenCalledWith('new-1'))
   })
 
+  it('shows the "Removed — sent to trash" toast when Undo succeeds', async () => {
+    setParams('url=https%3A%2F%2Fcentris.ca%2Fnew')
+    deleteListingMock.mockResolvedValue(true)
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      status: 200,
+      json: async () => ({ listing: { id: 'new-1', price: 1, location: 'A', image_url: null, full_address: null, bedrooms: null, liveable_area_sqft: null, commute_school_car: null, commute_pvm_transit: null } }),
+    }))
+    vi.stubGlobal('fetch', fetchMock)
+    render(<SharePage />)
+    const undo = await screen.findByRole('button', { name: /undo/i })
+    fireEvent.click(undo)
+    await waitFor(() => expect(screen.getByText(/removed — sent to trash/i)).toBeInTheDocument())
+  })
+
+  it('shows the "Redirecting to home in Ns" countdown during success', async () => {
+    setParams('url=https%3A%2F%2Fcentris.ca%2Fnew')
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      status: 200,
+      json: async () => ({ listing: { id: 'new-1', price: 1, location: 'A', image_url: null, full_address: null, bedrooms: null, liveable_area_sqft: null, commute_school_car: null, commute_pvm_transit: null } }),
+    }))
+    vi.stubGlobal('fetch', fetchMock)
+    render(<SharePage />)
+    await waitFor(() => expect(screen.getByText(/redirecting to home in 5s/i)).toBeInTheDocument())
+  })
+
   it('shows error state if undo fails', async () => {
     setParams('url=https%3A%2F%2Fcentris.ca%2Fnew')
     deleteListingMock.mockResolvedValue(false)

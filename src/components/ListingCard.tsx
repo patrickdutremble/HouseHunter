@@ -75,7 +75,7 @@ export function ListingCard({ listing, onTap, onDelete }: ListingCardProps) {
             <PlaceholderIcon />
           </div>
         )}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 pr-8">
           <div className="text-sm text-slate-900 truncate">{address}</div>
           <div className="font-bold text-slate-900">{formatPrice(listing.price)}</div>
           {meta && <div className="text-xs text-slate-600">{meta}</div>}
