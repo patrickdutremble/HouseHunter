@@ -218,24 +218,27 @@ function HomeContent() {
           <div className="relative flex items-center gap-1.5">
             <button
               onClick={openCompare}
+              aria-label={`Compare ${compareIds.size} listings`}
               className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors"
             >
-              <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
+              <svg aria-hidden="true" width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M2 3.75A.75.75 0 012.75 3h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 3.75zm0 4.167a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75a.75.75 0 01-.75-.75zm0 4.166a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75a.75.75 0 01-.75-.75zm0 4.167a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75a.75.75 0 01-.75-.75z" clipRule="evenodd" />
               </svg>
-              <span><span className="hidden sm:inline">Compare </span>({compareIds.size})</span>
+              <span className="hidden sm:inline">Compare</span>
+              <span>({compareIds.size})</span>
             </button>
             <button
               onClick={clearCompare}
+              aria-label="Clear selection"
               className="p-1.5 text-slate-400 bg-white border border-slate-200 rounded-lg hover:text-slate-600 hover:bg-slate-50 transition-colors"
               title="Clear selection"
             >
-              <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg aria-hidden="true" width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M5 5l10 10M15 5L5 15" />
               </svg>
             </button>
             {compareMaxWarning && (
-              <span className="absolute top-full right-0 mt-1 px-3 py-2 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-lg shadow-lg whitespace-nowrap z-30">
+              <span role="status" aria-live="polite" className="absolute top-full right-0 mt-1 px-3 py-2 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-lg shadow-lg whitespace-nowrap z-30">
                 Maximum 5 listings
               </span>
             )}
