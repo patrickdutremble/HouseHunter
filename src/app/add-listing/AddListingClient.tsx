@@ -194,6 +194,12 @@ export function AddListingClient() {
     imageUrl,
   ])
 
+  useEffect(() => {
+    if (status.kind !== 'success' && status.kind !== 'duplicate') return
+    const t = setTimeout(() => window.close(), 3000)
+    return () => clearTimeout(t)
+  }, [status.kind])
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
       <div className="w-full max-w-lg">
