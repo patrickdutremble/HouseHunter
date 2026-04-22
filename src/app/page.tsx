@@ -65,6 +65,13 @@ function HomeContent() {
     return () => clearTimeout(timer)
   }, [compareMaxWarning])
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (window.matchMedia('(max-width: 767px)').matches) {
+      router.replace('/recent')
+    }
+  }, [router])
+
   const clearCompare = () => {
     setCompareIds(new Set())
     setCompareMaxWarning(false)
