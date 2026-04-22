@@ -40,7 +40,7 @@ export function SortPanel({ sort, onChange }: SortPanelProps) {
   }
 
   const usedKeys = new Set(sort.map(s => s.column))
-  const available = tableColumns.filter(c => !usedKeys.has(c.key) && c.key !== 'favorite' && c.key !== 'centris_link')
+  const available = tableColumns.filter(c => !usedKeys.has(c.key) && c.sortable !== false)
 
   return (
     <div className="w-80 rounded-lg border border-slate-200 bg-white p-4 shadow-lg space-y-3">

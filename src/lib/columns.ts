@@ -20,11 +20,12 @@ export interface ColumnDef {
   showInTable: boolean
   showInDetail: boolean
   width?: string
+  sortable?: boolean
 }
 
 export const columns: ColumnDef[] = [
-  { key: 'favorite', label: '\u2605', align: 'left', format: 'favorite', editable: true, showInTable: true, showInDetail: false, width: '36px' },
-  { key: 'centris_link', label: 'Centris', align: 'left', format: 'link-icon', editable: true, showInTable: true, showInDetail: true, width: '60px' },
+  { key: 'favorite', label: '\u2605', align: 'left', format: 'favorite', editable: true, showInTable: true, showInDetail: false, width: '36px', sortable: false },
+  { key: 'centris_link', label: 'Centris', align: 'left', format: 'link-icon', editable: true, showInTable: true, showInDetail: true, width: '60px', sortable: false },
   { key: 'broker_link', label: 'Broker', align: 'left', format: 'link-icon', editable: true, showInTable: false, showInDetail: true, width: '60px' },
   { key: 'location', label: 'Location', align: 'left', format: 'location-link', editable: true, showInTable: true, showInDetail: true, width: '200px' },
   { key: 'property_type', label: 'Type', align: 'left', format: 'text', editable: true, showInTable: true, showInDetail: true, width: '90px' },

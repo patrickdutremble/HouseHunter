@@ -35,7 +35,7 @@ export function TableHeader({ sort, onSort, hasCompare }: TableHeaderProps) {
               `}
               style={{ width: col.width, minWidth: col.width }}
             >
-              {col.label}{rank > 0 && sort.length > 1 ? ` ${rank}` : ''}{arrow}
+              {col.label}{rank > 0 ? ` ${rank}` : ''}{arrow}
             </th>
           )
         })}

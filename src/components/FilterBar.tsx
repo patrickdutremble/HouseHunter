@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { type Filters, type FlagStatus, EMPTY_FILTERS } from '@/lib/filters'
+import { type Filters, type FlagStatus, EMPTY_FILTERS, countActiveFilters } from '@/lib/filters'
 import { FilterPanel } from './FilterPanel'
 import { SortPanel } from './SortPanel'
 import type { SortState } from '@/hooks/useSort'
@@ -52,18 +52,7 @@ export function FilterBar({
     onFilterChange({ ...filters, [field]: value })
   }
 
-  const activeCount = [
-    filters.type !== '',
-    filters.minPrice !== '',
-    filters.maxPrice !== '',
-    filters.favoritesOnly,
-    filters.flagStatus !== 'all',
-    filters.minBeds !== '',
-    filters.maxCommuteSchool !== '',
-    filters.maxCommutePvm !== '',
-    filters.maxMonthlyCost !== '',
-    filters.hasGarage,
-  ].filter(Boolean).length
+  const activeCount = countActiveFilters(filters)
 
   return (
     <div className="flex items-center gap-2">

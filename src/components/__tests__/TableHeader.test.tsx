@@ -11,17 +11,18 @@ describe('TableHeader', () => {
     expect(priceHeader.textContent).toBe('Price')
   })
 
-  it('renders an arrow for the sorted column', () => {
+  it('renders rank and arrow for a sorted column', () => {
     render(
       <table>
         <TableHeader sort={[{ column: 'price', direction: 'asc' }]} onSort={() => {}} />
       </table>
     )
     const priceHeader = screen.getByText(/Price/)
+    expect(priceHeader.textContent).toContain('1')
     expect(priceHeader.textContent).toContain('\u2191')
   })
 
-  it('shows rank number only when multiple sort levels active', () => {
+  it('shows rank + direction per column across multiple sort levels', () => {
     render(
       <table>
         <TableHeader

@@ -36,6 +36,21 @@ function parseCommuteMinutes(s: string | null): number | null {
 
 const GARAGE_RE = /\b\d+\s*garage/i
 
+export function countActiveFilters(filters: Filters): number {
+  return [
+    filters.type !== '',
+    filters.minPrice !== '',
+    filters.maxPrice !== '',
+    filters.favoritesOnly,
+    filters.flagStatus !== 'all',
+    filters.minBeds !== '',
+    filters.maxCommuteSchool !== '',
+    filters.maxCommutePvm !== '',
+    filters.maxMonthlyCost !== '',
+    filters.hasGarage,
+  ].filter(Boolean).length
+}
+
 export function applyFilters(listings: Listing[], filters: Filters): Listing[] {
   return listings.filter(l => {
     if (filters.flagStatus === 'only' && !l.flagged_for_deletion) return false

@@ -1,6 +1,6 @@
 'use client'
 
-import { type Filters, EMPTY_FILTERS } from '@/lib/filters'
+import { type Filters, EMPTY_FILTERS, countActiveFilters } from '@/lib/filters'
 
 interface FilterPanelProps {
   propertyTypes: string[]
@@ -18,18 +18,7 @@ export function FilterPanel({ propertyTypes, filters, onChange }: FilterPanelPro
     onChange({ ...filters, [field]: value })
   }
 
-  const activeCount = [
-    filters.type !== '',
-    filters.minPrice !== '',
-    filters.maxPrice !== '',
-    filters.favoritesOnly,
-    filters.flagStatus !== 'all',
-    filters.minBeds !== '',
-    filters.maxCommuteSchool !== '',
-    filters.maxCommutePvm !== '',
-    filters.maxMonthlyCost !== '',
-    filters.hasGarage,
-  ].filter(Boolean).length
+  const activeCount = countActiveFilters(filters)
 
   const schoolEnabled = filters.maxCommuteSchool !== ''
   const pvmEnabled = filters.maxCommutePvm !== ''
