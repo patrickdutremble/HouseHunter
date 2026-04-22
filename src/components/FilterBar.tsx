@@ -1,24 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import { type Filters, type FlagStatus, EMPTY_FILTERS } from '@/lib/filters'
 
-export type FlagStatus = 'all' | 'only' | 'hide'
-
-export interface Filters {
-  type: string
-  minPrice: string
-  maxPrice: string
-  favoritesOnly: boolean
-  flagStatus: FlagStatus
-}
-
-const EMPTY_FILTERS: Filters = {
-  type: '',
-  minPrice: '',
-  maxPrice: '',
-  favoritesOnly: false,
-  flagStatus: 'all',
-}
+export type { Filters, FlagStatus }
 
 interface FilterBarProps {
   propertyTypes: string[]

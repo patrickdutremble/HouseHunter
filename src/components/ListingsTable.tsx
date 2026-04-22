@@ -8,6 +8,7 @@ import { RefreshStatusesButton } from './RefreshStatusesButton'
 import { timeAgo } from '@/lib/time-ago'
 import { useSort } from '@/hooks/useSort'
 import { useTableKeyboard } from '@/hooks/useTableKeyboard'
+import { applyFilters, EMPTY_FILTERS } from '@/lib/filters'
 import type { Listing } from '@/types/listing'
 
 interface ListingsTableProps {
@@ -21,26 +22,10 @@ interface ListingsTableProps {
 }
 
 export function ListingsTable({ listings, selectedId, onSelect, onUpdate, compareIds, onToggleCompare, onRefreshed }: ListingsTableProps) {
-  const [filters, setFilters] = useState<Filters>({ type: '', minPrice: '', maxPrice: '', favoritesOnly: false, flagStatus: 'all' })
+  const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS)
   const [focusedId, setFocusedId] = useState<string | null>(null)
 
-  const filtered = useMemo(() => {
-    return listings.filter(l => {
-      if (filters.flagStatus === 'only' && !l.flagged_for_deletion) return false
-      if (filters.flagStatus === 'hide' && l.flagged_for_deletion) return false
-      if (filters.favoritesOnly && !l.favorite) return false
-      if (filters.type && l.property_type !== filters.type) return false
-      if (filters.minPrice) {
-        const min = Number(filters.minPrice.replace(/[$,\s]/g, ''))
-        if (!isNaN(min) && (l.price ?? 0) < min) return false
-      }
-      if (filters.maxPrice) {
-        const max = Number(filters.maxPrice.replace(/[$,\s]/g, ''))
-        if (!isNaN(max) && (l.price ?? Infinity) > max) return false
-      }
-      return true
-    })
-  }, [listings, filters])
+  const filtered = useMemo(() => applyFilters(listings, filters), [listings, filters])
 
   const { sorted, sort, toggleSort } = useSort(filtered)
 
