@@ -24,7 +24,7 @@ export async function calculateAndStoreCommute(
     .eq('id', listingId)
     .maybeSingle()
 
-  const needsDrive = !existing?.commute_school_car || existing?.commute_school_has_toll == null
+  const needsDrive = !existing?.commute_school_car
   const needsTransit = !existing?.commute_pvm_transit
 
   if (!needsDrive && !needsTransit) {

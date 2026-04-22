@@ -1,14 +1,22 @@
 import { config as loadEnv } from 'dotenv'
 loadEnv({ path: '.env.local' })
 
+const SCHOOL_DESTINATION = 'Secondary School Leblanc, Terrebonne, QC'
+
 async function sleep(ms: number) {
   return new Promise<void>((resolve) => setTimeout(resolve, ms))
 }
 
 async function main() {
   // Dynamic imports so env is loaded before ../src/lib/supabase runs createClient.
-  const { calculateAndStoreCommute } = await import('../src/lib/commute')
+  const { fetchDriveRoute } = await import('../src/lib/commute')
   const { supabase } = await import('../src/lib/supabase')
+
+  const apiKey = process.env.GOOGLE_MAPS_API_KEY
+  if (!apiKey) {
+    console.error('GOOGLE_MAPS_API_KEY missing from .env.local')
+    process.exit(1)
+  }
 
   const { data, error } = await supabase
     .from('listings')
@@ -28,18 +36,32 @@ async function main() {
   let ok = 0
   let failed = 0
   for (const row of data) {
-    const result = await calculateAndStoreCommute(
-      row.id,
-      row.latitude as number,
-      row.longitude as number
-    )
-    if (result.ok) {
-      ok += 1
-      console.log(`  ${row.id}: school=${result.school}`)
-    } else {
+    const origin = `${row.latitude},${row.longitude}`
+    const result = await fetchDriveRoute(origin, SCHOOL_DESTINATION, apiKey)
+
+    if (!result) {
       failed += 1
-      console.warn(`  ${row.id}: FAILED`)
+      console.warn(`  ${row.id}: FAILED (API returned null)`)
+      await sleep(150)
+      continue
     }
+
+    const { error: updErr } = await supabase
+      .from('listings')
+      .update({
+        commute_school_car: `${result.minutes} min`,
+        commute_school_has_toll: result.hasToll,
+      })
+      .eq('id', row.id)
+
+    if (updErr) {
+      failed += 1
+      console.warn(`  ${row.id}: UPDATE FAILED — ${updErr.message}`)
+    } else {
+      ok += 1
+      console.log(`  ${row.id}: school=${result.minutes} min, toll=${result.hasToll}`)
+    }
+
     await sleep(150)
   }
 

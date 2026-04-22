@@ -64,4 +64,39 @@ describe('fetchDriveRoute', () => {
 
     expect(result).toBeNull()
   })
+
+  it('returns null when the routes array is empty', async () => {
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ routes: [] }),
+    }) as unknown as typeof fetch
+
+    const result = await fetchDriveRoute('45.5,-73.6', 'dest', 'test-key')
+
+    expect(result).toBeNull()
+  })
+
+  it('returns null when the response has no routes field', async () => {
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({}),
+    }) as unknown as typeof fetch
+
+    const result = await fetchDriveRoute('45.5,-73.6', 'dest', 'test-key')
+
+    expect(result).toBeNull()
+  })
+
+  it('returns null when duration is malformed (missing "s" suffix)', async () => {
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        routes: [{ duration: '1920', travelAdvisory: {} }],
+      }),
+    }) as unknown as typeof fetch
+
+    const result = await fetchDriveRoute('45.5,-73.6', 'dest', 'test-key')
+
+    expect(result).toBeNull()
+  })
 })
