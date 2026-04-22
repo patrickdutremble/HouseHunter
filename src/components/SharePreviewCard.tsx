@@ -26,6 +26,8 @@ export function SharePreviewCard(props: SharePreviewCardProps) {
     return (
       <div
         data-testid="share-skeleton"
+        role="status"
+        aria-label="Loading listing preview"
         className="w-full max-w-sm mx-auto bg-white rounded-2xl shadow-lg p-5 space-y-4"
       >
         <div className="w-full aspect-video bg-slate-200 rounded-lg animate-pulse" />
@@ -38,7 +40,7 @@ export function SharePreviewCard(props: SharePreviewCardProps) {
 
   if (variant === 'error') {
     return (
-      <div className="w-full max-w-sm mx-auto bg-white rounded-2xl shadow-lg p-5 border-t-4 border-red-500">
+      <div role="alert" className="w-full max-w-sm mx-auto bg-white rounded-2xl shadow-lg p-5 border-t-4 border-red-500">
         <div className="text-red-600 font-semibold mb-2">{message ?? "Couldn't read this listing"}</div>
         {url && (
           <div className="text-xs text-slate-500 break-all mb-4">{url}</div>
@@ -76,7 +78,7 @@ export function SharePreviewCard(props: SharePreviewCardProps) {
       {l?.image_url ? (
         <img
           src={l.image_url}
-          alt=""
+          alt={`Photo of ${l?.full_address ?? l?.location ?? 'listing'}`}
           loading="lazy"
           className="w-full aspect-video object-cover bg-slate-100"
           onError={e => { (e.currentTarget as HTMLImageElement).style.visibility = 'hidden' }}
@@ -88,9 +90,9 @@ export function SharePreviewCard(props: SharePreviewCardProps) {
         <span className={`inline-block text-xs font-semibold px-2 py-1 rounded ${badgeClass}`}>
           {badgeText}
         </span>
-        <div className="text-slate-900 font-medium">
+        <h2 className="text-slate-900 font-medium">
           {l?.full_address ?? l?.location ?? '—'}
-        </div>
+        </h2>
         {l?.full_address && l?.location && (
           <div className="text-sm text-slate-600">{l.location}</div>
         )}
