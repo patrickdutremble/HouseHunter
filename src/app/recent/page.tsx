@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useListings } from '@/hooks/useListings'
 import { ListingCard } from '@/components/ListingCard'
+import { extractCentrisUrl } from '@/lib/extract-centris-url'
 
 type PasteState =
   | { kind: 'idle' }
@@ -35,12 +36,13 @@ export default function RecentPage() {
   async function handleAdd() {
     const trimmed = url.trim()
     if (!trimmed) return
+    const extracted = extractCentrisUrl(trimmed) ?? trimmed
     setPaste({ kind: 'loading' })
     try {
       const res = await fetch('/api/scrape-centris', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: trimmed }),
+        body: JSON.stringify({ url: extracted }),
       })
       let data: any
       try {

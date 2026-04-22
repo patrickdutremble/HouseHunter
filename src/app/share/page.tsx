@@ -3,6 +3,7 @@ import { Suspense, useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { SharePreviewCard } from '@/components/SharePreviewCard'
 import { useListings } from '@/hooks/useListings'
+import { extractCentrisUrl } from '@/lib/extract-centris-url'
 import type { Listing } from '@/types/listing'
 
 type State =
@@ -16,7 +17,8 @@ function SharePageContent() {
   const params = useSearchParams()
   const { deleteListing, fetchListings } = useListings()
 
-  const sharedUrl = (params.get('url') || params.get('text') || '').trim()
+  const rawShared = (params.get('url') || params.get('text') || params.get('title') || '').trim()
+  const sharedUrl = extractCentrisUrl(rawShared) ?? ''
 
   const [state, setState] = useState<State>({ kind: 'loading' })
   const redirectTimer = useRef<ReturnType<typeof setTimeout> | null>(null)

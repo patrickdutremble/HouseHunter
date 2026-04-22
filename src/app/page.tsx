@@ -8,6 +8,7 @@ import { ListingsTable } from '@/components/ListingsTable'
 import { DetailPanel } from '@/components/DetailPanel'
 import { ViewToggle, type ViewMode } from '@/components/ViewToggle'
 import { useListings } from '@/hooks/useListings'
+import { extractCentrisUrl } from '@/lib/extract-centris-url'
 
 const MapView = dynamic(() => import('@/components/MapView'), {
   ssr: false,
@@ -108,8 +109,9 @@ function HomeContent() {
   }
 
   const handleScrape = async () => {
-    const url = centrisUrl.trim()
-    if (!url) return
+    const raw = centrisUrl.trim()
+    if (!raw) return
+    const url = extractCentrisUrl(raw) ?? raw
 
     setScrapeStatus('loading')
     setScrapeMessage(null)
