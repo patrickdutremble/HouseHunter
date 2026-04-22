@@ -25,10 +25,18 @@ export default function DetailPage() {
 
   const listing: Listing | undefined = listings.find(l => l.id === params.id)
 
+  const handleBack = () => {
+    if (typeof window !== 'undefined' && window.history.length <= 1) {
+      router.push('/recent')
+    } else {
+      router.back()
+    }
+  }
+
   if (!listing) {
     return (
       <main className="min-h-screen bg-slate-50 p-4">
-        <button type="button" onClick={() => router.back()} className="text-slate-700 text-sm">← Back</button>
+        <button type="button" onClick={handleBack} className="text-slate-700 text-sm" aria-label="Back">← Back</button>
         <div className="mt-8 text-center text-slate-500">Listing not found</div>
       </main>
     )
@@ -46,7 +54,7 @@ export default function DetailPage() {
       <div className="px-4 py-3">
         <button
           type="button"
-          onClick={() => router.back()}
+          onClick={handleBack}
           className="text-slate-700 text-sm"
           aria-label="Back"
         >

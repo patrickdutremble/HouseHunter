@@ -1,13 +1,21 @@
-import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { describe, it, expect, vi, afterEach } from 'vitest'
+import { render, screen, fireEvent } from '@testing-library/react'
 import DetailPage from '@/app/recent/[id]/page'
 import type { Listing } from '@/types/listing'
 
 const backMock = vi.fn()
+const pushMock = vi.fn()
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ back: backMock, push: vi.fn(), replace: vi.fn() }),
+  useRouter: () => ({ back: backMock, push: pushMock, replace: vi.fn() }),
   useParams: () => ({ id: 'id-1' }),
 }))
+
+const originalHistory = window.history
+afterEach(() => {
+  backMock.mockReset()
+  pushMock.mockReset()
+  Object.defineProperty(window, 'history', { configurable: true, value: originalHistory })
+})
 
 const sample: Listing = {
   id: 'id-1',
@@ -76,5 +84,13 @@ describe('/recent/[id] detail page', () => {
   it('renders a fallback message when the id is not in the list', () => {
     // Intentional no-op — a second test file with a distinct useParams mock
     // would be the right tool. Keep this minimal.
+  })
+
+  it('falls back to /recent when there is no history to go back to', () => {
+    Object.defineProperty(window, 'history', { configurable: true, value: { length: 1 } })
+    render(<DetailPage />)
+    fireEvent.click(screen.getByRole('button', { name: /back/i }))
+    expect(pushMock).toHaveBeenCalledWith('/recent')
+    expect(backMock).not.toHaveBeenCalled()
   })
 })
