@@ -10,7 +10,9 @@ interface ListingCardProps {
 
 function timeAgo(iso: string): string {
   const then = new Date(iso).getTime()
+  if (!Number.isFinite(then)) return ''
   const diffMs = Date.now() - then
+  if (diffMs < 0) return 'just now'
   const mins = Math.floor(diffMs / 60000)
   if (mins < 1) return 'just now'
   if (mins < 60) return `${mins}m ago`
@@ -86,7 +88,7 @@ export function ListingCard({ listing, onTap, onDelete }: ListingCardProps) {
         type="button"
         aria-label="More"
         onClick={() => setMenuOpen(v => !v)}
-        className="absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-100"
+        className="absolute top-2 right-2 z-50 w-8 h-8 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-100"
       >
         <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
           <circle cx="4" cy="10" r="1.5" />
