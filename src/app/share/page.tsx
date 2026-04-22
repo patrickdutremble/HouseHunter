@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { SharePreviewCard } from '@/components/SharePreviewCard'
 import { useListings } from '@/hooks/useListings'
@@ -11,7 +11,7 @@ type State =
   | { kind: 'duplicate'; listing: Listing | null }
   | { kind: 'error'; message: string }
 
-export default function SharePage() {
+function SharePageContent() {
   const router = useRouter()
   const params = useSearchParams()
   const { deleteListing, fetchListings } = useListings()
@@ -105,5 +105,13 @@ export default function SharePage() {
         />
       )}
     </main>
+  )
+}
+
+export default function SharePage() {
+  return (
+    <Suspense fallback={<main className="min-h-screen bg-slate-50 flex items-center justify-center p-4"><SharePreviewCard variant="loading" /></main>}>
+      <SharePageContent />
+    </Suspense>
   )
 }
