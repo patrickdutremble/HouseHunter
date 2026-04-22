@@ -18,47 +18,115 @@ export async function calculateAndStoreCommute(
   const apiKey = process.env.GOOGLE_MAPS_API_KEY
   if (!apiKey) return { ok: false, school: null, pvm: null }
 
-  // Guard: skip if already has commute values
   const { data: existing } = await supabase
     .from('listings')
-    .select('commute_school_car, commute_pvm_transit')
+    .select('commute_school_car, commute_pvm_transit, commute_school_has_toll')
     .eq('id', listingId)
     .maybeSingle()
 
-  if (existing?.commute_school_car && existing?.commute_pvm_transit) {
-    return { ok: true, school: existing.commute_school_car, pvm: existing.commute_pvm_transit, skipped: true }
+  const needsDrive = !existing?.commute_school_car || existing?.commute_school_has_toll == null
+  const needsTransit = !existing?.commute_pvm_transit
+
+  if (!needsDrive && !needsTransit) {
+    return {
+      ok: true,
+      school: existing!.commute_school_car,
+      pvm: existing!.commute_pvm_transit,
+      skipped: true,
+    }
   }
 
   const origin = `${lat},${lon}`
   const arrivalSec = nextMonday9amMontrealUnixSec()
 
-  const [schoolMin, pvmMin] = await Promise.all([
-    fetchDriveMinutes(origin, SCHOOL_DESTINATION, apiKey),
-    fetchTransitMinutes(origin, PVM_DESTINATION, arrivalSec, apiKey),
+  const [driveRes, transitMin] = await Promise.all([
+    needsDrive ? fetchDriveRoute(origin, SCHOOL_DESTINATION, apiKey) : Promise.resolve(null),
+    needsTransit ? fetchTransitMinutes(origin, PVM_DESTINATION, arrivalSec, apiKey) : Promise.resolve(null),
   ])
 
-  const schoolText = schoolMin != null ? `${schoolMin} min` : null
-  const pvmText = pvmMin != null ? `${pvmMin} min` : null
+  const update: Record<string, string | boolean | null> = {}
+
+  if (needsDrive) {
+    update.commute_school_car = driveRes ? `${driveRes.minutes} min` : null
+    update.commute_school_has_toll = driveRes ? driveRes.hasToll : null
+  }
+  if (needsTransit) {
+    update.commute_pvm_transit = transitMin != null ? `${transitMin} min` : null
+  }
 
   const { error: updErr } = await supabase
     .from('listings')
-    .update({ commute_school_car: schoolText, commute_pvm_transit: pvmText })
+    .update(update)
     .eq('id', listingId)
+
+  const schoolText = needsDrive
+    ? (driveRes ? `${driveRes.minutes} min` : null)
+    : (existing?.commute_school_car ?? null)
+  const pvmText = needsTransit
+    ? (transitMin != null ? `${transitMin} min` : null)
+    : (existing?.commute_pvm_transit ?? null)
 
   if (updErr) return { ok: false, school: schoolText, pvm: pvmText }
   return { ok: true, school: schoolText, pvm: pvmText }
 }
 
-async function fetchDriveMinutes(origin: string, destination: string, apiKey: string): Promise<number | null> {
-  const url = new URL('https://maps.googleapis.com/maps/api/directions/json')
-  url.searchParams.set('origin', origin)
-  url.searchParams.set('destination', destination)
-  url.searchParams.set('mode', 'driving')
-  url.searchParams.set('region', 'ca')
-  url.searchParams.set('language', 'en')
-  url.searchParams.set('key', apiKey)
-  const res = await fetch(url, { cache: 'no-store' })
-  return parseDurationMinutes(await res.json())
+type DriveRouteResult = { minutes: number; hasToll: boolean }
+
+export async function fetchDriveRoute(
+  origin: string,
+  destination: string,
+  apiKey: string
+): Promise<DriveRouteResult | null> {
+  const url = 'https://routes.googleapis.com/directions/v2:computeRoutes'
+
+  const [latStr, lonStr] = origin.split(',')
+  const latitude = Number(latStr)
+  const longitude = Number(lonStr)
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return null
+
+  const body = {
+    origin: { location: { latLng: { latitude, longitude } } },
+    destination: { address: destination },
+    travelMode: 'DRIVE',
+    routingPreference: 'TRAFFIC_AWARE',
+    extraComputations: ['TOLLS'],
+    regionCode: 'CA',
+    languageCode: 'en',
+  }
+
+  const res = await fetch(url, {
+    method: 'POST',
+    cache: 'no-store',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Goog-Api-Key': apiKey,
+      'X-Goog-FieldMask': 'routes.duration,routes.travelAdvisory.tollInfo',
+    },
+    body: JSON.stringify(body),
+  })
+
+  if (!res.ok) return null
+
+  const data = (await res.json()) as {
+    routes?: Array<{
+      duration?: string
+      travelAdvisory?: { tollInfo?: unknown }
+    }>
+  }
+
+  const route = data.routes?.[0]
+  if (!route?.duration) return null
+
+  // Routes API returns duration as a protobuf Duration string like "1920s".
+  const match = route.duration.match(/^(\d+(?:\.\d+)?)s$/)
+  if (!match) return null
+  const seconds = Number(match[1])
+  if (!Number.isFinite(seconds)) return null
+
+  const minutes = Math.round(seconds / 60)
+  const hasToll = route.travelAdvisory?.tollInfo != null
+
+  return { minutes, hasToll }
 }
 
 async function fetchTransitMinutes(origin: string, destination: string, arrivalSec: number, apiKey: string): Promise<number | null> {
