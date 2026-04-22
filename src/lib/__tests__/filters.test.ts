@@ -61,3 +61,36 @@ describe('applyFilters — existing behavior', () => {
     expect(applyFilters(ls, { ...EMPTY_FILTERS, flagStatus: 'hide' }).map(l => l.id)).toEqual(['b'])
   })
 })
+
+describe('applyFilters — minBeds', () => {
+  it('includes rows where bedrooms parses >= min', () => {
+    const ls = [
+      mk({ id: 'a', bedrooms: '2' }),
+      mk({ id: 'b', bedrooms: '3' }),
+      mk({ id: 'c', bedrooms: '4' }),
+    ]
+    const out = applyFilters(ls, { ...EMPTY_FILTERS, minBeds: '3' })
+    expect(out.map(l => l.id)).toEqual(['b', 'c'])
+  })
+
+  it('treats "3+1" legacy value as 3 (parseInt)', () => {
+    const ls = [mk({ id: 'a', bedrooms: '3+1' })]
+    expect(applyFilters(ls, { ...EMPTY_FILTERS, minBeds: '3' })).toHaveLength(1)
+    expect(applyFilters(ls, { ...EMPTY_FILTERS, minBeds: '4' })).toHaveLength(0)
+  })
+
+  it('excludes rows with null/unparseable bedrooms when active', () => {
+    const ls = [
+      mk({ id: 'a', bedrooms: null }),
+      mk({ id: 'b', bedrooms: 'studio' }),
+      mk({ id: 'c', bedrooms: '3' }),
+    ]
+    const out = applyFilters(ls, { ...EMPTY_FILTERS, minBeds: '1' })
+    expect(out.map(l => l.id)).toEqual(['c'])
+  })
+
+  it('empty minBeds = no filtering', () => {
+    const ls = [mk({ id: 'a', bedrooms: null })]
+    expect(applyFilters(ls, { ...EMPTY_FILTERS, minBeds: '' })).toHaveLength(1)
+  })
+})

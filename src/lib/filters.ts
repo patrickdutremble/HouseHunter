@@ -8,6 +8,7 @@ export interface Filters {
   maxPrice: string
   favoritesOnly: boolean
   flagStatus: FlagStatus
+  minBeds: string
 }
 
 export const EMPTY_FILTERS: Filters = {
@@ -16,6 +17,7 @@ export const EMPTY_FILTERS: Filters = {
   maxPrice: '',
   favoritesOnly: false,
   flagStatus: 'all',
+  minBeds: '',
 }
 
 export function applyFilters(listings: Listing[], filters: Filters): Listing[] {
@@ -31,6 +33,13 @@ export function applyFilters(listings: Listing[], filters: Filters): Listing[] {
     if (filters.maxPrice) {
       const max = Number(filters.maxPrice.replace(/[$,\s]/g, ''))
       if (!isNaN(max) && (l.price ?? Infinity) > max) return false
+    }
+    if (filters.minBeds) {
+      const min = parseInt(filters.minBeds, 10)
+      if (!isNaN(min)) {
+        const beds = parseInt(l.bedrooms ?? '', 10)
+        if (isNaN(beds) || beds < min) return false
+      }
     }
     return true
   })
