@@ -77,7 +77,7 @@
     "function getCarac(rx){var cs=document.querySelectorAll('.carac-container');for(var a=0;a<cs.length;a++){var titleEl=cs[a].querySelector('.carac-title');if(!titleEl)continue;if(!rx.test(titleEl.textContent.trim()))continue;var valEl=cs[a].querySelector('.carac-value');if(valEl)return valEl.textContent.replace(/\\s+/g,' ').trim();}return null;}",
     "var areaRaw=getCarac(/^(net area|living area|superficie (nette|habitable))$/i);",
     "var area=null;",
-    "if(areaRaw){var n=parseFloat(areaRaw.replace(/,/g,''));if(!isNaN(n)){if(/m\\u00b2|m2/i.test(areaRaw))area=Math.round(n*10.764);else area=Math.round(n);}}",
+    "if(areaRaw){var n=parseFloat(areaRaw.replace(/[\\s,]/g,''));if(!isNaN(n)){if(/m\\u00b2|m2/i.test(areaRaw))area=Math.round(n*10.764);else area=Math.round(n);}}",
     "var parking=getCarac(/^(parking \\(total\\)|stationnement \\(total\\))$/i);",
     "var yearRaw=getCarac(/^(year built|ann\\u00e9e de construction)$/i);",
     "var yearBuilt=null;",
