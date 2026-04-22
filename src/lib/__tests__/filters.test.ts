@@ -150,3 +150,75 @@ describe('applyFilters — commute', () => {
       .toHaveLength(1)
   })
 })
+
+describe('applyFilters — maxMonthlyCost', () => {
+  it('keeps rows at or below threshold; excludes null', () => {
+    const ls = [
+      mk({ id: 'a', total_monthly_cost: 2500 }),
+      mk({ id: 'b', total_monthly_cost: 4500 }),
+      mk({ id: 'c', total_monthly_cost: null }),
+    ]
+    const out = applyFilters(ls, { ...EMPTY_FILTERS, maxMonthlyCost: '3000' })
+    expect(out.map(l => l.id)).toEqual(['a'])
+  })
+
+  it('strips $ and commas', () => {
+    const ls = [mk({ id: 'a', total_monthly_cost: 2500 })]
+    expect(applyFilters(ls, { ...EMPTY_FILTERS, maxMonthlyCost: '$3,000' })).toHaveLength(1)
+  })
+
+  it('empty = no filter', () => {
+    const ls = [mk({ id: 'a', total_monthly_cost: null })]
+    expect(applyFilters(ls, { ...EMPTY_FILTERS, maxMonthlyCost: '' })).toHaveLength(1)
+  })
+})
+
+describe('applyFilters — hasGarage', () => {
+  it('matches "1 garage"', () => {
+    const ls = [mk({ id: 'a', parking: '1 garage' })]
+    expect(applyFilters(ls, { ...EMPTY_FILTERS, hasGarage: true })).toHaveLength(1)
+  })
+
+  it('matches "2 garages"', () => {
+    const ls = [mk({ id: 'a', parking: '2 garages' })]
+    expect(applyFilters(ls, { ...EMPTY_FILTERS, hasGarage: true })).toHaveLength(1)
+  })
+
+  it('matches "1 garage + 1 outdoor"', () => {
+    const ls = [mk({ id: 'a', parking: '1 garage + 1 outdoor' })]
+    expect(applyFilters(ls, { ...EMPTY_FILTERS, hasGarage: true })).toHaveLength(1)
+  })
+
+  it('rejects "1 outdoor"', () => {
+    const ls = [mk({ id: 'a', parking: '1 outdoor' })]
+    expect(applyFilters(ls, { ...EMPTY_FILTERS, hasGarage: true })).toHaveLength(0)
+  })
+
+  it('rejects null and empty parking', () => {
+    const ls = [mk({ id: 'a', parking: null }), mk({ id: 'b', parking: '' })]
+    expect(applyFilters(ls, { ...EMPTY_FILTERS, hasGarage: true })).toHaveLength(0)
+  })
+
+  it('hasGarage=false = no filtering', () => {
+    const ls = [mk({ id: 'a', parking: null })]
+    expect(applyFilters(ls, { ...EMPTY_FILTERS, hasGarage: false })).toHaveLength(1)
+  })
+})
+
+describe('applyFilters — combined', () => {
+  it('all active filters AND together', () => {
+    const ls = [
+      mk({ id: 'a', bedrooms: '3', commute_school_car: '20 min', parking: '1 garage', total_monthly_cost: 2500 }),
+      mk({ id: 'b', bedrooms: '3', commute_school_car: '45 min', parking: '1 garage', total_monthly_cost: 2500 }),
+      mk({ id: 'c', bedrooms: '2', commute_school_car: '20 min', parking: '1 garage', total_monthly_cost: 2500 }),
+    ]
+    const out = applyFilters(ls, {
+      ...EMPTY_FILTERS,
+      minBeds: '3',
+      maxCommuteSchool: '30',
+      hasGarage: true,
+      maxMonthlyCost: '3000',
+    })
+    expect(out.map(l => l.id)).toEqual(['a'])
+  })
+})
