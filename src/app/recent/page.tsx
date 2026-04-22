@@ -74,7 +74,11 @@ export default function RecentPage() {
   }
 
   async function onDeleteCard(id: string) {
-    await deleteListing(id)
+    const ok = await deleteListing(id)
+    if (!ok) {
+      setPaste({ kind: 'error', message: "Couldn't delete — try again" })
+      return
+    }
     await fetchListings()
   }
 

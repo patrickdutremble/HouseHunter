@@ -112,4 +112,19 @@ describe('/share page', () => {
     fireEvent.click(undo)
     await waitFor(() => expect(deleteListingMock).toHaveBeenCalledWith('new-1'))
   })
+
+  it('shows error state if undo fails', async () => {
+    setParams('url=https%3A%2F%2Fcentris.ca%2Fnew')
+    deleteListingMock.mockResolvedValue(false)
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      status: 200,
+      json: async () => ({ listing: { id: 'new-1', price: 1, location: 'A', image_url: null, full_address: null, bedrooms: null, liveable_area_sqft: null, commute_school_car: null, commute_pvm_transit: null } }),
+    }))
+    vi.stubGlobal('fetch', fetchMock)
+    render(<SharePage />)
+    const undo = await screen.findByRole('button', { name: /undo/i })
+    fireEvent.click(undo)
+    await waitFor(() => expect(screen.getByText(/couldn't undo/i)).toBeInTheDocument())
+  })
 })

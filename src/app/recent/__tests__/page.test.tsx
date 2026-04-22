@@ -162,6 +162,18 @@ describe('/recent page', () => {
     expect(screen.queryByText(/added/i)).not.toBeInTheDocument()
   })
 
+  it('surfaces error if card delete fails', async () => {
+    mockListings = [makeListing({ id: 'card-1' })]
+    deleteListingMock.mockResolvedValue(false)
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
+    render(<RecentPage />)
+    fireEvent.click(screen.getByRole('button', { name: /more/i }))
+    fireEvent.click(screen.getByRole('button', { name: /^delete$/i }))
+    await waitFor(() => expect(deleteListingMock).toHaveBeenCalledWith('card-1'))
+    await waitFor(() => expect(screen.getByText(/couldn't delete/i)).toBeInTheDocument())
+    confirmSpy.mockRestore()
+  })
+
   it('shows a server error message when the response is not JSON', async () => {
     const fetchMock = vi.fn(async () => ({
       ok: false,

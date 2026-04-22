@@ -69,7 +69,11 @@ export default function SharePage() {
   async function handleUndo() {
     if (state.kind !== 'success') return
     if (redirectTimer.current) clearTimeout(redirectTimer.current)
-    await deleteListing(state.listing.id)
+    const ok = await deleteListing(state.listing.id)
+    if (!ok) {
+      setState({ kind: 'error', message: "Couldn't undo — try deleting from the Recent list" })
+      return
+    }
     redirectTimer.current = setTimeout(() => router.replace('/recent'), 1500)
   }
 
