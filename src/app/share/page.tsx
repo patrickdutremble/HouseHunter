@@ -52,6 +52,10 @@ export default function SharePage() {
         return
       }
 
+      if (!data.listing) {
+        setState({ kind: 'error', message: "Couldn't read this listing" })
+        return
+      }
       await fetchListings()
       setState({ kind: 'success', listing: data.listing as Listing })
 
@@ -66,7 +70,7 @@ export default function SharePage() {
     if (state.kind !== 'success') return
     if (redirectTimer.current) clearTimeout(redirectTimer.current)
     await deleteListing(state.listing.id)
-    setTimeout(() => router.replace('/recent'), 1500)
+    redirectTimer.current = setTimeout(() => router.replace('/recent'), 1500)
   }
 
   function handleDone() {
