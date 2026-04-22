@@ -157,11 +157,15 @@ export function TableRow({ listing, isSelected, isFocused = false, onSelect, onU
         const value = listing[col.key as keyof Listing]
         const isHighFeeCell = col.key === 'common_fees_yearly' && hasHighFees
         const showPriceBadge = col.key === 'price' && priceBadge !== null
+        const showTollBadge =
+          col.key === 'commute_school_car' && listing.commute_school_has_toll === true
 
         return (
           <td
             key={col.key}
-            className={`px-3 py-2.5 text-sm ${isHighFeeCell ? 'bg-red-50 text-red-800 font-medium' : 'text-slate-700'}`}
+            className={`px-3 py-2.5 text-sm ${showTollBadge ? 'relative' : ''} ${
+              isHighFeeCell ? 'bg-red-50 text-red-800 font-medium' : 'text-slate-700'
+            }`}
             style={{ width: col.width, minWidth: col.width }}
           >
             <div className={showPriceBadge ? 'flex items-center justify-end gap-2' : ''}>
@@ -184,6 +188,15 @@ export function TableRow({ listing, isSelected, isFocused = false, onSelect, onU
                 </span>
               )}
             </div>
+            {showTollBadge && (
+              <span
+                className="absolute left-1 top-1/2 -translate-y-1/2 text-[9px] font-semibold text-blue-600 pointer-events-none select-none"
+                title="Route includes toll road A-25"
+                data-testid="toll-badge"
+              >
+                A25
+              </span>
+            )}
           </td>
         )
       })}
