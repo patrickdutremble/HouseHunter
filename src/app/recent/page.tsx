@@ -42,7 +42,17 @@ export default function RecentPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: trimmed }),
       })
-      const data = await res.json()
+      let data: any
+      try {
+        data = await res.json()
+      } catch {
+        if (!res.ok) {
+          setPaste({ kind: 'error', message: `Server error (${res.status})` })
+        } else {
+          setPaste({ kind: 'error', message: 'Unexpected server response' })
+        }
+        return
+      }
       if (res.status === 409) {
         setPaste({ kind: 'duplicate' })
         return
@@ -90,7 +100,12 @@ export default function RecentPage() {
             <input
               type="url"
               value={url}
-              onChange={e => setUrl(e.target.value)}
+              onChange={e => {
+                setUrl(e.target.value)
+                if (paste.kind !== 'loading' && paste.kind !== 'idle') {
+                  setPaste({ kind: 'idle' })
+                }
+              }}
               placeholder="Paste a Centris URL"
               className="flex-1 border border-slate-300 rounded-lg px-3 py-2 text-sm"
             />

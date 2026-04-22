@@ -145,4 +145,33 @@ describe('/recent page', () => {
     expect(trash.getAttribute('href')).toBe('/trash')
     expect(screen.getByText('3')).toBeInTheDocument()
   })
+
+  it('clears the success banner when the user edits the URL input', async () => {
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      status: 200,
+      json: async () => ({ listing: makeListing({ id: 'new' }) }),
+    }))
+    vi.stubGlobal('fetch', fetchMock)
+    render(<RecentPage />)
+    const input = screen.getByPlaceholderText(/paste a centris/i) as HTMLInputElement
+    fireEvent.change(input, { target: { value: 'https://www.centris.ca/x' } })
+    fireEvent.click(screen.getByRole('button', { name: /^add$/i }))
+    await waitFor(() => expect(screen.getByText(/added/i)).toBeInTheDocument())
+    fireEvent.change(input, { target: { value: 'https://www.centris.ca/y' } })
+    expect(screen.queryByText(/added/i)).not.toBeInTheDocument()
+  })
+
+  it('shows a server error message when the response is not JSON', async () => {
+    const fetchMock = vi.fn(async () => ({
+      ok: false,
+      status: 502,
+      json: async () => { throw new SyntaxError('Unexpected token <') },
+    }))
+    vi.stubGlobal('fetch', fetchMock)
+    render(<RecentPage />)
+    fireEvent.change(screen.getByPlaceholderText(/paste a centris/i), { target: { value: 'https://www.centris.ca/x' } })
+    fireEvent.click(screen.getByRole('button', { name: /^add$/i }))
+    await waitFor(() => expect(screen.getByText(/server error \(502\)/i)).toBeInTheDocument())
+  })
 })
