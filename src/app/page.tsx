@@ -27,6 +27,10 @@ function HomeContent() {
   const [scrapeMessage, setScrapeMessage] = useState<string | null>(null)
   const [compareIds, setCompareIds] = useState<Set<string>>(new Set())
   const [compareMaxWarning, setCompareMaxWarning] = useState(false)
+  const [isRedirecting, setIsRedirecting] = useState(() => {
+    if (typeof window === 'undefined') return false
+    return window.matchMedia('(max-width: 767px)').matches
+  })
 
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -64,6 +68,14 @@ function HomeContent() {
     const timer = setTimeout(() => setCompareMaxWarning(false), 2000)
     return () => clearTimeout(timer)
   }, [compareMaxWarning])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (window.matchMedia('(max-width: 767px)').matches) {
+      setIsRedirecting(true)
+      router.replace('/recent')
+    }
+  }, [router])
 
   const clearCompare = () => {
     setCompareIds(new Set())
@@ -109,7 +121,14 @@ function HomeContent() {
         body: JSON.stringify({ url }),
       })
 
-      const data = await res.json()
+      let data: any
+      try {
+        data = await res.json()
+      } catch {
+        setScrapeStatus('error')
+        setScrapeMessage(res.ok ? 'Unexpected server response' : `Server error (${res.status})`)
+        return
+      }
 
       if (res.status === 409) {
         setScrapeStatus('duplicate')
@@ -151,6 +170,8 @@ function HomeContent() {
       </div>
     )
   }
+
+  if (isRedirecting) return null
 
   const statusColor =
     scrapeStatus === 'success' ? 'text-green-600' :
