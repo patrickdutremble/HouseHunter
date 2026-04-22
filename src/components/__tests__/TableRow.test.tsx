@@ -173,7 +173,6 @@ describe('TableRow — School column A25 toll indicator', () => {
     expect(badge).toBeInTheDocument()
     expect(badge.textContent).toBe('A25')
     expect(badge.className).toMatch(/text-blue-/)
-    expect(badge.className).toMatch(/absolute/)
   })
 
   it('does not render A25 when commute_school_has_toll is false', () => {

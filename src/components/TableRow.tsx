@@ -163,12 +163,21 @@ export function TableRow({ listing, isSelected, isFocused = false, onSelect, onU
         return (
           <td
             key={col.key}
-            className={`px-3 py-2.5 text-sm ${showTollBadge ? 'relative' : ''} ${
+            className={`px-3 py-2.5 text-sm ${
               isHighFeeCell ? 'bg-red-50 text-red-800 font-medium' : 'text-slate-700'
             }`}
             style={{ width: col.width, minWidth: col.width }}
           >
-            <div className={showPriceBadge ? 'flex items-center justify-end gap-2' : ''}>
+            <div className={showPriceBadge || showTollBadge ? 'flex items-center justify-end gap-1' : ''}>
+              {showTollBadge && (
+                <span
+                  className="shrink-0 text-[9px] font-semibold text-blue-600 pointer-events-none select-none"
+                  title="Route includes toll road A-25"
+                  data-testid="toll-badge"
+                >
+                  A25
+                </span>
+              )}
               <EditableCell
                 value={value}
                 format={col.format}
@@ -188,15 +197,6 @@ export function TableRow({ listing, isSelected, isFocused = false, onSelect, onU
                 </span>
               )}
             </div>
-            {showTollBadge && (
-              <span
-                className="absolute right-0.5 top-1/2 -translate-y-1/2 text-[9px] font-semibold text-blue-600 pointer-events-none select-none"
-                title="Route includes toll road A-25"
-                data-testid="toll-badge"
-              >
-                A25
-              </span>
-            )}
           </td>
         )
       })}
