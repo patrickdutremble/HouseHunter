@@ -25,6 +25,7 @@ function make(partial: Partial<Listing> = {}): Listing {
     monthly_mortgage: null,
     total_monthly_cost: null,
     commute_school_car: '15 min',
+    commute_school_has_toll: null,
     commute_pvm_transit: null,
     notes: null,
     personal_rating: null,

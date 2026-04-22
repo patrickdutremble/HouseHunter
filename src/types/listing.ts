@@ -19,6 +19,7 @@ export interface Listing {
   monthly_mortgage: number | null
   total_monthly_cost: number | null
   commute_school_car: string | null
+  commute_school_has_toll: boolean | null
   commute_pvm_transit: string | null
   notes: string | null
   personal_rating: string | null

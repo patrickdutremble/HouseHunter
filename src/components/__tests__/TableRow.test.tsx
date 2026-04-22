@@ -24,6 +24,7 @@ const BASE: Listing = {
   monthly_mortgage: null,
   total_monthly_cost: null,
   commute_school_car: null,
+  commute_school_has_toll: null,
   commute_pvm_transit: null,
   notes: null,
   personal_rating: null,
@@ -162,5 +163,26 @@ describe('TableRow', () => {
     const { container } = renderRow({ ...BASE, flagged_for_deletion: true })
     const flagBtn = container.querySelector('button[title="Unflag"]')
     expect(flagBtn).not.toBeNull()
+  })
+})
+
+describe('TableRow — School column A25 toll indicator', () => {
+  it('renders a blue "A25" label next to the school duration when commute_school_has_toll is true', () => {
+    renderRow({ ...BASE, commute_school_car: '32 min', commute_school_has_toll: true })
+    const badge = screen.getByTestId('toll-badge')
+    expect(badge).toBeInTheDocument()
+    expect(badge.textContent).toBe('A25')
+    expect(badge.className).toMatch(/text-blue-/)
+    expect(badge.className).toMatch(/absolute/)
+  })
+
+  it('does not render A25 when commute_school_has_toll is false', () => {
+    renderRow({ ...BASE, commute_school_car: '32 min', commute_school_has_toll: false })
+    expect(screen.queryByTestId('toll-badge')).toBeNull()
+  })
+
+  it('does not render A25 when commute_school_has_toll is null', () => {
+    renderRow({ ...BASE, commute_school_car: '32 min', commute_school_has_toll: null })
+    expect(screen.queryByTestId('toll-badge')).toBeNull()
   })
 })
