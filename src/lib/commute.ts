@@ -46,18 +46,17 @@ export async function calculateAndStoreCommute(
 
   const update: Record<string, string | boolean | null> = {}
 
-  if (needsDrive) {
-    update.commute_school_car = driveRes ? `${driveRes.minutes} min` : null
-    update.commute_school_has_toll = driveRes ? driveRes.hasToll : null
+  if (needsDrive && driveRes) {
+    update.commute_school_car = `${driveRes.minutes} min`
+    update.commute_school_has_toll = driveRes.hasToll
   }
-  if (needsTransit) {
-    update.commute_pvm_transit = transitMin != null ? `${transitMin} min` : null
+  if (needsTransit && transitMin != null) {
+    update.commute_pvm_transit = `${transitMin} min`
   }
 
-  const { error: updErr } = await supabase
-    .from('listings')
-    .update(update)
-    .eq('id', listingId)
+  const updErr = Object.keys(update).length > 0
+    ? (await supabase.from('listings').update(update).eq('id', listingId)).error
+    : null
 
   const schoolText = needsDrive
     ? (driveRes ? `${driveRes.minutes} min` : null)
