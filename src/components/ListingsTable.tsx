@@ -27,7 +27,7 @@ export function ListingsTable({ listings, selectedId, onSelect, onUpdate, compar
 
   const filtered = useMemo(() => applyFilters(listings, filters), [listings, filters])
 
-  const { sorted, sort, toggleSort } = useSort(filtered)
+  const { sorted, sort, toggleSort, setSort } = useSort(filtered)
 
   useTableKeyboard({
     listings: sorted,
@@ -67,7 +67,13 @@ export function ListingsTable({ listings, selectedId, onSelect, onUpdate, compar
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-white gap-4">
         <div className="flex items-center gap-3 flex-wrap">
-          <FilterBar propertyTypes={propertyTypes} onFilterChange={setFilters} />
+          <FilterBar
+            propertyTypes={propertyTypes}
+            filters={filters}
+            onFilterChange={setFilters}
+            sort={sort}
+            onSortChange={setSort}
+          />
           <RefreshStatusesButton onRefreshed={() => onRefreshed?.()} />
           {lastCheckedAgo && (
             <span className="text-xs text-slate-500">Last checked: {lastCheckedAgo}</span>
