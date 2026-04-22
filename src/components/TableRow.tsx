@@ -190,7 +190,7 @@ export function TableRow({ listing, isSelected, isFocused = false, onSelect, onU
             </div>
             {showTollBadge && (
               <span
-                className="absolute left-1 top-1/2 -translate-y-1/2 text-[9px] font-semibold text-blue-600 pointer-events-none select-none"
+                className="absolute right-0.5 top-1/2 -translate-y-1/2 text-[9px] font-semibold text-blue-600 pointer-events-none select-none"
                 title="Route includes toll road A-25"
                 data-testid="toll-badge"
               >
