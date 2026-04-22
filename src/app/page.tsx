@@ -116,7 +116,14 @@ function HomeContent() {
         body: JSON.stringify({ url }),
       })
 
-      const data = await res.json()
+      let data: any
+      try {
+        data = await res.json()
+      } catch {
+        setScrapeStatus('error')
+        setScrapeMessage(res.ok ? 'Unexpected server response' : `Server error (${res.status})`)
+        return
+      }
 
       if (res.status === 409) {
         setScrapeStatus('duplicate')
