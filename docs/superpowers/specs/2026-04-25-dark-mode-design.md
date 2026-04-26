@@ -84,7 +84,7 @@ Defined in `globals.css`. Light values in `:root` via `@theme`; dark values in `
 - `ListingCard.tsx` — bg, border, status pills.
 - `DetailPanel.tsx` — panel bg, field labels (use `text-fg-muted`), link colors (use `text-accent`).
 - `ListingPopup.tsx` — popup body classes; container styled by leaflet override in globals.css.
-- `SharePreviewCard.tsx` — read-only share card (note: shared snapshots with stable colors may want to lock to light mode regardless of viewer's theme — see Open Questions).
+- `SharePreviewCard.tsx` — read-only share card. **Locked to light mode** regardless of viewer's theme so shared snapshots render consistently for recipients. Implemented by wrapping the card root in a `<div class="hh-force-light">` and adding a `globals.css` rule that resets the tokens inside it back to the light values, so descendant classes resolve to light colors even under `.dark`.
 
 ### F. Action buttons — 2 files
 
@@ -164,10 +164,6 @@ Provider:
 - `npm run lint` clean.
 - `npm run build` succeeds.
 - `npm test` green.
-
-## Open questions
-
-1. **Share preview card** — `SharePreviewCard.tsx` renders the snapshot a user shares externally. Should it always render in light mode regardless of viewer's theme (so the recipient sees a consistent image)? Default assumption: yes, lock to light. Confirm during implementation.
 
 ## Out of scope
 
