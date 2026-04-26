@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     title: 'HouseHunter',
-    statusBarStyle: 'black',
+    statusBarStyle: 'black-translucent',
   },
   icons: {
     apple: '/icon-192.png',
