@@ -49,7 +49,7 @@ export function SharePreviewCard(props: SharePreviewCardProps) {
           <button
             type="button"
             onClick={onRetry}
-            className="flex-1 py-3 rounded-lg bg-fg text-accent-fg font-medium"
+            className="flex-1 py-3 rounded-lg bg-accent text-accent-fg font-medium"
           >
             Try again
           </button>
@@ -67,6 +67,7 @@ export function SharePreviewCard(props: SharePreviewCardProps) {
 
   // success or duplicate
   const isSuccess = variant === 'success'
+  // No dark: variants needed — the card root is wrapped in hh-force-light.
   const badgeClass = isSuccess
     ? 'bg-green-100 text-green-700'
     : 'bg-amber-100 text-amber-700'
@@ -120,7 +121,7 @@ export function SharePreviewCard(props: SharePreviewCardProps) {
             <button
               type="button"
               onClick={onDone}
-              className="px-4 py-2 rounded-lg bg-fg text-accent-fg font-medium"
+              className="px-4 py-2 rounded-lg bg-accent text-accent-fg font-medium"
             >
               Done
             </button>

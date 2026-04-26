@@ -15,6 +15,9 @@ interface DetailPanelProps {
   onDelete: (id: string) => void
 }
 
+const SECONDARY_LINK_BUTTON_CLASSES =
+  'px-3 py-1.5 text-xs font-medium bg-blue-50 dark:bg-sky-900/40 text-accent rounded-lg hover:bg-blue-100 dark:hover:bg-sky-900/60 hover:text-sky-700 dark:hover:text-sky-300 transition-colors'
+
 export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPanelProps) {
   const [pendingCriteria, setPendingCriteria] = useState<Record<string, boolean>>(listing.criteria ?? {})
 
@@ -57,7 +60,7 @@ export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPane
               href={listing.centris_link}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3 py-1.5 text-xs font-medium bg-blue-50 dark:bg-sky-900/40 text-accent rounded-lg hover:bg-blue-100 dark:hover:bg-sky-900/60 hover:text-sky-700 dark:hover:text-sky-300 transition-colors"
+              className={SECONDARY_LINK_BUTTON_CLASSES}
             >
               View on Centris &#8599;
             </a>
@@ -67,7 +70,7 @@ export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPane
               href={listing.broker_link}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3 py-1.5 text-xs font-medium bg-blue-50 dark:bg-sky-900/40 text-accent rounded-lg hover:bg-blue-100 dark:hover:bg-sky-900/60 hover:text-sky-700 dark:hover:text-sky-300 transition-colors"
+              className={SECONDARY_LINK_BUTTON_CLASSES}
             >
               Broker site &#8599;
             </a>

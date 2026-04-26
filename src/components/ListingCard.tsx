@@ -119,7 +119,7 @@ export function ListingCard({ listing, onTap, onDelete }: ListingCardProps) {
             <button
               type="button"
               onClick={handleDeleteClick}
-              className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-surface-hover"
+              className="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-300 hover:bg-surface-hover"
             >
               Delete
             </button>
