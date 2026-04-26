@@ -92,7 +92,7 @@ export function LocationCell({ text, mapQuery, editable, isSelected = false, ima
           target="_blank"
           rel="noopener noreferrer"
           onClick={e => e.stopPropagation()}
-          className="text-accent hover:text-accent hover:underline leading-tight text-[12.5px] break-words min-w-0"
+          className="text-accent hover:text-sky-700 dark:hover:text-sky-300 hover:underline leading-tight text-[12.5px] break-words min-w-0"
           title={mapQuery ?? undefined}
         >
           {text}

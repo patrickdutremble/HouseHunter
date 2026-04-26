@@ -123,7 +123,7 @@ export function EditableCell({ value, format, editable, align, wrap = false, mul
             rel="noopener noreferrer"
             onClick={handleIconClick}
             title={href}
-            className="text-accent hover:text-accent"
+            className="text-accent hover:text-sky-700 dark:hover:text-sky-300"
           >
             <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M11 3h6v6M17 3l-8 8M8 5H4v11h11v-4" strokeLinecap="round" strokeLinejoin="round" />

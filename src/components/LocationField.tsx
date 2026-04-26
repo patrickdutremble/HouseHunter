@@ -62,7 +62,7 @@ export function LocationField({ displayValue, mapQuery, onSave }: LocationFieldP
           href={mapHref}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex-1 break-words text-accent hover:text-accent hover:underline"
+          className="flex-1 break-words text-accent hover:text-sky-700 dark:hover:text-sky-300 hover:underline"
           title="Open in Google Maps"
         >
           {displayValue}
