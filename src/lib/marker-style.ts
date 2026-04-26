@@ -40,8 +40,8 @@ export function getPillClasses(listing: PillInputs): PillClasses {
     }
   }
   return {
-    pill: 'bg-white border-2 border-slate-400',
-    text: 'text-slate-900',
+    pill: 'bg-surface border-2 border-border-strong',
+    text: 'text-fg',
     dotColor,
   }
 }
