@@ -95,7 +95,7 @@ export default function DetailPage() {
             href={listing.centris_link}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-6 block w-full text-center py-3 rounded-lg bg-accent text-accent-fg font-medium hover:bg-sky-600 dark:hover:bg-sky-300 active:bg-sky-700 dark:active:bg-sky-200 transition-colors"
+            className="mt-6 block w-full text-center py-3 rounded-lg bg-accent text-accent-fg font-medium hover:bg-sky-700 dark:hover:bg-sky-300 active:bg-sky-800 dark:active:bg-sky-200 transition-colors"
           >
             Open on Centris
           </a>

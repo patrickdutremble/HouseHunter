@@ -131,7 +131,7 @@ export default function RecentPage() {
             type="button"
             onClick={handleAdd}
             disabled={paste.kind === 'loading' || !url.trim()}
-            className="w-full py-3 rounded-lg bg-accent text-accent-fg font-medium hover:bg-sky-600 dark:hover:bg-sky-300 active:bg-sky-700 dark:active:bg-sky-200 disabled:opacity-50 transition-colors"
+            className="w-full py-3 rounded-lg bg-accent text-accent-fg font-medium hover:bg-sky-700 dark:hover:bg-sky-300 active:bg-sky-800 dark:active:bg-sky-200 disabled:opacity-50 transition-colors"
           >
             {paste.kind === 'loading' ? 'Adding…' : 'Add'}
           </button>

@@ -255,7 +255,7 @@ export function AddListingClient() {
             )}
             <Link
               href="/"
-              className="inline-block px-4 py-2 text-sm font-medium text-accent-fg bg-accent rounded-lg hover:bg-sky-600 dark:hover:bg-sky-300 active:bg-sky-700 dark:active:bg-sky-200 transition-colors"
+              className="inline-block px-4 py-2 text-sm font-medium text-accent-fg bg-accent rounded-lg hover:bg-sky-700 dark:hover:bg-sky-300 active:bg-sky-800 dark:active:bg-sky-200 transition-colors"
             >
               Open HouseHunter
             </Link>
@@ -276,7 +276,7 @@ export function AddListingClient() {
             </p>
             <Link
               href="/"
-              className="inline-block px-4 py-2 text-sm font-medium text-accent-fg bg-accent rounded-lg hover:bg-sky-600 dark:hover:bg-sky-300 active:bg-sky-700 dark:active:bg-sky-200 transition-colors"
+              className="inline-block px-4 py-2 text-sm font-medium text-accent-fg bg-accent rounded-lg hover:bg-sky-700 dark:hover:bg-sky-300 active:bg-sky-800 dark:active:bg-sky-200 transition-colors"
             >
               Open HouseHunter
             </Link>

@@ -12,7 +12,7 @@
   --color-fg: #0f172a;
   --color-fg-muted: #475569;
   --color-fg-subtle: #94a3b8;
-  --color-accent: #0ea5e9;
+  --color-accent: #0284c7;
   --color-accent-fg: #ffffff;
 }
 
@@ -80,7 +80,7 @@ body {
   --color-fg: #0f172a;
   --color-fg-muted: #475569;
   --color-fg-subtle: #94a3b8;
-  --color-accent: #0ea5e9;
+  --color-accent: #0284c7;
   --color-accent-fg: #ffffff;
   color-scheme: light;
 }
