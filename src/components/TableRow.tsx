@@ -38,7 +38,7 @@ function computePriceChangeBadge(listing: Listing): PriceChangeBadge | null {
 
   const dropped = listing.price < listing.previous_price
   const arrow = dropped ? '\u2193' : '\u2191'
-  const color = dropped ? 'bg-green-50 text-green-700 border-green-200' : 'bg-amber-50 text-amber-700 border-amber-200'
+  const color = dropped ? 'bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800' : 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800'
   return {
     label: `${arrow} ${formatPriceDelta(listing.price, listing.previous_price)}`,
     colorClass: color,
@@ -67,11 +67,11 @@ export function TableRow({ listing, isSelected, isFocused = false, onSelect, onU
       ref={rowRef}
       onClick={() => onSelect(listing.id)}
       className={`
-        border-b border-slate-100 cursor-pointer transition-colors
-        ${isSelected ? 'bg-blue-50 border-blue-200' : listing.flagged_for_deletion ? 'bg-red-50 hover:bg-red-100' : listing.favorite ? 'bg-amber-50 hover:bg-amber-100' : 'hover:bg-slate-50'}
-        ${hasFlags ? 'ring-1 ring-inset ring-amber-200' : ''}
-        ${isFocused ? 'ring-2 ring-inset ring-blue-400' : ''}
-        ${isCompared ? 'border-l-2 border-l-blue-400' : ''}
+        border-b border-border cursor-pointer transition-colors
+        ${isSelected ? 'bg-blue-50 dark:bg-sky-900/40 border-blue-200 dark:border-sky-700' : listing.flagged_for_deletion ? 'bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/40' : listing.favorite ? 'bg-amber-50 dark:bg-amber-900/30 hover:bg-amber-100 dark:hover:bg-amber-900/40' : 'hover:bg-surface-hover'}
+        ${hasFlags ? 'ring-1 ring-inset ring-amber-200 dark:ring-amber-800' : ''}
+        ${isFocused ? 'ring-2 ring-inset ring-blue-400 dark:ring-sky-500' : ''}
+        ${isCompared ? 'border-l-2 border-l-blue-400 dark:border-l-sky-500' : ''}
         ${isUnavailable ? 'opacity-50' : ''}
       `}
     >
@@ -84,7 +84,7 @@ export function TableRow({ listing, isSelected, isFocused = false, onSelect, onU
           type="checkbox"
           checked={isCompared}
           onChange={() => onToggleCompare(listing.id)}
-          className="w-3.5 h-3.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+          className="w-3.5 h-3.5 rounded border-border-strong text-accent focus:ring-accent cursor-pointer"
         />
       </td>
       {tableColumns.map(col => {
@@ -115,7 +115,7 @@ export function TableRow({ listing, isSelected, isFocused = false, onSelect, onU
           return (
             <td
               key={col.key}
-              className="px-3 py-2.5 text-sm text-slate-700 text-right"
+              className="px-3 py-2.5 text-sm text-fg-muted text-right"
               style={{ width: col.width, minWidth: col.width }}
             >
               {checked}/{criteria.length}
@@ -127,7 +127,7 @@ export function TableRow({ listing, isSelected, isFocused = false, onSelect, onU
           return (
             <td
               key={col.key}
-              className="px-3 py-2.5 text-sm text-slate-700"
+              className="px-3 py-2.5 text-sm text-fg-muted"
               style={{ width: col.width, minWidth: col.width }}
             >
               <div className="flex items-center gap-2">
@@ -143,7 +143,7 @@ export function TableRow({ listing, isSelected, isFocused = false, onSelect, onU
                 </div>
                 {isUnavailable && (
                   <span
-                    className="inline-flex items-center rounded-full border border-slate-300 bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-600"
+                    className="inline-flex items-center rounded-full border border-border bg-surface-muted px-2 py-0.5 text-[10px] font-medium text-fg-muted"
                     data-testid="unavailable-pill"
                   >
                     Unavailable
@@ -164,14 +164,14 @@ export function TableRow({ listing, isSelected, isFocused = false, onSelect, onU
           <td
             key={col.key}
             className={`px-3 py-2.5 text-sm ${
-              isHighFeeCell ? 'bg-red-50 text-red-800 font-medium' : 'text-slate-700'
+              isHighFeeCell ? 'bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-300 font-medium' : 'text-fg-muted'
             }`}
             style={{ width: col.width, minWidth: col.width }}
           >
             <div className={showPriceBadge || showTollBadge ? 'flex items-center justify-end gap-1' : ''}>
               {showTollBadge && (
                 <span
-                  className="shrink-0 text-[9px] font-semibold text-blue-600 pointer-events-none select-none"
+                  className="shrink-0 text-[9px] font-semibold text-blue-600 dark:text-sky-300 pointer-events-none select-none"
                   title="Route includes toll road A-25"
                   data-testid="toll-badge"
                 >

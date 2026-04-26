@@ -45,7 +45,7 @@ export function LocationField({ displayValue, mapQuery, onSave }: LocationFieldP
         onChange={e => setEditValue(e.target.value)}
         onBlur={handleSave}
         onKeyDown={handleKeyDown}
-        className="w-full px-2 py-1 text-sm border border-blue-400 rounded outline-none bg-white"
+        className="w-full px-2 py-1 text-sm border border-accent rounded outline-none bg-surface"
       />
     )
   }
@@ -62,19 +62,19 @@ export function LocationField({ displayValue, mapQuery, onSave }: LocationFieldP
           href={mapHref}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex-1 break-words text-blue-600 hover:text-blue-800 hover:underline"
+          className="flex-1 break-words text-accent hover:text-accent hover:underline"
           title="Open in Google Maps"
         >
           {displayValue}
         </a>
       ) : (
-        <span className="flex-1 text-slate-400">—</span>
+        <span className="flex-1 text-fg-subtle">—</span>
       )}
       <button
         type="button"
         onClick={startEdit}
         title={displayValue ? 'Edit address' : 'Add address'}
-        className="flex-shrink-0 text-slate-300 hover:text-blue-600 transition-colors pt-0.5"
+        className="flex-shrink-0 text-fg-subtle hover:text-accent transition-colors pt-0.5"
       >
         <svg width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
           {displayValue ? (
