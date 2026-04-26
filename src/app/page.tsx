@@ -14,7 +14,7 @@ import { extractCentrisUrl } from '@/lib/extract-centris-url'
 const MapView = dynamic(() => import('@/components/MapView'), {
   ssr: false,
   loading: () => (
-    <div className="h-full flex items-center justify-center text-slate-400 text-sm">
+    <div className="h-full flex items-center justify-center text-fg-subtle text-sm">
       Loading map…
     </div>
   ),
@@ -160,15 +160,15 @@ function HomeContent() {
 
   if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center bg-slate-50">
-        <div className="text-slate-400 text-sm">Loading listings...</div>
+      <div className="h-screen flex items-center justify-center bg-bg">
+        <div className="text-fg-subtle text-sm">Loading listings...</div>
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="h-screen flex items-center justify-center bg-slate-50">
+      <div className="h-screen flex items-center justify-center bg-bg">
         <div className="text-red-500 text-sm">Error: {error}</div>
       </div>
     )
@@ -177,14 +177,14 @@ function HomeContent() {
   if (isRedirecting) return null
 
   const statusColor =
-    scrapeStatus === 'success' ? 'text-green-600' :
-    scrapeStatus === 'duplicate' ? 'text-amber-600' :
-    scrapeStatus === 'error' ? 'text-red-600' :
-    'text-slate-400'
+    scrapeStatus === 'success' ? 'text-green-600 dark:text-green-300' :
+    scrapeStatus === 'duplicate' ? 'text-amber-600 dark:text-amber-300' :
+    scrapeStatus === 'error' ? 'text-red-600 dark:text-red-300' :
+    'text-fg-subtle'
 
   return (
-    <div className="h-screen flex flex-col bg-slate-50">
-      <div className="flex items-center gap-2 px-4 py-2 bg-white border-b border-slate-200">
+    <div className="h-screen flex flex-col bg-bg">
+      <div className="flex items-center gap-2 px-4 py-2 bg-surface border-b border-border">
         {/* URL input */}
         <input
           type="url"
@@ -193,14 +193,14 @@ function HomeContent() {
           onKeyDown={e => { if (e.key === 'Enter') handleScrape() }}
           placeholder="Paste a Centris URL..."
           disabled={scrapeStatus === 'loading'}
-          className="flex-1 min-w-0 px-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 placeholder:text-slate-400"
+          className="flex-1 min-w-0 px-3 py-1.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent disabled:opacity-50 placeholder:text-fg-subtle"
         />
 
         {/* Paste button */}
         <button
           onClick={handlePaste}
           disabled={scrapeStatus === 'loading'}
-          className="hidden sm:block px-3 py-1.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="hidden sm:block px-3 py-1.5 text-sm font-medium text-fg-muted bg-surface border border-border rounded-lg hover:bg-surface-hover disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           title="Paste from clipboard"
         >
           Paste
@@ -210,7 +210,7 @@ function HomeContent() {
         <button
           onClick={handleScrape}
           disabled={scrapeStatus === 'loading' || !centrisUrl.trim()}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 active:bg-blue-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 dark:bg-sky-600 rounded-lg hover:bg-blue-700 dark:hover:bg-sky-500 active:bg-blue-800 dark:active:bg-sky-400 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
           {scrapeStatus === 'loading' ? (
             <>
@@ -243,7 +243,7 @@ function HomeContent() {
             <button
               onClick={openCompare}
               aria-label={`Compare ${compareIds.size} listings`}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 dark:bg-sky-600 rounded-lg hover:bg-blue-700 dark:hover:bg-sky-500 active:bg-blue-800 dark:active:bg-sky-400 transition-colors"
             >
               <svg aria-hidden="true" width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M2 3.75A.75.75 0 012.75 3h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 3.75zm0 4.167a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75a.75.75 0 01-.75-.75zm0 4.166a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75a.75.75 0 01-.75-.75zm0 4.167a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75a.75.75 0 01-.75-.75z" clipRule="evenodd" />
@@ -254,7 +254,7 @@ function HomeContent() {
             <button
               onClick={clearCompare}
               aria-label="Clear selection"
-              className="p-1.5 text-slate-400 bg-white border border-slate-200 rounded-lg hover:text-slate-600 hover:bg-slate-50 transition-colors"
+              className="p-1.5 text-fg-subtle bg-surface border border-border rounded-lg hover:text-fg-muted hover:bg-surface-hover transition-colors"
               title="Clear selection"
             >
               <svg aria-hidden="true" width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
@@ -262,7 +262,7 @@ function HomeContent() {
               </svg>
             </button>
             {compareMaxWarning && (
-              <span role="status" aria-live="polite" className="absolute top-full right-0 mt-1 px-3 py-2 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-lg shadow-lg whitespace-nowrap z-30">
+              <span role="status" aria-live="polite" className="absolute top-full right-0 mt-1 px-3 py-2 text-xs font-medium text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-lg shadow-lg whitespace-nowrap z-30">
                 Maximum 5 listings
               </span>
             )}
@@ -305,7 +305,7 @@ function HomeContent() {
       {/* Trash link */}
       <Link
         href="/trash"
-        className="fixed bottom-4 left-4 flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-slate-500 bg-white border border-slate-200 rounded-lg shadow-sm hover:bg-slate-50 hover:text-slate-700 transition-colors"
+        className="fixed bottom-4 left-4 flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-fg-subtle bg-surface border border-border rounded-lg shadow-sm hover:bg-surface-hover hover:text-fg-muted transition-colors"
         title="View deleted listings"
       >
         <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
@@ -313,7 +313,7 @@ function HomeContent() {
         </svg>
         Trash
         {trashCount > 0 && (
-          <span className="ml-0.5 px-1.5 py-0.5 text-xs font-semibold bg-red-100 text-red-700 rounded-full">
+          <span className="ml-0.5 px-1.5 py-0.5 text-xs font-semibold bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 rounded-full">
             {trashCount}
           </span>
         )}
@@ -325,7 +325,7 @@ function HomeContent() {
 
 export default function Home() {
   return (
-    <Suspense fallback={<div className="h-screen flex items-center justify-center bg-slate-50"><div className="text-slate-400 text-sm">Loading...</div></div>}>
+    <Suspense fallback={<div className="h-screen flex items-center justify-center bg-bg"><div className="text-fg-subtle text-sm">Loading...</div></div>}>
       <HomeContent />
     </Suspense>
   )
