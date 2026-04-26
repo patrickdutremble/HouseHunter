@@ -136,13 +136,13 @@ export default function RecentPage() {
             {paste.kind === 'loading' ? 'Adding…' : 'Add'}
           </button>
           {paste.kind === 'success' && (
-            <div className="text-sm text-green-700">Added</div>
+            <div className="text-sm text-green-700 dark:text-green-300">Added</div>
           )}
           {paste.kind === 'duplicate' && (
-            <div className="text-sm text-amber-700">Already saved</div>
+            <div className="text-sm text-amber-700 dark:text-amber-300">Already saved</div>
           )}
           {paste.kind === 'error' && (
-            <div className="text-sm text-red-600">{paste.message}</div>
+            <div className="text-sm text-red-600 dark:text-red-300">{paste.message}</div>
           )}
         </div>
 
