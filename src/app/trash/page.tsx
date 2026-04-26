@@ -174,7 +174,7 @@ export default function TrashPage() {
                 <div className="flex items-center gap-2 shrink-0">
                   <button
                     onClick={() => restoreListing(listing.id)}
-                    className="px-3 py-1.5 text-xs font-medium text-accent hover:text-sky-700 dark:hover:text-sky-200 hover:bg-blue-50 dark:hover:bg-sky-900/40 rounded-lg transition-colors"
+                    className="px-3 py-1.5 text-xs font-medium text-accent hover:text-sky-700 dark:hover:text-sky-300 hover:bg-blue-50 dark:hover:bg-sky-900/40 rounded-lg transition-colors"
                   >
                     Restore
                   </button>

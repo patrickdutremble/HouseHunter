@@ -109,7 +109,7 @@ function CompareContent() {
         <p className="text-fg-subtle text-sm">Select at least 2 listings to compare.</p>
         <Link
           href="/"
-          className="px-4 py-2 text-sm font-medium text-accent hover:text-sky-700 dark:hover:text-sky-200 hover:bg-blue-50 dark:hover:bg-sky-900/40 rounded-lg transition-colors"
+          className="px-4 py-2 text-sm font-medium text-accent hover:text-sky-700 dark:hover:text-sky-300 hover:bg-blue-50 dark:hover:bg-sky-900/40 rounded-lg transition-colors"
         >
           Back to listings
         </Link>
@@ -189,7 +189,7 @@ function CompareContent() {
                     href={listing.centris_link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="ml-2 text-xs text-accent hover:text-sky-700 dark:hover:text-sky-200"
+                    className="ml-2 text-xs text-accent hover:text-sky-700 dark:hover:text-sky-300"
                   >
                     Centris &#8599;
                   </a>
