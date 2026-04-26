@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import RecentPage from '@/app/recent/page'
+import { ThemeProvider } from '@/components/ThemeProvider'
 import type { Listing } from '@/types/listing'
 
 const pushMock = vi.fn()
@@ -82,7 +83,7 @@ describe('/recent page', () => {
 
   it('renders the paste card and empty state when there are no listings', () => {
     mockListings = []
-    render(<RecentPage />)
+    render(<RecentPage />, { wrapper: ThemeProvider })
     expect(screen.getByPlaceholderText(/paste a centris url/i)).toBeInTheDocument()
     expect(screen.getByText(/no listings yet/i)).toBeInTheDocument()
   })
@@ -91,7 +92,7 @@ describe('/recent page', () => {
     mockListings = Array.from({ length: 12 }, (_, i) =>
       makeListing({ id: `x-${i}`, location: `City-${i}`, created_at: new Date(2026, 3, 21, i).toISOString() })
     )
-    render(<RecentPage />)
+    render(<RecentPage />, { wrapper: ThemeProvider })
     const cards = screen.getAllByTestId('listing-card-body')
     expect(cards.length).toBe(10)
   })
@@ -103,7 +104,7 @@ describe('/recent page', () => {
       json: async () => ({ listing: makeListing({ id: 'new-1' }) }),
     }))
     vi.stubGlobal('fetch', fetchMock)
-    render(<RecentPage />)
+    render(<RecentPage />, { wrapper: ThemeProvider })
     const input = screen.getByPlaceholderText(/paste a centris url/i) as HTMLInputElement
     fireEvent.change(input, { target: { value: 'https://centris.ca/new' } })
     fireEvent.click(screen.getByRole('button', { name: /^add$/i }))
@@ -121,7 +122,7 @@ describe('/recent page', () => {
       json: async () => ({ listingId: 'x', error: 'Duplicate' }),
     }))
     vi.stubGlobal('fetch', fetchMock)
-    render(<RecentPage />)
+    render(<RecentPage />, { wrapper: ThemeProvider })
     fireEvent.change(screen.getByPlaceholderText(/paste a centris url/i), { target: { value: 'https://centris.ca/d' } })
     fireEvent.click(screen.getByRole('button', { name: /^add$/i }))
     await waitFor(() => expect(screen.getByText(/already saved/i)).toBeInTheDocument())
@@ -134,14 +135,14 @@ describe('/recent page', () => {
       json: async () => ({ error: 'Boom' }),
     }))
     vi.stubGlobal('fetch', fetchMock)
-    render(<RecentPage />)
+    render(<RecentPage />, { wrapper: ThemeProvider })
     fireEvent.change(screen.getByPlaceholderText(/paste a centris url/i), { target: { value: 'https://centris.ca/bad' } })
     fireEvent.click(screen.getByRole('button', { name: /^add$/i }))
     await waitFor(() => expect(screen.getByText(/boom/i)).toBeInTheDocument())
   })
 
   it('trash link shows trashCount badge and targets /trash', () => {
-    render(<RecentPage />)
+    render(<RecentPage />, { wrapper: ThemeProvider })
     const trash = screen.getByRole('link', { name: /trash/i }) as HTMLAnchorElement
     expect(trash.getAttribute('href')).toBe('/trash')
     expect(screen.getByText('3')).toBeInTheDocument()
@@ -154,7 +155,7 @@ describe('/recent page', () => {
       json: async () => ({ listing: makeListing({ id: 'new' }) }),
     }))
     vi.stubGlobal('fetch', fetchMock)
-    render(<RecentPage />)
+    render(<RecentPage />, { wrapper: ThemeProvider })
     const input = screen.getByPlaceholderText(/paste a centris/i) as HTMLInputElement
     fireEvent.change(input, { target: { value: 'https://www.centris.ca/x' } })
     fireEvent.click(screen.getByRole('button', { name: /^add$/i }))
@@ -167,7 +168,7 @@ describe('/recent page', () => {
     mockListings = [makeListing({ id: 'card-1' })]
     deleteListingMock.mockResolvedValue(false)
     const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
-    render(<RecentPage />)
+    render(<RecentPage />, { wrapper: ThemeProvider })
     fireEvent.click(screen.getByRole('button', { name: /more/i }))
     fireEvent.click(screen.getByRole('button', { name: /^delete$/i }))
     await waitFor(() => expect(deleteListingMock).toHaveBeenCalledWith('card-1'))
@@ -182,7 +183,7 @@ describe('/recent page', () => {
       json: async () => { throw new SyntaxError('Unexpected token <') },
     }))
     vi.stubGlobal('fetch', fetchMock)
-    render(<RecentPage />)
+    render(<RecentPage />, { wrapper: ThemeProvider })
     fireEvent.change(screen.getByPlaceholderText(/paste a centris/i), { target: { value: 'https://www.centris.ca/x' } })
     fireEvent.click(screen.getByRole('button', { name: /^add$/i }))
     await waitFor(() => expect(screen.getByText(/server error \(502\)/i)).toBeInTheDocument())
