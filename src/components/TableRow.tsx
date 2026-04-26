@@ -45,6 +45,17 @@ function computePriceChangeBadge(listing: Listing): PriceChangeBadge | null {
   }
 }
 
+function getRowStateClass(
+  isSelected: boolean,
+  flagged: boolean,
+  favorite: boolean,
+): string {
+  if (isSelected) return 'bg-blue-50 dark:bg-sky-900/40 border-blue-200 dark:border-sky-700'
+  if (flagged) return 'bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/40'
+  if (favorite) return 'bg-amber-50 dark:bg-amber-900/30 hover:bg-amber-100 dark:hover:bg-amber-900/40'
+  return 'hover:bg-surface-hover'
+}
+
 export function TableRow({ listing, isSelected, isFocused = false, onSelect, onUpdate, isCompared, onToggleCompare }: TableRowProps) {
   const rowRef = useRef<HTMLTableRowElement>(null)
   const hasHighFees = (listing.common_fees_yearly ?? 0) > 6000
@@ -68,7 +79,7 @@ export function TableRow({ listing, isSelected, isFocused = false, onSelect, onU
       onClick={() => onSelect(listing.id)}
       className={`
         border-b border-border cursor-pointer transition-colors
-        ${isSelected ? 'bg-blue-50 dark:bg-sky-900/40 border-blue-200 dark:border-sky-700' : listing.flagged_for_deletion ? 'bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/40' : listing.favorite ? 'bg-amber-50 dark:bg-amber-900/30 hover:bg-amber-100 dark:hover:bg-amber-900/40' : 'hover:bg-surface-hover'}
+        ${getRowStateClass(isSelected, listing.flagged_for_deletion, listing.favorite)}
         ${hasFlags ? 'ring-1 ring-inset ring-amber-200 dark:ring-amber-800' : ''}
         ${isFocused ? 'ring-2 ring-inset ring-blue-400 dark:ring-sky-500' : ''}
         ${isCompared ? 'border-l-2 border-l-blue-400 dark:border-l-sky-500' : ''}
@@ -171,7 +182,7 @@ export function TableRow({ listing, isSelected, isFocused = false, onSelect, onU
             <div className={showPriceBadge || showTollBadge ? 'flex items-center justify-end gap-1' : ''}>
               {showTollBadge && (
                 <span
-                  className="shrink-0 text-[9px] font-semibold text-blue-600 dark:text-sky-300 pointer-events-none select-none"
+                  className="shrink-0 text-[9px] font-semibold text-accent pointer-events-none select-none"
                   title="Route includes toll road A-25"
                   data-testid="toll-badge"
                 >

@@ -105,7 +105,7 @@ export function LocationCell({ text, mapQuery, editable, isSelected = false, ima
           type="button"
           onClick={startEdit}
           title={isSelected ? 'Edit location' : undefined}
-          className={`flex-shrink-0 transition-colors ${isSelected ? 'text-fg-subtle hover:text-accent' : 'text-border cursor-default'}`}
+          className={`flex-shrink-0 transition-colors ${isSelected ? 'text-fg-subtle hover:text-accent' : 'text-fg-subtle/50 cursor-default'}`}
         >
           <svg width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M4 13.5V16h2.5L15 7.5 12.5 5 4 13.5z" strokeLinecap="round" strokeLinejoin="round" />
