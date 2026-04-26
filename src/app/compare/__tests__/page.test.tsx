@@ -81,6 +81,7 @@ vi.mock('@/lib/supabase', () => ({
 }))
 
 import ComparePage from '../page'
+import { ThemeProvider } from '@/components/ThemeProvider'
 
 beforeEach(() => {
   updateSpy.mockClear()
@@ -88,7 +89,7 @@ beforeEach(() => {
 
 describe('ComparePage — criteria toggles', () => {
   it('persists toggles on the editable criterion to Supabase', async () => {
-    render(<ComparePage />)
+    render(<ThemeProvider><ComparePage /></ThemeProvider>)
 
     const noAbove = await screen.findAllByRole('checkbox', {
       name: 'No above neighbors',
@@ -103,7 +104,7 @@ describe('ComparePage — criteria toggles', () => {
   })
 
   it('does not persist or toggle clicks on derived (disabled) criteria', async () => {
-    render(<ComparePage />)
+    render(<ThemeProvider><ComparePage /></ThemeProvider>)
 
     const threeBed = await screen.findAllByRole('checkbox', { name: '3 bedrooms' })
     expect(threeBed[0]).toBeDisabled()
