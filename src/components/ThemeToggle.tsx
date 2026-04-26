@@ -39,7 +39,7 @@ export function ThemeToggle() {
     <div
       role="group"
       aria-label="Theme"
-      className="fixed top-4 right-4 z-50 inline-flex rounded-full border border-border bg-surface p-0.5 gap-0.5 shadow-sm"
+      className="inline-flex rounded-full border border-border bg-surface p-0.5 gap-0.5 shadow-sm"
     >
       {OPTIONS.map(({ value, label, Icon }) => {
         const active = theme === value
