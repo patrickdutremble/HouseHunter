@@ -32,7 +32,7 @@ export function ListingPopup({ listing, onSelect }: ListingPopupProps) {
       <button
         type="button"
         onClick={() => onSelect(listing.id)}
-        className="mt-3 w-full px-3 py-1.5 text-xs font-medium text-accent-fg bg-accent rounded-md hover:bg-sky-700 dark:hover:bg-sky-500 active:bg-sky-800 dark:active:bg-sky-600 transition-colors"
+        className="mt-3 w-full px-3 py-1.5 text-xs font-medium text-accent-fg bg-accent rounded-md hover:bg-sky-700 dark:hover:bg-sky-300 active:bg-sky-800 dark:active:bg-sky-200 transition-colors"
       >
         See full details
       </button>

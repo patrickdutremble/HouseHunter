@@ -171,7 +171,7 @@ export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPane
               onDelete(listing.id)
             }
           }}
-          className="px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+          className="px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-300 hover:text-red-800 dark:hover:text-red-200 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
         >
           Delete listing
         </button>
