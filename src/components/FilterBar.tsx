@@ -62,7 +62,7 @@ export function FilterBar({
           className={`
             px-3 py-1.5 text-sm rounded-lg border transition-colors
             ${activeCount > 0
-              ? 'bg-blue-50 dark:bg-sky-900/40 border-blue-300 dark:border-sky-700 text-blue-700 dark:text-accent'
+              ? 'bg-blue-50 dark:bg-sky-900/40 border-blue-300 dark:border-sky-700 text-blue-700 dark:text-blue-300'
               : 'bg-surface border-border text-fg-muted hover:bg-surface-hover'}
           `}
         >
@@ -85,7 +85,7 @@ export function FilterBar({
           className={`
             px-3 py-1.5 text-sm rounded-lg border transition-colors
             ${sort.length > 0
-              ? 'bg-blue-50 dark:bg-sky-900/40 border-blue-300 dark:border-sky-700 text-blue-700 dark:text-accent'
+              ? 'bg-blue-50 dark:bg-sky-900/40 border-blue-300 dark:border-sky-700 text-blue-700 dark:text-blue-300'
               : 'bg-surface border-border text-fg-muted hover:bg-surface-hover'}
           `}
         >
