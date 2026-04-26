@@ -210,7 +210,7 @@ function HomeContent() {
         <button
           onClick={handleScrape}
           disabled={scrapeStatus === 'loading' || !centrisUrl.trim()}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 dark:bg-sky-600 rounded-lg hover:bg-blue-700 dark:hover:bg-sky-500 active:bg-blue-800 dark:active:bg-sky-400 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-accent-fg bg-accent rounded-lg hover:bg-sky-600 dark:hover:bg-sky-300 active:bg-sky-700 dark:active:bg-sky-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
           {scrapeStatus === 'loading' ? (
             <>
@@ -243,7 +243,7 @@ function HomeContent() {
             <button
               onClick={openCompare}
               aria-label={`Compare ${compareIds.size} listings`}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 dark:bg-sky-600 rounded-lg hover:bg-blue-700 dark:hover:bg-sky-500 active:bg-blue-800 dark:active:bg-sky-400 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-accent-fg bg-accent rounded-lg hover:bg-sky-600 dark:hover:bg-sky-300 active:bg-sky-700 dark:active:bg-sky-200 transition-colors"
             >
               <svg aria-hidden="true" width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M2 3.75A.75.75 0 012.75 3h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 3.75zm0 4.167a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75a.75.75 0 01-.75-.75zm0 4.166a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75a.75.75 0 01-.75-.75zm0 4.167a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75a.75.75 0 01-.75-.75z" clipRule="evenodd" />
