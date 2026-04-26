@@ -55,7 +55,7 @@ export function ListingCard({ listing, onTap, onDelete }: ListingCardProps) {
   }
 
   return (
-    <div className="relative bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+    <div className="relative bg-surface rounded-xl shadow-sm border border-border overflow-hidden">
       <button
         type="button"
         data-testid="listing-card-body"
@@ -67,20 +67,20 @@ export function ListingCard({ listing, onTap, onDelete }: ListingCardProps) {
             src={listing.image_url}
             alt={address}
             loading="lazy"
-            className="shrink-0 w-20 h-20 rounded-lg object-cover bg-slate-100"
+            className="shrink-0 w-20 h-20 rounded-lg object-cover bg-surface-muted"
             onError={e => { (e.currentTarget as HTMLImageElement).style.visibility = 'hidden' }}
           />
         ) : (
-          <div className="shrink-0 w-20 h-20 rounded-lg bg-slate-100 flex items-center justify-center text-slate-300">
+          <div className="shrink-0 w-20 h-20 rounded-lg bg-surface-muted flex items-center justify-center text-fg-subtle">
             <PlaceholderIcon />
           </div>
         )}
         <div className="flex-1 min-w-0 pr-8">
-          <div className="text-sm text-slate-900 truncate">{address}</div>
-          <div className="font-bold text-slate-900">{formatPrice(listing.price)}</div>
-          {meta && <div className="text-xs text-slate-600">{meta}</div>}
-          {commute && <div className="text-xs text-slate-600 truncate">{commute}</div>}
-          <div className="text-[11px] text-slate-400 mt-0.5">Added {timeAgo(listing.created_at)}</div>
+          <div className="text-sm text-fg truncate">{address}</div>
+          <div className="font-bold text-fg">{formatPrice(listing.price)}</div>
+          {meta && <div className="text-xs text-fg-muted">{meta}</div>}
+          {commute && <div className="text-xs text-fg-muted truncate">{commute}</div>}
+          <div className="text-[11px] text-fg-subtle mt-0.5">Added {timeAgo(listing.created_at)}</div>
         </div>
       </button>
 
@@ -88,7 +88,7 @@ export function ListingCard({ listing, onTap, onDelete }: ListingCardProps) {
         type="button"
         aria-label="More"
         onClick={() => setMenuOpen(v => !v)}
-        className="absolute top-2 right-2 z-50 w-8 h-8 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-100"
+        className="absolute top-2 right-2 z-50 w-8 h-8 rounded-full flex items-center justify-center text-fg-muted hover:bg-surface-muted"
       >
         <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
           <circle cx="4" cy="10" r="1.5" />
@@ -104,14 +104,14 @@ export function ListingCard({ listing, onTap, onDelete }: ListingCardProps) {
             onClick={() => setMenuOpen(false)}
             aria-hidden="true"
           />
-          <div className="absolute top-10 right-2 z-50 bg-white rounded-lg shadow-lg border border-slate-200 py-1 min-w-[180px]">
+          <div className="absolute top-10 right-2 z-50 bg-surface rounded-lg shadow-lg border border-border py-1 min-w-[180px]">
             {listing.centris_link && (
               <a
                 href={listing.centris_link}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setMenuOpen(false)}
-                className="block px-4 py-2 text-sm text-slate-900 hover:bg-slate-50"
+                className="block px-4 py-2 text-sm text-fg hover:bg-surface-hover"
               >
                 Open on Centris
               </a>
@@ -119,7 +119,7 @@ export function ListingCard({ listing, onTap, onDelete }: ListingCardProps) {
             <button
               type="button"
               onClick={handleDeleteClick}
-              className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-slate-50"
+              className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-surface-hover"
             >
               Delete
             </button>

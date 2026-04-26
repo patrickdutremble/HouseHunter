@@ -22,11 +22,11 @@ export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPane
     setPendingCriteria(listing.criteria ?? {})
   }, [listing.id])
   return (
-    <div className="w-[420px] border-l border-slate-200 bg-white flex flex-col h-full shadow-lg">
+    <div className="w-[420px] border-l border-border bg-surface flex flex-col h-full shadow-lg">
       {/* Header */}
-      <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200 bg-slate-50">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-border bg-bg">
         <div>
-          <h2 className="text-lg font-semibold text-slate-800">
+          <h2 className="text-lg font-semibold text-fg">
             {listing.location ?? 'Unknown Location'}
           </h2>
         </div>
@@ -38,7 +38,7 @@ export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPane
           />
         <button
           onClick={onClose}
-          className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200 transition-colors"
+          className="p-1.5 rounded-lg text-fg-subtle hover:text-fg-muted hover:bg-surface-muted transition-colors"
           aria-label="Close"
         >
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
@@ -57,7 +57,7 @@ export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPane
               href={listing.centris_link}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3 py-1.5 text-xs font-medium bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors"
+              className="px-3 py-1.5 text-xs font-medium bg-blue-50 dark:bg-sky-900/40 text-accent rounded-lg hover:bg-blue-100 dark:hover:bg-sky-900/60 hover:text-sky-700 dark:hover:text-sky-300 transition-colors"
             >
               View on Centris &#8599;
             </a>
@@ -67,7 +67,7 @@ export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPane
               href={listing.broker_link}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3 py-1.5 text-xs font-medium bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-colors"
+              className="px-3 py-1.5 text-xs font-medium bg-blue-50 dark:bg-sky-900/40 text-accent rounded-lg hover:bg-blue-100 dark:hover:bg-sky-900/60 hover:text-sky-700 dark:hover:text-sky-300 transition-colors"
             >
               Broker site &#8599;
             </a>
@@ -76,7 +76,7 @@ export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPane
 
         {/* Good-to-have criteria */}
         <div className="mb-5">
-          <div className="text-xs font-medium text-slate-400 uppercase tracking-wide mb-2">
+          <div className="text-xs font-medium text-fg-subtle uppercase tracking-wide mb-2">
             Good-to-have criteria
           </div>
           <div className="grid grid-cols-2 gap-x-4 gap-y-2">
@@ -87,7 +87,7 @@ export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPane
                 : pendingCriteria[c.key] === true
               const cursor = isDerived ? 'cursor-not-allowed' : 'cursor-pointer'
               return (
-                <label key={c.key} className={`flex items-center gap-2 text-sm text-slate-700 ${cursor}`}>
+                <label key={c.key} className={`flex items-center gap-2 text-sm text-fg-muted ${cursor}`}>
                   <input
                     type="checkbox"
                     aria-label={c.label}
@@ -101,9 +101,9 @@ export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPane
                         return next
                       })
                     }}
-                    className={`w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 ${cursor} ${isDerived ? 'opacity-70' : ''}`}
+                    className={`w-4 h-4 rounded border-border-strong text-accent focus:ring-accent ${cursor} ${isDerived ? 'opacity-70' : ''}`}
                   />
-                  <span className={isDerived ? 'text-slate-500' : ''}>{c.label}</span>
+                  <span className={isDerived ? 'text-fg-subtle' : ''}>{c.label}</span>
                 </label>
               )
             })}
@@ -115,16 +115,16 @@ export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPane
           <img
             src={listing.image_url}
             alt="Listing photo"
-            className="w-full h-48 object-cover rounded-lg border border-slate-200 mb-5"
+            className="w-full h-48 object-cover rounded-lg border border-border mb-5"
           />
         )}
 
         {/* Location with full address + Maps link */}
-        <div className="flex items-start justify-between py-1.5 border-b border-slate-50 mb-3">
-          <span className="text-xs font-medium text-slate-400 uppercase tracking-wide w-32 shrink-0 pt-0.5">
+        <div className="flex items-start justify-between py-1.5 border-b border-border mb-3">
+          <span className="text-xs font-medium text-fg-subtle uppercase tracking-wide w-32 shrink-0 pt-0.5">
             Location
           </span>
-          <div className="flex-1 text-sm text-slate-700 min-w-0">
+          <div className="flex-1 text-sm text-fg-muted min-w-0">
             <LocationField
               displayValue={listing.full_address ?? listing.location}
               mapQuery={listing.full_address ?? listing.location}
@@ -141,11 +141,11 @@ export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPane
             const value = listing[col.key as keyof Listing]
 
             return (
-              <div key={col.key} className="flex items-start justify-between py-1.5 border-b border-slate-50">
-                <span className="text-xs font-medium text-slate-400 uppercase tracking-wide w-32 shrink-0 pt-0.5">
+              <div key={col.key} className="flex items-start justify-between py-1.5 border-b border-border">
+                <span className="text-xs font-medium text-fg-subtle uppercase tracking-wide w-32 shrink-0 pt-0.5">
                   {col.label}
                 </span>
-                <div className="flex-1 text-sm text-slate-700 min-w-0">
+                <div className="flex-1 text-sm text-fg-muted min-w-0">
                   <EditableCell
                     value={value}
                     format={col.format}
@@ -164,14 +164,14 @@ export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPane
       </div>
 
       {/* Footer */}
-      <div className="px-5 py-3 border-t border-slate-200 bg-slate-50">
+      <div className="px-5 py-3 border-t border-border bg-bg">
         <button
           onClick={() => {
             if (confirm('Move this listing to the trash?')) {
               onDelete(listing.id)
             }
           }}
-          className="px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
+          className="px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
         >
           Delete listing
         </button>
