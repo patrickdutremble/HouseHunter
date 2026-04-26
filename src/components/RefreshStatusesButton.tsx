@@ -41,14 +41,14 @@ export function RefreshStatusesButton({ onRefreshed }: Props) {
         className={`
           px-3 py-1.5 text-sm rounded-lg border transition-colors
           ${running
-            ? 'bg-slate-100 border-slate-200 text-slate-400 cursor-wait'
-            : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'}
+            ? 'bg-surface-muted border-border text-fg-subtle cursor-wait'
+            : 'bg-surface border-border text-fg-muted hover:bg-surface-hover'}
         `}
       >
         {running ? 'Refreshing\u2026' : 'Refresh statuses'}
       </button>
       {message && (
-        <span className={`text-xs ${isError ? 'text-red-600' : 'text-slate-500'}`}>{message}</span>
+        <span className={`text-xs ${isError ? 'text-red-600 dark:text-red-400' : 'text-fg-subtle'}`}>{message}</span>
       )}
     </div>
   )

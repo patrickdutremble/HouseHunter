@@ -17,10 +17,10 @@ interface FilterBarProps {
 }
 
 const flagBtnBase = 'px-3 py-1.5 text-sm border transition-colors'
-const flagBtnActive = 'bg-red-50 border-red-300 text-red-700'
-const flagBtnHideActive = 'bg-slate-100 border-slate-300 text-slate-700'
-const flagBtnAllActive = 'bg-white border-slate-300 text-slate-700'
-const flagBtnIdle = 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
+const flagBtnActive = 'bg-red-50 dark:bg-red-900/30 border-red-300 dark:border-red-800 text-red-700 dark:text-red-300'
+const flagBtnHideActive = 'bg-surface-muted border-border-strong text-fg-muted'
+const flagBtnAllActive = 'bg-surface border-border-strong text-fg-muted'
+const flagBtnIdle = 'bg-surface border-border text-fg-subtle hover:bg-surface-hover'
 
 function usePopover() {
   const [open, setOpen] = useState(false)
@@ -62,8 +62,8 @@ export function FilterBar({
           className={`
             px-3 py-1.5 text-sm rounded-lg border transition-colors
             ${activeCount > 0
-              ? 'bg-blue-50 border-blue-300 text-blue-700'
-              : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'}
+              ? 'bg-blue-50 dark:bg-sky-900/40 border-blue-300 dark:border-sky-700 text-blue-700 dark:text-accent'
+              : 'bg-surface border-border text-fg-muted hover:bg-surface-hover'}
           `}
         >
           Filters{activeCount > 0 ? ` (${activeCount})` : ''}
@@ -85,8 +85,8 @@ export function FilterBar({
           className={`
             px-3 py-1.5 text-sm rounded-lg border transition-colors
             ${sort.length > 0
-              ? 'bg-blue-50 border-blue-300 text-blue-700'
-              : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'}
+              ? 'bg-blue-50 dark:bg-sky-900/40 border-blue-300 dark:border-sky-700 text-blue-700 dark:text-accent'
+              : 'bg-surface border-border text-fg-muted hover:bg-surface-hover'}
           `}
         >
           Sort{sort.length > 0 ? ` (${sort.length})` : ''}
@@ -105,19 +105,19 @@ export function FilterBar({
         className={`
           px-3 py-1.5 text-sm rounded-lg border transition-colors
           ${filters.favoritesOnly
-            ? 'bg-amber-50 border-amber-300 text-amber-700'
-            : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'}
+            ? 'bg-amber-50 dark:bg-amber-900/30 border-amber-300 dark:border-amber-800 text-amber-700 dark:text-amber-300'
+            : 'bg-surface border-border text-fg-muted hover:bg-surface-hover'}
         `}
       >
         {filters.favoritesOnly ? '\u2605' : '\u2606'} Favorites
       </button>
 
-      <div role="radiogroup" aria-label="Flag status" className="inline-flex rounded-lg overflow-hidden border border-slate-200">
+      <div role="radiogroup" aria-label="Flag status" className="inline-flex rounded-lg overflow-hidden border border-border">
         <button
           type="button" role="radio"
           onClick={() => update('flagStatus', 'all')}
           aria-checked={filters.flagStatus === 'all'}
-          className={`${flagBtnBase} border-0 border-r border-slate-200 ${filters.flagStatus === 'all' ? flagBtnAllActive : flagBtnIdle}`}
+          className={`${flagBtnBase} border-0 border-r border-border ${filters.flagStatus === 'all' ? flagBtnAllActive : flagBtnIdle}`}
         >
           All
         </button>
@@ -125,7 +125,7 @@ export function FilterBar({
           type="button" role="radio"
           onClick={() => update('flagStatus', 'only')}
           aria-checked={filters.flagStatus === 'only'}
-          className={`${flagBtnBase} border-0 border-r border-slate-200 ${filters.flagStatus === 'only' ? flagBtnActive : flagBtnIdle}`}
+          className={`${flagBtnBase} border-0 border-r border-border ${filters.flagStatus === 'only' ? flagBtnActive : flagBtnIdle}`}
         >
           Flagged only
         </button>

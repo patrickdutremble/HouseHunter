@@ -24,13 +24,13 @@ export function FilterPanel({ propertyTypes, filters, onChange }: FilterPanelPro
   const pvmEnabled = filters.maxCommutePvm !== ''
 
   return (
-    <div className="w-96 rounded-lg border border-slate-200 bg-white p-4 shadow-lg space-y-4">
+    <div className="w-96 rounded-lg border border-border bg-surface p-4 shadow-lg space-y-4">
       <section>
-        <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2">Property</h4>
+        <h4 className="text-xs font-semibold uppercase tracking-wide text-fg-subtle mb-2">Property</h4>
         <select
           value={filters.type}
           onChange={e => update('type', e.target.value)}
-          className="w-full px-2 py-1.5 text-sm border border-slate-200 rounded-lg bg-white text-slate-700"
+          className="w-full px-2 py-1.5 text-sm border border-border rounded-lg bg-surface text-fg-muted"
           aria-label="Property type"
         >
           <option value="">All types</option>
@@ -39,38 +39,38 @@ export function FilterPanel({ propertyTypes, filters, onChange }: FilterPanelPro
       </section>
 
       <section>
-        <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2">Price</h4>
+        <h4 className="text-xs font-semibold uppercase tracking-wide text-fg-subtle mb-2">Price</h4>
         <div className="flex gap-2">
           <input
             type="text" placeholder="Min $" aria-label="Minimum price"
             value={filters.minPrice}
             onChange={e => update('minPrice', e.target.value)}
-            className="w-1/2 px-2 py-1.5 text-sm border border-slate-200 rounded-lg"
+            className="w-1/2 px-2 py-1.5 text-sm border border-border rounded-lg"
           />
           <input
             type="text" placeholder="Max $" aria-label="Maximum price"
             value={filters.maxPrice}
             onChange={e => update('maxPrice', e.target.value)}
-            className="w-1/2 px-2 py-1.5 text-sm border border-slate-200 rounded-lg"
+            className="w-1/2 px-2 py-1.5 text-sm border border-border rounded-lg"
           />
         </div>
       </section>
 
       <section>
-        <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2">Beds</h4>
+        <h4 className="text-xs font-semibold uppercase tracking-wide text-fg-subtle mb-2">Beds</h4>
         <input
           type="number" min={0} placeholder="Min beds" aria-label="Min beds"
           value={filters.minBeds}
           onChange={e => update('minBeds', e.target.value)}
-          className="w-24 px-2 py-1.5 text-sm border border-slate-200 rounded-lg"
+          className="w-24 px-2 py-1.5 text-sm border border-border rounded-lg"
         />
       </section>
 
       <section>
-        <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2">Commute</h4>
+        <h4 className="text-xs font-semibold uppercase tracking-wide text-fg-subtle mb-2">Commute</h4>
         <div className="space-y-3">
           <div>
-            <label className="flex items-center gap-2 text-sm text-slate-700">
+            <label className="flex items-center gap-2 text-sm text-fg-muted">
               <input
                 type="checkbox"
                 checked={schoolEnabled}
@@ -88,12 +88,12 @@ export function FilterPanel({ propertyTypes, filters, onChange }: FilterPanelPro
                   onChange={e => update('maxCommuteSchool', e.target.value)}
                   className="flex-1"
                 />
-                <span className="text-xs text-slate-600 w-12 text-right">{filters.maxCommuteSchool} min</span>
+                <span className="text-xs text-fg-muted w-12 text-right">{filters.maxCommuteSchool} min</span>
               </div>
             )}
           </div>
           <div>
-            <label className="flex items-center gap-2 text-sm text-slate-700">
+            <label className="flex items-center gap-2 text-sm text-fg-muted">
               <input
                 type="checkbox"
                 checked={pvmEnabled}
@@ -111,7 +111,7 @@ export function FilterPanel({ propertyTypes, filters, onChange }: FilterPanelPro
                   onChange={e => update('maxCommutePvm', e.target.value)}
                   className="flex-1"
                 />
-                <span className="text-xs text-slate-600 w-12 text-right">{filters.maxCommutePvm} min</span>
+                <span className="text-xs text-fg-muted w-12 text-right">{filters.maxCommutePvm} min</span>
               </div>
             )}
           </div>
@@ -119,18 +119,18 @@ export function FilterPanel({ propertyTypes, filters, onChange }: FilterPanelPro
       </section>
 
       <section>
-        <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2">Costs</h4>
+        <h4 className="text-xs font-semibold uppercase tracking-wide text-fg-subtle mb-2">Costs</h4>
         <input
           type="text" placeholder="Max total $/mo" aria-label="Max monthly cost"
           value={filters.maxMonthlyCost}
           onChange={e => update('maxMonthlyCost', e.target.value)}
-          className="w-40 px-2 py-1.5 text-sm border border-slate-200 rounded-lg"
+          className="w-40 px-2 py-1.5 text-sm border border-border rounded-lg"
         />
       </section>
 
       <section>
-        <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2">Features</h4>
-        <label className="flex items-center gap-2 text-sm text-slate-700">
+        <h4 className="text-xs font-semibold uppercase tracking-wide text-fg-subtle mb-2">Features</h4>
+        <label className="flex items-center gap-2 text-sm text-fg-muted">
           <input
             type="checkbox"
             checked={filters.hasGarage}
@@ -141,12 +141,12 @@ export function FilterPanel({ propertyTypes, filters, onChange }: FilterPanelPro
         </label>
       </section>
 
-      <footer className="flex items-center justify-between pt-3 border-t border-slate-200">
-        <span className="text-xs text-slate-500">{activeCount} active</span>
+      <footer className="flex items-center justify-between pt-3 border-t border-border">
+        <span className="text-xs text-fg-subtle">{activeCount} active</span>
         {activeCount > 0 && (
           <button
             onClick={() => onChange(EMPTY_FILTERS)}
-            className="text-sm text-slate-500 hover:text-slate-800 transition-colors"
+            className="text-sm text-fg-subtle hover:text-fg transition-colors"
           >
             Clear all
           </button>

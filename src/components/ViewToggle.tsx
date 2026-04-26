@@ -9,7 +9,7 @@ interface ViewToggleProps {
 
 export function ViewToggle({ current, onChange }: ViewToggleProps) {
   return (
-    <div className="inline-flex rounded-lg border border-slate-200 bg-white p-0.5 text-sm">
+    <div className="inline-flex rounded-lg border border-border bg-surface p-0.5 text-sm">
       {(['table', 'map'] as const).map((mode) => {
         const active = current === mode
         return (
@@ -20,8 +20,8 @@ export function ViewToggle({ current, onChange }: ViewToggleProps) {
             onClick={() => onChange(mode)}
             className={`px-3 py-1 rounded-md font-medium transition-colors ${
               active
-                ? 'bg-slate-900 text-white'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-accent text-accent-fg'
+                : 'text-fg-muted hover:text-fg'
             }`}
           >
             {mode === 'table' ? 'Table' : 'Map'}
