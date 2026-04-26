@@ -43,19 +43,19 @@ export function SortPanel({ sort, onChange }: SortPanelProps) {
   const available = tableColumns.filter(c => !usedKeys.has(c.key) && c.sortable !== false)
 
   return (
-    <div className="w-80 rounded-lg border border-slate-200 bg-white p-4 shadow-lg space-y-3">
+    <div className="w-80 rounded-lg border border-border bg-surface p-4 shadow-lg space-y-3">
       {sort.length === 0 ? (
-        <p className="text-sm text-slate-500">No sort applied.</p>
+        <p className="text-sm text-fg-subtle">No sort applied.</p>
       ) : (
         <ul className="space-y-1.5">
           {sort.map((level, idx) => (
             <li key={level.column} className="flex items-center gap-2 text-sm">
-              <span className="w-5 text-slate-400 tabular-nums">{idx + 1}.</span>
-              <span className="flex-1 text-slate-700">{labelFor(level.column)}</span>
+              <span className="w-5 text-fg-subtle tabular-nums">{idx + 1}.</span>
+              <span className="flex-1 text-fg-muted">{labelFor(level.column)}</span>
               <button
                 onClick={() => flip(idx)}
                 aria-label={`Flip direction of ${labelFor(level.column)}`}
-                className="px-1.5 py-0.5 text-xs border border-slate-200 rounded hover:bg-slate-100"
+                className="px-1.5 py-0.5 text-xs border border-border rounded hover:bg-surface-hover"
               >
                 {level.direction === 'asc' ? '\u2191' : '\u2193'}
               </button>
@@ -63,7 +63,7 @@ export function SortPanel({ sort, onChange }: SortPanelProps) {
                 onClick={() => move(idx, -1)}
                 aria-label={`Move ${labelFor(level.column)} up`}
                 disabled={idx === 0}
-                className="px-1.5 py-0.5 text-xs text-slate-500 hover:text-slate-800 disabled:opacity-30"
+                className="px-1.5 py-0.5 text-xs text-fg-subtle hover:text-fg disabled:opacity-30"
               >
                 &#x25B2;
               </button>
@@ -71,14 +71,14 @@ export function SortPanel({ sort, onChange }: SortPanelProps) {
                 onClick={() => move(idx, 1)}
                 aria-label={`Move ${labelFor(level.column)} down`}
                 disabled={idx === sort.length - 1}
-                className="px-1.5 py-0.5 text-xs text-slate-500 hover:text-slate-800 disabled:opacity-30"
+                className="px-1.5 py-0.5 text-xs text-fg-subtle hover:text-fg disabled:opacity-30"
               >
                 &#x25BC;
               </button>
               <button
                 onClick={() => remove(idx)}
                 aria-label={`Remove ${labelFor(level.column)}`}
-                className="px-1.5 py-0.5 text-xs text-slate-500 hover:text-red-600"
+                className="px-1.5 py-0.5 text-xs text-fg-subtle hover:text-red-600 dark:hover:text-red-400"
               >
                 ×
               </button>
@@ -87,12 +87,12 @@ export function SortPanel({ sort, onChange }: SortPanelProps) {
         </ul>
       )}
 
-      <div className="pt-2 border-t border-slate-200">
+      <div className="pt-2 border-t border-border">
         <select
           aria-label="Add sort"
           value=""
           onChange={e => add(e.target.value)}
-          className="w-full px-2 py-1.5 text-sm border border-slate-200 rounded-lg bg-white text-slate-700"
+          className="w-full px-2 py-1.5 text-sm border border-border rounded-lg bg-surface text-fg-muted"
         >
           <option value="">+ Add sort…</option>
           {available.map(c => <option key={c.key} value={c.key}>{c.label}</option>)}

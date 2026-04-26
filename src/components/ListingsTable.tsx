@@ -65,7 +65,7 @@ export function ListingsTable({ listings, selectedId, onSelect, onUpdate, compar
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-white gap-4">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-surface gap-4">
         <div className="flex items-center gap-3 flex-wrap">
           <FilterBar
             propertyTypes={propertyTypes}
@@ -76,17 +76,17 @@ export function ListingsTable({ listings, selectedId, onSelect, onUpdate, compar
           />
           <RefreshStatusesButton onRefreshed={() => onRefreshed?.()} />
           {lastCheckedAgo && (
-            <span className="text-xs text-slate-500">Last checked: {lastCheckedAgo}</span>
+            <span className="text-xs text-fg-subtle">Last checked: {lastCheckedAgo}</span>
           )}
         </div>
         <div className="flex items-center gap-4">
-          <span className="hidden md:inline text-xs text-slate-400" title="Keyboard shortcuts: Arrow keys to navigate, Enter to open, Esc to close, c to toggle compare">
-            <kbd className="px-1 py-0.5 text-[10px] font-mono bg-slate-100 border border-slate-200 rounded">↑↓</kbd>{' '}
-            <kbd className="px-1 py-0.5 text-[10px] font-mono bg-slate-100 border border-slate-200 rounded">Enter</kbd>{' '}
-            <kbd className="px-1 py-0.5 text-[10px] font-mono bg-slate-100 border border-slate-200 rounded">Esc</kbd>{' '}
-            <kbd className="px-1 py-0.5 text-[10px] font-mono bg-slate-100 border border-slate-200 rounded">c</kbd>
+          <span className="hidden md:inline text-xs text-fg-subtle" title="Keyboard shortcuts: Arrow keys to navigate, Enter to open, Esc to close, c to toggle compare">
+            <kbd className="px-1 py-0.5 text-[10px] font-mono bg-surface-muted border border-border rounded">↑↓</kbd>{' '}
+            <kbd className="px-1 py-0.5 text-[10px] font-mono bg-surface-muted border border-border rounded">Enter</kbd>{' '}
+            <kbd className="px-1 py-0.5 text-[10px] font-mono bg-surface-muted border border-border rounded">Esc</kbd>{' '}
+            <kbd className="px-1 py-0.5 text-[10px] font-mono bg-surface-muted border border-border rounded">c</kbd>
           </span>
-          <span className="text-sm text-slate-500">
+          <span className="text-sm text-fg-subtle">
             {sorted.length} listing{sorted.length !== 1 ? 's' : ''}
           </span>
         </div>
@@ -110,7 +110,7 @@ export function ListingsTable({ listings, selectedId, onSelect, onUpdate, compar
             ))}
             {sorted.length === 0 && (
               <tr>
-                <td colSpan={99} className="px-4 py-12 text-center text-slate-400 text-sm">
+                <td colSpan={99} className="px-4 py-12 text-center text-fg-subtle text-sm">
                   {listings.length === 0
                     ? 'No listings yet. Click "Add listing" to get started.'
                     : 'No listings match your filters.'}

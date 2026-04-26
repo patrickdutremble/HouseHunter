@@ -20,6 +20,7 @@ vi.mock('@/hooks/useListings', () => ({
 }))
 
 import HomePage from '@/app/page'
+import { ThemeProvider } from '@/components/ThemeProvider'
 
 function mockMatchMedia(narrow: boolean) {
   window.matchMedia = vi.fn().mockImplementation((query: string) => ({
@@ -44,19 +45,19 @@ describe('/ mobile redirect', () => {
 
   it('redirects to /recent when viewport is below 768px', () => {
     mockMatchMedia(true)
-    render(<HomePage />)
+    render(<HomePage />, { wrapper: ThemeProvider })
     expect(replaceMock).toHaveBeenCalledWith('/recent')
   })
 
   it('does not redirect when viewport is >= 768px', () => {
     mockMatchMedia(false)
-    render(<HomePage />)
+    render(<HomePage />, { wrapper: ThemeProvider })
     expect(replaceMock).not.toHaveBeenCalled()
   })
 
   it('renders nothing on narrow viewports (no desktop flash)', () => {
     mockMatchMedia(true)
-    const { container } = render(<HomePage />)
+    const { container } = render(<HomePage />, { wrapper: ThemeProvider })
     expect(container.querySelector('input[type="url"]')).toBeNull()
   })
 })

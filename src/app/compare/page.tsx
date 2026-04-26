@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useRef, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
+import { ThemeToggle } from '@/components/ThemeToggle'
 import { getBestValues, type BestMap } from '@/lib/comparison'
 import { criteria, countChecked, deriveCriteria, isDerivedCriterion, type CriterionKey } from '@/lib/criteria'
 import { formatCellValue } from '@/lib/formatting'
@@ -96,19 +97,19 @@ function CompareContent() {
 
   if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center bg-slate-50">
-        <div className="text-slate-400 text-sm">Loading comparison...</div>
+      <div className="h-screen flex items-center justify-center bg-bg">
+        <div className="text-fg-subtle text-sm">Loading comparison...</div>
       </div>
     )
   }
 
   if (listings.length < 2) {
     return (
-      <div className="h-screen flex flex-col items-center justify-center bg-slate-50 gap-4">
-        <p className="text-slate-500 text-sm">Select at least 2 listings to compare.</p>
+      <div className="h-screen flex flex-col items-center justify-center bg-bg gap-4">
+        <p className="text-fg-subtle text-sm">Select at least 2 listings to compare.</p>
         <Link
           href="/"
-          className="px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors"
+          className="px-4 py-2 text-sm font-medium text-accent hover:text-sky-700 dark:hover:text-sky-300 hover:bg-blue-50 dark:hover:bg-sky-900/40 rounded-lg transition-colors"
         >
           Back to listings
         </Link>
@@ -117,37 +118,38 @@ function CompareContent() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-bg">
       {/* Header */}
-      <div className="bg-white border-b border-slate-200 px-6 py-4">
+      <div className="bg-surface border-b border-border px-6 py-4">
         <div className="flex items-center gap-3">
           <Link
             href="/"
-            className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+            className="p-1.5 text-fg-subtle hover:text-fg-muted hover:bg-surface-muted rounded-lg transition-colors"
             title="Back to listings"
           >
             <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M17 10a.75.75 0 01-.75.75H5.612l4.158 3.96a.75.75 0 11-1.04 1.08l-5.5-5.25a.75.75 0 010-1.08l5.5-5.25a.75.75 0 111.04 1.08L5.612 9.25H16.25A.75.75 0 0117 10z" clipRule="evenodd" />
             </svg>
           </Link>
-          <h1 className="text-lg font-semibold text-slate-800">
+          <h1 className="text-lg font-semibold text-fg">
             Compare Listings
-            <span className="ml-2 text-sm font-normal text-slate-400">
+            <span className="ml-2 text-sm font-normal text-fg-subtle">
               ({listings.length} listings)
             </span>
           </h1>
           <button
             type="button"
             onClick={copyCompareLink}
-            className={`ml-auto px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+            className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
               copied
-                ? 'text-green-700 bg-green-50'
-                : 'text-slate-600 hover:text-slate-800 hover:bg-slate-100'
+                ? 'text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/30'
+                : 'text-fg-muted hover:text-fg hover:bg-surface-muted'
             }`}
             title="Copy shareable comparison link"
           >
             {copied ? 'Copied!' : 'Copy link'}
           </button>
+          <ThemeToggle />
         </div>
       </div>
 
@@ -156,7 +158,7 @@ function CompareContent() {
         <div className={`grid gap-4`} style={{ gridTemplateColumns: `repeat(${listings.length}, minmax(0, 1fr))` }}>
           {/* Images */}
           {listings.map(listing => (
-            <div key={listing.id} className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+            <div key={listing.id} className="bg-surface rounded-lg border border-border shadow-sm overflow-hidden">
               {/* Image */}
               {listing.image_url ? (
                 <img
@@ -165,20 +167,20 @@ function CompareContent() {
                   className="w-full h-[180px] object-cover"
                 />
               ) : (
-                <div className="w-full h-[180px] bg-slate-100 flex items-center justify-center">
-                  <svg className="text-slate-300" width="32" height="32" viewBox="0 0 20 20" fill="currentColor">
+                <div className="w-full h-[180px] bg-surface-muted flex items-center justify-center">
+                  <svg className="text-fg-subtle" width="32" height="32" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M1 5.25A2.25 2.25 0 013.25 3h13.5A2.25 2.25 0 0119 5.25v9.5A2.25 2.25 0 0116.75 17H3.25A2.25 2.25 0 011 14.75v-9.5zm1.5 5.81V14.75c0 .414.336.75.75.75h13.5a.75.75 0 00.75-.75v-2.06l-2.22-2.22a.75.75 0 00-1.06 0L9.06 13.06a.75.75 0 01-1.06 0l-1.94-1.94a.75.75 0 00-1.06 0L2.5 11.06zM12 7a1 1 0 11-2 0 1 1 0 012 0z" clipRule="evenodd" />
                   </svg>
                 </div>
               )}
 
               {/* Location header */}
-              <div className="px-4 py-3 border-b border-slate-100">
+              <div className="px-4 py-3 border-b border-border">
                 <a
                   href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(listing.full_address ?? listing.location ?? '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm font-semibold text-slate-800 hover:text-blue-600 transition-colors"
+                  className="text-sm font-semibold text-fg hover:text-accent transition-colors"
                 >
                   {listing.location ?? 'Unknown location'}
                 </a>
@@ -187,7 +189,7 @@ function CompareContent() {
                     href={listing.centris_link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="ml-2 text-xs text-blue-500 hover:text-blue-700"
+                    className="ml-2 text-xs text-accent hover:text-sky-700 dark:hover:text-sky-300"
                   >
                     Centris &#8599;
                   </a>
@@ -195,14 +197,14 @@ function CompareContent() {
               </div>
 
               {/* Criteria section */}
-              <div className="divide-y divide-slate-50">
+              <div className="divide-y divide-border">
                 <div
-                  className={`flex items-start justify-between px-4 py-2 ${bestValues.criteria_count.has(listing.id) ? 'bg-green-50' : ''}`}
+                  className={`flex items-start justify-between px-4 py-2 ${bestValues.criteria_count.has(listing.id) ? 'bg-green-50 dark:bg-green-900/30' : ''}`}
                 >
-                  <span className="text-xs font-medium text-slate-400 uppercase tracking-wide shrink-0">
+                  <span className="text-xs font-medium text-fg-subtle uppercase tracking-wide shrink-0">
                     Criteria met
                   </span>
-                  <span className={`text-sm text-right ${bestValues.criteria_count.has(listing.id) ? 'text-green-700 font-medium' : 'text-slate-700'}`}>
+                  <span className={`text-sm text-right ${bestValues.criteria_count.has(listing.id) ? 'text-green-700 dark:text-green-300 font-medium' : 'text-fg-muted'}`}>
                     {countChecked(deriveCriteria(listing))} / {criteria.length}
                   </span>
                 </div>
@@ -214,9 +216,9 @@ function CompareContent() {
                   return (
                     <div
                       key={`crit-${c.key}`}
-                      className={`flex items-center justify-between px-4 py-2 ${rowIsBest ? 'bg-green-50' : ''}`}
+                      className={`flex items-center justify-between px-4 py-2 ${rowIsBest ? 'bg-green-50 dark:bg-green-900/30' : ''}`}
                     >
-                      <span className={`text-xs font-medium uppercase tracking-wide shrink-0 ${rowIsBest ? 'text-green-700' : 'text-slate-400'}`}>
+                      <span className={`text-xs font-medium uppercase tracking-wide shrink-0 ${rowIsBest ? 'text-green-700 dark:text-green-300' : 'text-fg-subtle'}`}>
                         {c.label}
                       </span>
                       <input
@@ -228,7 +230,7 @@ function CompareContent() {
                         onChange={isDerived ? undefined : () => {
                           toggleCriterion(listing.id, c.key, !checked)
                         }}
-                        className={`w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 ${isDerived ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'}`}
+                        className={`w-4 h-4 rounded border-border-strong text-accent focus:ring-accent ${isDerived ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'}`}
                       />
                     </div>
                   )
@@ -236,7 +238,7 @@ function CompareContent() {
               </div>
 
               {/* Data rows */}
-              <div className="divide-y divide-slate-50">
+              <div className="divide-y divide-border">
                 {compareFields.map(field => {
                   const value = listing[field.key as keyof Listing]
                   const isBest = field.key in bestValues
@@ -246,12 +248,12 @@ function CompareContent() {
                   return (
                     <div
                       key={field.key}
-                      className={`flex items-start justify-between px-4 py-2 ${isBest ? 'bg-green-50' : ''}`}
+                      className={`flex items-start justify-between px-4 py-2 ${isBest ? 'bg-green-50 dark:bg-green-900/30' : ''}`}
                     >
-                      <span className="text-xs font-medium text-slate-400 uppercase tracking-wide shrink-0">
+                      <span className="text-xs font-medium text-fg-subtle uppercase tracking-wide shrink-0">
                         {field.label}
                       </span>
-                      <span className={`text-sm text-right ${isBest ? 'text-green-700 font-medium' : 'text-slate-700'} ${field.key === 'notes' ? 'whitespace-pre-wrap text-xs' : ''}`}>
+                      <span className={`text-sm text-right ${isBest ? 'text-green-700 dark:text-green-300 font-medium' : 'text-fg-muted'} ${field.key === 'notes' ? 'whitespace-pre-wrap text-xs' : ''}`}>
                         {formatted}
                       </span>
                     </div>
@@ -270,8 +272,8 @@ export default function ComparePage() {
   return (
     <Suspense
       fallback={
-        <div className="h-screen flex items-center justify-center bg-slate-50">
-          <div className="text-slate-400 text-sm">Loading comparison...</div>
+        <div className="h-screen flex items-center justify-center bg-bg">
+          <div className="text-fg-subtle text-sm">Loading comparison...</div>
         </div>
       }
     >

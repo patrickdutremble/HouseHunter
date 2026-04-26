@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { ServiceWorkerRegistrar } from '@/components/ServiceWorkerRegistrar'
+import { ThemeProvider } from '@/components/ThemeProvider'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     title: 'HouseHunter',
-    statusBarStyle: 'black',
+    statusBarStyle: 'black-translucent',
   },
   icons: {
     apple: '/icon-192.png',
@@ -23,15 +24,25 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#000000',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#f8fafc' },
+    { media: '(prefers-color-scheme: dark)', color: '#020617' },
+  ],
 }
+
+const themeInitScript = `(function(){try{var t=localStorage.getItem('theme');var d=t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d)document.documentElement.classList.add('dark');}catch(e){}})();`
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} h-full`}>
+    <html lang="en" className={`${inter.variable} h-full`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body className="h-full antialiased font-[family-name:var(--font-inter)]">
-        <ServiceWorkerRegistrar />
-        {children}
+        <ThemeProvider>
+          <ServiceWorkerRegistrar />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   )

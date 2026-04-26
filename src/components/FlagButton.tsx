@@ -15,7 +15,7 @@ export function FlagButton({ value, onToggle, size = 18 }: FlagButtonProps) {
       aria-pressed={value}
       className={`
         inline-flex items-center justify-center rounded transition-colors
-        ${value ? 'text-red-500 hover:text-red-600' : 'text-slate-300 hover:text-red-400'}
+        ${value ? 'text-red-500 hover:text-red-600 dark:hover:text-red-400' : 'text-fg-subtle hover:text-red-400'}
       `}
     >
       <svg

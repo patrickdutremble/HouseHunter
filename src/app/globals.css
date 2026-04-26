@@ -1,13 +1,38 @@
 @import "tailwindcss";
 
-:root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-bg: #f8fafc;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f1f5f9;
+  --color-surface-hover: #f8fafc;
+  --color-border: #e2e8f0;
+  --color-border-strong: #cbd5e1;
+  --color-fg: #0f172a;
+  --color-fg-muted: #475569;
+  --color-fg-subtle: #94a3b8;
+  --color-accent: #0284c7;
+  --color-accent-fg: #ffffff;
+}
+
+.dark {
+  --color-bg: #020617;
+  --color-surface: #0f172a;
+  --color-surface-muted: #1e293b;
+  --color-surface-hover: #1e293b;
+  --color-border: #334155;
+  --color-border-strong: #475569;
+  --color-fg: #f1f5f9;
+  --color-fg-muted: #94a3b8;
+  --color-fg-subtle: #64748b;
+  --color-accent: #38bdf8;
+  --color-accent-fg: #0f172a;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--color-bg);
+  color: var(--color-fg);
 }
 
 /* Custom scrollbar for the table */
@@ -21,10 +46,41 @@ body {
 }
 
 .overflow-auto::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: var(--color-border-strong);
   border-radius: 3px;
 }
 
 .overflow-auto::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: var(--color-fg-subtle);
+}
+
+/* Leaflet dark-mode overrides */
+.dark .leaflet-popup-content-wrapper,
+.dark .leaflet-popup-tip {
+  background: var(--color-surface);
+  color: var(--color-fg);
+}
+.dark .leaflet-control-zoom a {
+  background: var(--color-surface);
+  color: var(--color-fg);
+  border-color: var(--color-border);
+}
+.dark .leaflet-bar {
+  border-color: var(--color-border);
+}
+
+/* Locked-light wrapper for shareable snapshots */
+.hh-force-light {
+  --color-bg: #f8fafc;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f1f5f9;
+  --color-surface-hover: #f8fafc;
+  --color-border: #e2e8f0;
+  --color-border-strong: #cbd5e1;
+  --color-fg: #0f172a;
+  --color-fg-muted: #475569;
+  --color-fg-subtle: #94a3b8;
+  --color-accent: #0284c7;
+  --color-accent-fg: #ffffff;
+  color-scheme: light;
 }

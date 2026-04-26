@@ -10,10 +10,10 @@ interface TableHeaderProps {
 export function TableHeader({ sort, onSort, hasCompare }: TableHeaderProps) {
   return (
     <thead>
-      <tr className="border-b border-slate-200">
+      <tr className="border-b border-border">
         {hasCompare && (
           <th
-            className="sticky top-0 z-10 bg-slate-50 px-1 py-2.5 border-b border-slate-200"
+            className="sticky top-0 z-10 bg-surface-muted px-1 py-2.5 border-b border-border"
             style={{ width: '32px', minWidth: '32px' }}
           />
         )}
@@ -27,10 +27,10 @@ export function TableHeader({ sort, onSort, hasCompare }: TableHeaderProps) {
               key={col.key}
               onClick={(e) => onSort(col.key, e.shiftKey)}
               className={`
-                sticky top-0 z-10 bg-slate-50 px-3 py-2.5
-                text-xs font-semibold uppercase tracking-wider text-slate-500
-                cursor-pointer select-none hover:text-slate-800 hover:bg-slate-100
-                transition-colors border-b border-slate-200
+                sticky top-0 z-10 bg-surface-muted px-3 py-2.5
+                text-xs font-semibold uppercase tracking-wider text-fg-subtle
+                cursor-pointer select-none hover:text-fg hover:bg-surface-hover
+                transition-colors border-b border-border
                 ${col.align === 'right' ? 'text-right' : 'text-left'}
               `}
               style={{ width: col.width, minWidth: col.width }}

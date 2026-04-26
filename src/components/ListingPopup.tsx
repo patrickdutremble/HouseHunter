@@ -14,16 +14,16 @@ export function ListingPopup({ listing, onSelect }: ListingPopupProps) {
           src={listing.image_url}
           alt={listing.full_address ?? listing.location ?? 'Listing thumbnail'}
           loading="lazy"
-          className="w-full h-28 object-cover rounded-md bg-slate-100 mb-2"
+          className="w-full h-28 object-cover rounded-md bg-surface-muted mb-2"
         />
       )}
-      <div className="text-base font-semibold text-slate-900">
+      <div className="text-base font-semibold text-fg">
         {formatPillPrice(listing.price)}
       </div>
-      <div className="text-xs text-slate-600 mt-0.5 leading-snug">
+      <div className="text-xs text-fg-muted mt-0.5 leading-snug">
         {listing.full_address ?? listing.location ?? '—'}
       </div>
-      <div className="flex gap-3 mt-2 text-[11px] text-slate-500">
+      <div className="flex gap-3 mt-2 text-[11px] text-fg-subtle">
         {listing.bedrooms && <span>{listing.bedrooms} bed</span>}
         {listing.commute_school_car && (
           <span>School: {listing.commute_school_car}</span>
@@ -32,7 +32,7 @@ export function ListingPopup({ listing, onSelect }: ListingPopupProps) {
       <button
         type="button"
         onClick={() => onSelect(listing.id)}
-        className="mt-3 w-full px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 active:bg-blue-800 transition-colors"
+        className="mt-3 w-full px-3 py-1.5 text-xs font-medium text-accent-fg bg-accent rounded-md hover:bg-sky-700 dark:hover:bg-sky-300 active:bg-sky-800 dark:active:bg-sky-200 transition-colors"
       >
         See full details
       </button>

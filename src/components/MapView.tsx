@@ -13,6 +13,7 @@ import {
   DEFAULT_MAP_ZOOM,
 } from '@/lib/map-config'
 import { ListingMarker } from './ListingMarker'
+import { useTheme } from './ThemeProvider'
 
 interface MapViewProps {
   listings: Listing[]
@@ -59,6 +60,11 @@ function FitBounds({ listings }: { listings: Listing[] }) {
 }
 
 export default function MapView({ listings, onSelect }: MapViewProps) {
+  const { resolvedTheme } = useTheme()
+  const tileUrl = resolvedTheme === 'dark'
+    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+    : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
+
   const withCoords = listings.filter(
     (l) => l.latitude != null && l.longitude != null
   )
@@ -73,8 +79,9 @@ export default function MapView({ listings, onSelect }: MapViewProps) {
         className="h-full w-full"
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          key={resolvedTheme}
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          url={tileUrl}
         />
         <Circle
           center={SCHOOL_COORDS}

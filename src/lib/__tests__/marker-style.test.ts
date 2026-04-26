@@ -32,9 +32,9 @@ describe('getPillClasses', () => {
   it('returns far-from-school classes with no dot', () => {
     const p = pointKmEast(20)
     const c = getPillClasses({ favorite: false, latitude: p.latitude, longitude: p.longitude })
-    expect(c.pill).toContain('bg-white')
-    expect(c.pill).toContain('border-slate-400')
-    expect(c.text).toContain('text-slate-900')
+    expect(c.pill).toContain('bg-surface')
+    expect(c.pill).toContain('border-border-strong')
+    expect(c.text).toContain('text-fg')
     expect(c.dotColor).toBeNull()
   })
   it('adds a teal dot when inside the inner zone', () => {

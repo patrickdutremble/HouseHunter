@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import SharePage from '@/app/share/page'
+import { ThemeProvider } from '@/components/ThemeProvider'
 
 const replaceMock = vi.fn()
 vi.mock('next/navigation', () => ({
@@ -41,7 +42,7 @@ describe('/share page', () => {
 
   it('redirects to /recent when no url query param is present', () => {
     setParams('')
-    render(<SharePage />)
+    render(<ThemeProvider><SharePage /></ThemeProvider>)
     expect(replaceMock).toHaveBeenCalledWith('/recent')
   })
 
@@ -53,7 +54,7 @@ describe('/share page', () => {
       json: async () => ({ listing: { id: 'new-1', location: 'Laval', price: 500000, image_url: null, full_address: null, bedrooms: '2', liveable_area_sqft: 800, commute_school_car: null, commute_pvm_transit: null } }),
     }))
     vi.stubGlobal('fetch', fetchMock)
-    render(<SharePage />)
+    render(<ThemeProvider><SharePage /></ThemeProvider>)
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1))
     const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit]
     expect(url).toBe('/api/scrape-centris')
@@ -70,7 +71,7 @@ describe('/share page', () => {
       json: async () => ({ listingId: 'dup-1', error: 'Duplicate' }),
     }))
     vi.stubGlobal('fetch', fetchMock)
-    render(<SharePage />)
+    render(<ThemeProvider><SharePage /></ThemeProvider>)
     await waitFor(() => expect(screen.getByText(/already saved/i)).toBeInTheDocument())
     expect(screen.queryByRole('button', { name: /undo/i })).toBeNull()
   })
@@ -83,7 +84,7 @@ describe('/share page', () => {
       json: async () => ({ error: 'Boom' }),
     }))
     vi.stubGlobal('fetch', fetchMock)
-    render(<SharePage />)
+    render(<ThemeProvider><SharePage /></ThemeProvider>)
     await waitFor(() => expect(screen.getByText(/couldn't read/i)).toBeInTheDocument())
     expect(screen.getByRole('button', { name: /try again/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /paste manually/i })).toBeInTheDocument()
@@ -93,7 +94,7 @@ describe('/share page', () => {
     setParams('text=https%3A%2F%2Fcentris.ca%2Ffrom-text')
     const fetchMock = vi.fn(async () => ({ ok: true, status: 200, json: async () => ({ listing: { id: 'x', price: 1, location: 'A', image_url: null, full_address: null, bedrooms: null, liveable_area_sqft: null, commute_school_car: null, commute_pvm_transit: null } }) }))
     vi.stubGlobal('fetch', fetchMock)
-    render(<SharePage />)
+    render(<ThemeProvider><SharePage /></ThemeProvider>)
     await waitFor(() => expect(fetchMock).toHaveBeenCalled())
     const init = fetchMock.mock.calls[0][1] as RequestInit
     expect(JSON.parse(init.body as string)).toEqual({ url: 'https://centris.ca/from-text' })
@@ -107,7 +108,7 @@ describe('/share page', () => {
       json: async () => ({ listing: { id: 'new-1', price: 1, location: 'A', image_url: null, full_address: null, bedrooms: null, liveable_area_sqft: null, commute_school_car: null, commute_pvm_transit: null } }),
     }))
     vi.stubGlobal('fetch', fetchMock)
-    render(<SharePage />)
+    render(<ThemeProvider><SharePage /></ThemeProvider>)
     const undo = await screen.findByRole('button', { name: /undo/i })
     fireEvent.click(undo)
     await waitFor(() => expect(deleteListingMock).toHaveBeenCalledWith('new-1'))
@@ -122,7 +123,7 @@ describe('/share page', () => {
       json: async () => ({ listing: { id: 'new-1', price: 1, location: 'A', image_url: null, full_address: null, bedrooms: null, liveable_area_sqft: null, commute_school_car: null, commute_pvm_transit: null } }),
     }))
     vi.stubGlobal('fetch', fetchMock)
-    render(<SharePage />)
+    render(<ThemeProvider><SharePage /></ThemeProvider>)
     const undo = await screen.findByRole('button', { name: /undo/i })
     fireEvent.click(undo)
     await waitFor(() => expect(screen.getByText(/removed — sent to trash/i)).toBeInTheDocument())
@@ -136,7 +137,7 @@ describe('/share page', () => {
       json: async () => ({ listing: { id: 'new-1', price: 1, location: 'A', image_url: null, full_address: null, bedrooms: null, liveable_area_sqft: null, commute_school_car: null, commute_pvm_transit: null } }),
     }))
     vi.stubGlobal('fetch', fetchMock)
-    render(<SharePage />)
+    render(<ThemeProvider><SharePage /></ThemeProvider>)
     await waitFor(() => expect(screen.getByText(/redirecting to home in 5s/i)).toBeInTheDocument())
   })
 
@@ -149,7 +150,7 @@ describe('/share page', () => {
       json: async () => ({ listing: { id: 'new-1', price: 1, location: 'A', image_url: null, full_address: null, bedrooms: null, liveable_area_sqft: null, commute_school_car: null, commute_pvm_transit: null } }),
     }))
     vi.stubGlobal('fetch', fetchMock)
-    render(<SharePage />)
+    render(<ThemeProvider><SharePage /></ThemeProvider>)
     const undo = await screen.findByRole('button', { name: /undo/i })
     fireEvent.click(undo)
     await waitFor(() => expect(screen.getByText(/couldn't undo/i)).toBeInTheDocument())

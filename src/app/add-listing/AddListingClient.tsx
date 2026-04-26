@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 type Status =
   | { kind: 'loading'; stage: 'inserting' | 'commutes' }
@@ -201,11 +202,15 @@ export function AddListingClient() {
   }, [status.kind])
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
+    <div className="min-h-screen flex flex-col bg-bg">
+      <div className="flex justify-end p-4">
+        <ThemeToggle />
+      </div>
+      <div className="flex-1 flex items-center justify-center px-4 pb-8">
       <div className="w-full max-w-lg">
         {status.kind === 'loading' && (
-          <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm">
-            <div className="text-slate-400 text-sm">
+          <div className="bg-surface border border-border rounded-xl p-6 shadow-sm">
+            <div className="text-fg-subtle text-sm">
               {status.stage === 'inserting'
                 ? 'Adding listing to HouseHunter...'
                 : 'Calculating commute times...'}
@@ -214,8 +219,8 @@ export function AddListingClient() {
         )}
 
         {status.kind === 'success' && (
-          <div className="bg-white border-2 border-green-500 rounded-xl p-6 shadow-sm">
-            <div className="flex items-center gap-2 text-green-700 font-semibold text-lg mb-3">
+          <div className="bg-surface border-2 border-green-500 rounded-xl p-6 shadow-sm">
+            <div className="flex items-center gap-2 text-green-700 dark:text-green-300 font-semibold text-lg mb-3">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="M4 10l4 4 8-8" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
@@ -225,10 +230,10 @@ export function AddListingClient() {
               <img
                 src={imageUrl}
                 alt="Listing photo"
-                className="w-full h-40 object-cover rounded-lg border border-slate-200 mb-4"
+                className="w-full h-40 object-cover rounded-lg border border-border mb-4"
               />
             )}
-            <dl className="text-sm text-slate-600 space-y-1.5 mb-4">
+            <dl className="text-sm text-fg-muted space-y-1.5 mb-4">
               <Field label="Type" value={type} />
               <Field label="Address" value={fullAddress} />
               <Field label="Location" value={location} />
@@ -244,13 +249,13 @@ export function AddListingClient() {
               <Field label="Centris link" value={url} href={url ?? undefined} />
             </dl>
             {status.commuteError && (
-              <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-2 mb-4">
+              <p className="text-xs text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-lg p-2 mb-4">
                 Commute times unavailable: {status.commuteError}
               </p>
             )}
             <Link
               href="/"
-              className="inline-block px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-block px-4 py-2 text-sm font-medium text-accent-fg bg-accent rounded-lg hover:bg-sky-700 dark:hover:bg-sky-300 active:bg-sky-800 dark:active:bg-sky-200 transition-colors"
             >
               Open HouseHunter
             </Link>
@@ -258,20 +263,20 @@ export function AddListingClient() {
         )}
 
         {status.kind === 'duplicate' && (
-          <div className="bg-white border-2 border-amber-500 rounded-xl p-6 shadow-sm">
-            <div className="flex items-center gap-2 text-amber-700 font-semibold text-lg mb-3">
+          <div className="bg-surface border-2 border-amber-500 rounded-xl p-6 shadow-sm">
+            <div className="flex items-center gap-2 text-amber-700 dark:text-amber-300 font-semibold text-lg mb-3">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="M10 6v4M10 14h.01" strokeLinecap="round" />
                 <circle cx="10" cy="10" r="8" />
               </svg>
               Already in HouseHunter
             </div>
-            <p className="text-sm text-slate-600 mb-4">
+            <p className="text-sm text-fg-muted mb-4">
               This Centris listing is already in your database. Nothing was added.
             </p>
             <Link
               href="/"
-              className="inline-block px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-block px-4 py-2 text-sm font-medium text-accent-fg bg-accent rounded-lg hover:bg-sky-700 dark:hover:bg-sky-300 active:bg-sky-800 dark:active:bg-sky-200 transition-colors"
             >
               Open HouseHunter
             </Link>
@@ -279,24 +284,25 @@ export function AddListingClient() {
         )}
 
         {status.kind === 'error' && (
-          <div className="bg-white border-2 border-red-500 rounded-xl p-6 shadow-sm">
-            <div className="flex items-center gap-2 text-red-700 font-semibold text-lg mb-3">
+          <div className="bg-surface border-2 border-red-500 rounded-xl p-6 shadow-sm">
+            <div className="flex items-center gap-2 text-red-700 dark:text-red-300 font-semibold text-lg mb-3">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="M6 6l8 8M14 6l-8 8" strokeLinecap="round" />
               </svg>
               Could not add listing
             </div>
-            <p className="text-sm text-slate-600 mb-4 font-mono bg-slate-50 p-3 rounded border border-slate-200">
+            <p className="text-sm text-fg-muted mb-4 font-mono bg-bg p-3 rounded border border-border">
               {status.message}
             </p>
             <Link
               href="/"
-              className="inline-block px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+              className="inline-block px-4 py-2 text-sm font-medium text-fg-muted bg-surface border border-border rounded-lg hover:bg-surface-hover transition-colors"
             >
               Open HouseHunter
             </Link>
           </div>
         )}
+      </div>
       </div>
     </div>
   )
@@ -314,18 +320,18 @@ function calcMonthlyMortgage(price: number): number {
 function Field({ label, value, href }: { label: string; value: string | null; href?: string }) {
   return (
     <div className="flex gap-2">
-      <dt className="text-slate-400 w-24 shrink-0">{label}</dt>
-      <dd className="text-slate-700 truncate">
+      <dt className="text-fg-subtle w-24 shrink-0">{label}</dt>
+      <dd className="text-fg-muted truncate">
         {value ? (
           href ? (
-            <a href={href} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">
+            <a href={href} target="_blank" rel="noreferrer" className="text-accent hover:underline">
               {value}
             </a>
           ) : (
             value
           )
         ) : (
-          <span className="text-slate-300">—</span>
+          <span className="text-fg-subtle">—</span>
         )}
       </dd>
     </div>

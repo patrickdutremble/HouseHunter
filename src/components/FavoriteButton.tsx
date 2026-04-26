@@ -15,7 +15,7 @@ export function FavoriteButton({ value, onToggle, size = 18 }: FavoriteButtonPro
       aria-pressed={value}
       className={`
         inline-flex items-center justify-center rounded transition-colors
-        ${value ? 'text-amber-500 hover:text-amber-600' : 'text-slate-300 hover:text-amber-400'}
+        ${value ? 'text-amber-500 hover:text-amber-600 dark:hover:text-amber-400' : 'text-fg-subtle hover:text-amber-400'}
       `}
     >
       <svg

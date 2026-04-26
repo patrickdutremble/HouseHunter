@@ -86,7 +86,7 @@ export function EditableCell({ value, format, editable, align, wrap = false, mul
           }}
           onBlur={handleSave}
           onKeyDown={handleKeyDown}
-          className={`w-full px-2 py-1 text-sm border border-blue-400 rounded outline-none bg-white resize-none ${alignClass}`}
+          className={`w-full px-2 py-1 text-sm border border-accent rounded outline-none bg-surface resize-none ${alignClass}`}
           rows={3}
         />
       )
@@ -99,7 +99,7 @@ export function EditableCell({ value, format, editable, align, wrap = false, mul
         onChange={e => setEditValue(e.target.value)}
         onBlur={handleSave}
         onKeyDown={handleKeyDown}
-        className={`w-full px-2 py-1 text-sm border border-blue-400 rounded outline-none bg-white ${alignClass}`}
+        className={`w-full px-2 py-1 text-sm border border-accent rounded outline-none bg-surface ${alignClass}`}
       />
     )
   }
@@ -123,7 +123,7 @@ export function EditableCell({ value, format, editable, align, wrap = false, mul
             rel="noopener noreferrer"
             onClick={handleIconClick}
             title={href}
-            className="text-blue-600 hover:text-blue-800"
+            className="text-accent hover:text-sky-700 dark:hover:text-sky-300"
           >
             <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M11 3h6v6M17 3l-8 8M8 5H4v11h11v-4" strokeLinecap="round" strokeLinejoin="round" />
@@ -135,7 +135,7 @@ export function EditableCell({ value, format, editable, align, wrap = false, mul
             type="button"
             onClick={handleEditClick}
             title={isSelected ? (href ? 'Edit URL' : 'Paste URL') : undefined}
-            className="text-slate-300 hover:text-blue-600 transition-colors"
+            className="text-fg-subtle hover:text-accent transition-colors"
           >
             <svg width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
               {href ? (
@@ -152,7 +152,7 @@ export function EditableCell({ value, format, editable, align, wrap = false, mul
 
   const displayValue = formatCellValue(value, format)
   const cursorClass = editable && isSelected
-    ? 'cursor-pointer hover:border hover:border-dashed hover:border-blue-300 hover:rounded px-1 -mx-1 transition-colors'
+    ? 'cursor-pointer hover:border hover:border-dashed hover:border-accent hover:rounded px-1 -mx-1 transition-colors'
     : ''
   const overflowClass = wrap ? 'break-words whitespace-pre-wrap' : 'truncate'
 
