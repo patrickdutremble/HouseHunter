@@ -5,8 +5,8 @@ export default function AddListingPage() {
   return (
     <Suspense
       fallback={
-        <div className="h-screen flex items-center justify-center bg-slate-50">
-          <div className="text-slate-400 text-sm">Loading...</div>
+        <div className="h-screen flex items-center justify-center bg-bg">
+          <div className="text-fg-subtle text-sm">Loading...</div>
         </div>
       }
     >

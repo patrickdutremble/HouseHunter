@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import DetailPage from '@/app/recent/[id]/page'
+import { ThemeProvider } from '@/components/ThemeProvider'
 import type { Listing } from '@/types/listing'
 
 const backMock = vi.fn()
@@ -71,7 +72,7 @@ vi.mock('@/hooks/useListings', () => ({
 
 describe('/recent/[id] detail page', () => {
   it('renders the listing fields and an Open on Centris button', () => {
-    render(<DetailPage />)
+    render(<ThemeProvider><DetailPage /></ThemeProvider>)
     expect(screen.getByText('123 rue Main')).toBeInTheDocument()
     expect(screen.getByText(/500,000/)).toBeInTheDocument()
     expect(screen.getByText(/3 bdr/i)).toBeInTheDocument()
@@ -89,7 +90,7 @@ describe('/recent/[id] detail page', () => {
 
   it('falls back to /recent when there is no history to go back to', () => {
     Object.defineProperty(window, 'history', { configurable: true, value: { length: 1 } })
-    render(<DetailPage />)
+    render(<ThemeProvider><DetailPage /></ThemeProvider>)
     fireEvent.click(screen.getByRole('button', { name: /back/i }))
     expect(pushMock).toHaveBeenCalledWith('/recent')
     expect(backMock).not.toHaveBeenCalled()

@@ -2,6 +2,7 @@
 import { Suspense, useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { SharePreviewCard } from '@/components/SharePreviewCard'
+import { ThemeToggle } from '@/components/ThemeToggle'
 import { useListings } from '@/hooks/useListings'
 import { extractCentrisUrl } from '@/lib/extract-centris-url'
 import type { Listing } from '@/types/listing'
@@ -113,7 +114,11 @@ function SharePageContent() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
+    <main className="min-h-screen bg-bg flex flex-col">
+      <div className="flex justify-end p-4">
+        <ThemeToggle />
+      </div>
+      <div className="flex-1 flex flex-col items-center justify-center p-4">
       {state.kind === 'loading' && <SharePreviewCard variant="loading" />}
       {state.kind === 'success' && (
         <>
@@ -122,7 +127,7 @@ function SharePageContent() {
             <div
               role="status"
               aria-live="polite"
-              className="mt-4 flex items-center gap-2 text-sm text-slate-500"
+              className="mt-4 flex items-center gap-2 text-sm text-fg-subtle"
             >
               <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -140,12 +145,12 @@ function SharePageContent() {
         <div
           role="status"
           aria-live="polite"
-          className="w-full max-w-sm mx-auto bg-white rounded-2xl shadow-lg p-5 flex items-center gap-3"
+          className="w-full max-w-sm mx-auto bg-surface rounded-2xl shadow-lg p-5 flex items-center gap-3"
         >
-          <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-700" aria-hidden="true">
+          <div className="w-8 h-8 rounded-full bg-surface-muted flex items-center justify-center text-fg-muted" aria-hidden="true">
             ✓
           </div>
-          <div className="flex-1 text-slate-900 font-medium">Removed — sent to trash</div>
+          <div className="flex-1 text-fg font-medium">Removed — sent to trash</div>
         </div>
       )}
       {state.kind === 'error' && (
@@ -157,13 +162,14 @@ function SharePageContent() {
           onManual={handleManual}
         />
       )}
+      </div>
     </main>
   )
 }
 
 export default function SharePage() {
   return (
-    <Suspense fallback={<main className="min-h-screen bg-slate-50 flex items-center justify-center p-4"><SharePreviewCard variant="loading" /></main>}>
+    <Suspense fallback={<main className="min-h-screen bg-bg flex items-center justify-center p-4"><SharePreviewCard variant="loading" /></main>}>
       <SharePageContent />
     </Suspense>
   )

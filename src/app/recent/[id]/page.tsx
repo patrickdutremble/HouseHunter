@@ -1,6 +1,7 @@
 'use client'
 import { useRouter, useParams } from 'next/navigation'
 import { useListings } from '@/hooks/useListings'
+import { ThemeToggle } from '@/components/ThemeToggle'
 import type { Listing } from '@/types/listing'
 
 function formatPrice(price: number | null): string {
@@ -11,9 +12,9 @@ function formatPrice(price: number | null): string {
 function Field({ label, value }: { label: string; value: string | number | null | undefined }) {
   if (value == null || value === '') return null
   return (
-    <div className="py-2 border-b border-slate-100">
-      <div className="text-[11px] uppercase tracking-wide text-slate-400">{label}</div>
-      <div className="text-slate-900">{value}</div>
+    <div className="py-2 border-b border-border">
+      <div className="text-[11px] uppercase tracking-wide text-fg-subtle">{label}</div>
+      <div className="text-fg">{value}</div>
     </div>
   )
 }
@@ -35,9 +36,9 @@ export default function DetailPage() {
 
   if (!listing) {
     return (
-      <main className="min-h-screen bg-slate-50 p-4">
-        <button type="button" onClick={handleBack} className="text-slate-700 text-sm" aria-label="Back">← Back</button>
-        <div className="mt-8 text-center text-slate-500">Listing not found</div>
+      <main className="min-h-screen bg-bg p-4">
+        <button type="button" onClick={handleBack} className="text-fg-muted text-sm" aria-label="Back">← Back</button>
+        <div className="mt-8 text-center text-fg-subtle">Listing not found</div>
       </main>
     )
   }
@@ -50,34 +51,35 @@ export default function DetailPage() {
     : null
 
   return (
-    <main className="min-h-screen bg-slate-50 pb-8">
-      <div className="px-4 py-3">
+    <main className="min-h-screen bg-bg pb-8">
+      <div className="px-4 py-3 flex items-center justify-between">
         <button
           type="button"
           onClick={handleBack}
-          className="text-slate-700 text-sm"
+          className="text-fg-muted text-sm"
           aria-label="Back"
         >
           ← Back
         </button>
+        <ThemeToggle />
       </div>
 
       {listing.image_url ? (
         <img
           src={listing.image_url}
           alt=""
-          className="w-full aspect-video object-cover bg-slate-100"
+          className="w-full aspect-video object-cover bg-surface-muted"
           onError={e => { (e.currentTarget as HTMLImageElement).style.visibility = 'hidden' }}
         />
       ) : (
-        <div className="w-full aspect-video bg-slate-100" />
+        <div className="w-full aspect-video bg-surface-muted" />
       )}
 
       <section className="p-4">
-        <div className="text-slate-900 font-medium">{listing.full_address ?? listing.location ?? '—'}</div>
+        <div className="text-fg font-medium">{listing.full_address ?? listing.location ?? '—'}</div>
         <div className="text-3xl font-bold mt-1">{formatPrice(listing.price)}</div>
 
-        <div className="mt-4 divide-y divide-slate-100">
+        <div className="mt-4 divide-y divide-border">
           <Field label="Bedrooms" value={listing.bedrooms ? `${listing.bedrooms} bdr` : null} />
           <Field label="Area" value={listing.liveable_area_sqft ? `${listing.liveable_area_sqft} sqft` : null} />
           <Field label="Property type" value={listing.property_type} />
@@ -93,7 +95,7 @@ export default function DetailPage() {
             href={listing.centris_link}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-6 block w-full text-center py-3 rounded-lg bg-slate-900 text-white font-medium"
+            className="mt-6 block w-full text-center py-3 rounded-lg bg-fg text-bg font-medium"
           >
             Open on Centris
           </a>
