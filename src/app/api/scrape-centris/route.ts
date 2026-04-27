@@ -13,7 +13,25 @@ export async function POST(req: Request) {
   }
 
   const url = body.url?.trim()
-  if (!url || !/centris\.ca\//.test(url)) {
+  if (!url) {
+    return NextResponse.json(
+      { error: 'Please provide a valid Centris URL' },
+      { status: 400 }
+    )
+  }
+  let parsedUrl: URL
+  try {
+    parsedUrl = new URL(url)
+  } catch {
+    return NextResponse.json(
+      { error: 'Please provide a valid Centris URL' },
+      { status: 400 }
+    )
+  }
+  if (
+    parsedUrl.protocol !== 'https:' ||
+    (parsedUrl.hostname !== 'www.centris.ca' && parsedUrl.hostname !== 'centris.ca')
+  ) {
     return NextResponse.json(
       { error: 'Please provide a valid Centris URL' },
       { status: 400 }

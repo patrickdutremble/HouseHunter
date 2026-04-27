@@ -246,7 +246,7 @@ export function AddListingClient() {
               <Field label="Fees/yr" value={fees != null ? `$${fees.toLocaleString('en-CA')}` : null} />
               <Field label="School (car)" value={status.commuteSchool} />
               <Field label="PVM (transit)" value={status.commutePvm} />
-              <Field label="Centris link" value={url} href={url ?? undefined} />
+              <Field label="Centris link" value={url} href={safeHref(url)} />
             </dl>
             {status.commuteError && (
               <p className="text-xs text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 rounded-lg p-2 mb-4">
@@ -315,6 +315,16 @@ function calcMonthlyMortgage(price: number): number {
   const n = 25 * 12
   const factor = Math.pow(1 + r, n)
   return Math.round((principal * (r * factor)) / (factor - 1))
+}
+
+function safeHref(u: string | null): string | undefined {
+  if (!u) return undefined
+  try {
+    const p = new URL(u)
+    return p.protocol === 'https:' || p.protocol === 'http:' ? p.toString() : undefined
+  } catch {
+    return undefined
+  }
 }
 
 function Field({ label, value, href }: { label: string; value: string | null; href?: string }) {
