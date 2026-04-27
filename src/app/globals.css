@@ -55,6 +55,9 @@ body {
 }
 
 /* Leaflet dark-mode overrides */
+.dark .leaflet-container {
+  background: #1a1a1a;
+}
 .dark .leaflet-popup-content-wrapper,
 .dark .leaflet-popup-tip {
   background: var(--color-surface);
