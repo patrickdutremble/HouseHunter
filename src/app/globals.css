@@ -35,6 +35,14 @@ body {
   color: var(--color-fg);
 }
 
+/* Disable transitions during theme switch so all elements flip at once */
+.theme-switching,
+.theme-switching *,
+.theme-switching *::before,
+.theme-switching *::after {
+  transition: none !important;
+}
+
 /* Custom scrollbar for the table */
 .overflow-auto::-webkit-scrollbar {
   width: 6px;

@@ -33,8 +33,15 @@ function resolve(theme: Theme): ResolvedTheme {
 
 function applyClass(resolved: ResolvedTheme) {
   const root = document.documentElement
+  root.classList.add('theme-switching')
   if (resolved === 'dark') root.classList.add('dark')
   else root.classList.remove('dark')
+  // Force a reflow so the class change takes effect before transitions resume.
+  void root.offsetHeight
+  // setTimeout (not rAF) so cleanup also runs in hidden tabs.
+  setTimeout(() => {
+    root.classList.remove('theme-switching')
+  }, 0)
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
