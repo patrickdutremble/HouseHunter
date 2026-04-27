@@ -56,6 +56,8 @@
   // Uses a placeholder __APP__ that each button replaces with its own base URL.
   var source = [
     "(function(){",
+    "var V='2026-04-27';",
+    "try{",
     "var APP=__APP__;",
     "var url=window.location.href;",
     "if(!/centris\\.ca\\//.test(url)){alert('HouseHunter: open a Centris listing page first.');return;}",
@@ -105,7 +107,9 @@
     "if(lat)p.set('lat',lat);",
     "if(lon)p.set('lon',lon);",
     "if(img)p.set('img',img);",
+    "if(!price&&!addr){alert('HouseHunter ('+V+'): could not read price or address. Centris may have changed their page structure — let Patrick know.');return;}",
     "window.open(APP+'/add-listing?'+p.toString(),'_blank');",
+    "}catch(e){alert('HouseHunter ('+V+') error: '+((e&&e.message)||e));}",
     "})();"
   ].join("");
 
