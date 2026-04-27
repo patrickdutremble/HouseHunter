@@ -104,6 +104,8 @@ export function AddListingClient() {
           liveable_area_sqft: area != null && Number.isFinite(area) ? area : null,
           parking: parking || null,
           year_built: yearBuilt != null && Number.isFinite(yearBuilt) ? yearBuilt : null,
+          latitude: lat != null && Number.isFinite(lat) ? lat : null,
+          longitude: lon != null && Number.isFinite(lon) ? lon : null,
           downpayment,
           monthly_mortgage: monthlyMortgage,
           total_monthly_cost: totalMonthlyCost,
