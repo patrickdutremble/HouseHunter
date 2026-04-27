@@ -60,6 +60,7 @@ export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPane
               href={listing.centris_link}
               target="_blank"
               rel="noopener noreferrer"
+              title="Tip: Ctrl/⌘-click (or middle-click) to open in a background tab"
               className={SECONDARY_LINK_BUTTON_CLASSES}
             >
               View on Centris &#8599;
@@ -70,6 +71,7 @@ export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPane
               href={listing.broker_link}
               target="_blank"
               rel="noopener noreferrer"
+              title="Tip: Ctrl/⌘-click (or middle-click) to open in a background tab"
               className={SECONDARY_LINK_BUTTON_CLASSES}
             >
               Broker site &#8599;
