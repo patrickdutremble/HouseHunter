@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { refreshAllStatuses } from '@/lib/refresh-statuses'
 
 export const maxDuration = 60
@@ -11,13 +11,11 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!url || !serviceKey) {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
     return NextResponse.json({ error: 'Supabase env vars missing' }, { status: 500 })
   }
 
-  const supabase = createClient(url, serviceKey)
+  const supabase = createAdminClient()
   try {
     const summary = await refreshAllStatuses(supabase)
     return NextResponse.json(summary)
