@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase/server'
 
 const SCHOOL_DESTINATION = 'Secondary School Leblanc, Terrebonne, QC'
 const PVM_DESTINATION = '1 Place Ville Marie, Montreal, QC'
@@ -17,6 +17,8 @@ export async function calculateAndStoreCommute(
 ): Promise<{ ok: boolean; school: string | null; pvm: string | null; skipped?: boolean }> {
   const apiKey = process.env.GOOGLE_MAPS_API_KEY
   if (!apiKey) return { ok: false, school: null, pvm: null }
+
+  const supabase = await createClient()
 
   const { data: existing } = await supabase
     .from('listings')

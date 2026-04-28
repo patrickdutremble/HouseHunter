@@ -8,7 +8,7 @@ vi.mock('next/navigation', () => ({
   }),
 }))
 
-const updateSpy = vi.fn()
+const { updateSpy } = vi.hoisted(() => ({ updateSpy: vi.fn() }))
 
 function makeListing(overrides: Partial<Listing>): Listing {
   return {
@@ -58,8 +58,8 @@ const seedListings: Listing[] = [
   makeListing({ id: 'id-b', location: 'B' }),
 ]
 
-vi.mock('@/lib/supabase', () => ({
-  supabase: {
+vi.mock('@/lib/supabase/client', () => ({
+  createClient: () => ({
     from: () => ({
       select: () => ({
         in: () => ({
@@ -77,7 +77,7 @@ vi.mock('@/lib/supabase', () => ({
         }
       },
     }),
-  },
+  }),
 }))
 
 import ComparePage from '../page'
