@@ -56,7 +56,7 @@
   // Uses a placeholder __APP__ that each button replaces with its own base URL.
   var source = [
     "(function(){",
-    "var V='2026-04-27';",
+    "var V='2026-04-28';",
     "try{",
     "var APP=__APP__;",
     "var url=window.location.href;",
@@ -80,7 +80,8 @@
     "var areaRaw=getCarac(/^(net area|living area|superficie (nette|habitable))$/i);",
     "var area=null;",
     "if(areaRaw){var n=parseFloat(areaRaw.replace(/[\\s,]/g,''));if(!isNaN(n)){if(/m\\u00b2|m2/i.test(areaRaw))area=Math.round(n*10.764);else area=Math.round(n);}}",
-    "var parking=getCarac(/^(parking \\(total\\)|stationnement \\(total\\))$/i);",
+    "var parking=getCarac(/^(parking|stationnement)\\s+\\(?total\\)?$/i);",
+    "if(parking)parking=parking.replace(/^All\\u00e9e\\b/,'Driveway');",
     "var yearRaw=getCarac(/^(year built|ann\\u00e9e de construction)$/i);",
     "var yearBuilt=null;",
     "if(yearRaw){var ym=yearRaw.match(/\\d{4}/);if(ym)yearBuilt=ym[0];}",

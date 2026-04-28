@@ -25,7 +25,7 @@ A "javascript:" bookmarklet that runs on any Centris listing page, scrapes field
 | `fees` | same, title === `Fees`/`Frais` (optional) | `common_fees_yearly` | integer |
 | `bedrooms` | first `body.innerText` match of `/(\d+)\s+(bedroom\|chambre)/i` | `bedrooms` | text |
 | `area` | `.carac-container` where title matches `^(net area\|living area\|superficie (nette\|habitable))$`, parse number; if `m²`/`m2` convert × 10.764 | `liveable_area_sqft` | integer |
-| `parking` | `.carac-container` where title matches `^(parking \(total\)\|stationnement \(total\))$` | `parking` | text |
+| `parking` | `.carac-container` where title matches `^(parking\|stationnement)\s+\(?total\)?$` (English uses "Parking (Total)", French uses "Stationnement total" with no parens) | `parking` | text |
 | `year` | `.carac-container` where title matches `^(year built\|année de construction)$`, first 4-digit group | `year_built` | integer |
 | `lat` | `<meta itemprop="latitude">` content | (transient — `/api/commute` only) | — |
 | `lon` | `<meta itemprop="longitude">` content | (transient — `/api/commute` only) | — |
