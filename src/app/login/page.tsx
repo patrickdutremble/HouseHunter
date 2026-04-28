@@ -1,13 +1,14 @@
 'use client'
 
-import { Suspense, useState } from 'react'
+import { Suspense, useState, useRef, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const returnTo = searchParams.get('returnTo') ?? '/'
+  const rawReturnTo = searchParams.get('returnTo')
+  const returnTo = rawReturnTo && rawReturnTo.startsWith('/') && !rawReturnTo.startsWith('//') ? rawReturnTo : '/'
 
   const [stage, setStage] = useState<'email' | 'otp'>('email')
   const [email, setEmail] = useState('')
@@ -15,6 +16,18 @@ function LoginForm() {
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [resendHint, setResendHint] = useState(false)
+  const resendTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  function clearResendTimer() {
+    if (resendTimerRef.current) {
+      clearTimeout(resendTimerRef.current)
+      resendTimerRef.current = null
+    }
+  }
+
+  useEffect(() => {
+    return () => clearResendTimer()
+  }, [])
 
   const supabase = createClient()
 
@@ -32,7 +45,8 @@ function LoginForm() {
       return
     }
     setStage('otp')
-    setTimeout(() => setResendHint(true), 30000)
+    clearResendTimer()
+    resendTimerRef.current = setTimeout(() => setResendHint(true), 30000)
   }
 
   async function verifyCode(e: React.FormEvent) {
@@ -54,6 +68,7 @@ function LoginForm() {
   }
 
   function resetToEmail() {
+    clearResendTimer()
     setStage('email')
     setCode('')
     setError(null)
