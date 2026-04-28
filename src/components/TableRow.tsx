@@ -52,7 +52,7 @@ function getRowStateClass(
 ): string {
   if (isSelected) return 'bg-blue-50 dark:bg-sky-900/40 border-blue-200 dark:border-sky-700'
   if (flagged) return 'bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/40'
-  if (favorite) return 'bg-amber-50 dark:bg-amber-900/30 hover:bg-amber-100 dark:hover:bg-amber-900/40'
+  if (favorite) return 'bg-amber-50 dark:bg-amber-400/15 hover:bg-amber-100 dark:hover:bg-amber-400/25'
   return 'hover:bg-surface-hover'
 }
 
