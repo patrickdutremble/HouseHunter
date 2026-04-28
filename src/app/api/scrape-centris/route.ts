@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase/server'
 import { parseCentrisHtml } from '@/lib/centris-parser'
 import { recalculateListing } from '@/lib/calculations'
 import { calculateAndStoreCommute } from '@/lib/commute'
@@ -37,6 +37,8 @@ export async function POST(req: Request) {
       { status: 400 }
     )
   }
+
+  const supabase = await createClient()
 
   // --- Duplicate check ---
   const { data: existing } = await supabase
