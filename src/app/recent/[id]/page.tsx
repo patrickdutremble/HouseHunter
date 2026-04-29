@@ -1,4 +1,5 @@
 'use client'
+import Image from 'next/image'
 import { useRouter, useParams } from 'next/navigation'
 import { useListings } from '@/hooks/useListings'
 import { ThemeToggle } from '@/components/ThemeToggle'
@@ -69,12 +70,17 @@ export default function DetailPage() {
       </div>
 
       {listing.image_url ? (
-        <img
-          src={listing.image_url}
-          alt=""
-          className="w-full aspect-video object-cover bg-surface-muted"
-          onError={e => { (e.currentTarget as HTMLImageElement).style.visibility = 'hidden' }}
-        />
+        <div className="relative w-full aspect-video bg-surface-muted">
+          <Image
+            src={listing.image_url}
+            alt=""
+            fill
+            sizes="100vw"
+            preload
+            className="object-cover"
+            onError={e => { (e.currentTarget as HTMLImageElement).style.visibility = 'hidden' }}
+          />
+        </div>
       ) : (
         <div className="w-full aspect-video bg-surface-muted" />
       )}
