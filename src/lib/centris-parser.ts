@@ -28,6 +28,14 @@ export function parseCentrisHtml(html: string): CentrisParseResult {
   }
 
   // --- Property type (from first h1 matching "... for sale / à vendre") ---
+  // Normalize French labels to English so the column is consistent regardless
+  // of the language Centris served the page in.
+  const PROPERTY_TYPE_FR_TO_EN: Record<string, string> = {
+    'Maison': 'House',
+    'Maison de ville': 'Townhouse',
+    'Maison en copropriété': 'Condominium house',
+    'Appartement': 'Condo',
+  }
   let property_type: string | null = null
   $('h1').each((_i, el) => {
     if (property_type) return
@@ -35,6 +43,9 @@ export function parseCentrisHtml(html: string): CentrisParseResult {
     const m = text.match(/^(.+?)\s+(?:for sale|à vendre|for rent|à louer)/i)
     if (m) property_type = m[1].trim()
   })
+  if (property_type && PROPERTY_TYPE_FR_TO_EN[property_type]) {
+    property_type = PROPERTY_TYPE_FR_TO_EN[property_type]
+  }
 
   // --- Address & location (from first h2 starting with digits + comma) ---
   let full_address: string | null = null

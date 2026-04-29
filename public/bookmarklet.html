@@ -68,6 +68,8 @@
     "var type=null;",
     "var h1s=document.querySelectorAll('h1');",
     "for(var i=0;i<h1s.length;i++){var t=h1s[i].textContent.trim().replace(/\\s+/g,' ');var m=t.match(/^(.+?)\\s+(?:for sale|\\u00e0 vendre|for rent|\\u00e0 louer)/i);if(m){type=m[1].trim();break;}}",
+    "var typeMap={'Maison':'House','Maison de ville':'Townhouse','Maison en copropri\\u00e9t\\u00e9':'Condominium house','Appartement':'Condo'};",
+    "if(type&&typeMap[type])type=typeMap[type];",
     "var loc=null;var addr=null;",
     "var h2s=document.querySelectorAll('h2');",
     "for(var j=0;j<h2s.length;j++){var s=h2s[j].textContent.trim().replace(/\\s+/g,' ');if(/^\\d+[A-Za-z0-9-]*[\\s,]/.test(s)&&s.indexOf(',')>-1){addr=s;var parts=s.split(',').map(function(x){return x.trim();}).filter(Boolean);loc=parts[parts.length-1]||null;break;}}",
