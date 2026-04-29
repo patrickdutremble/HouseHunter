@@ -57,6 +57,35 @@ export function UserMenu() {
 
   const initial = email[0].toUpperCase()
 
+  async function handleEmailFavorites() {
+    const { data, error } = await supabase
+      .from('listings')
+      .select('centris_link')
+      .eq('favorite', true)
+      .is('deleted_at', null)
+      .not('centris_link', 'is', null)
+
+    setOpen(false)
+
+    if (error) {
+      console.error('[UserMenu] fetch favorites failed:', error)
+      return
+    }
+
+    const links = (data ?? [])
+      .map((l) => l.centris_link)
+      .filter((link): link is string => Boolean(link))
+
+    if (links.length === 0) {
+      window.alert('No favorited listings with Centris links.')
+      return
+    }
+
+    const subject = `Favorited listings (${links.length})`
+    const body = links.join('\n')
+    window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+  }
+
   async function handleLogout() {
     const { error } = await supabase.auth.signOut()
     setOpen(false)
@@ -92,6 +121,15 @@ export function UserMenu() {
           <div className="px-3 py-2.5 border-b border-border">
             <p className="text-xs text-fg-subtle truncate">{email}</p>
           </div>
+
+          {/* Email favorites */}
+          <button
+            role="menuitem"
+            onClick={handleEmailFavorites}
+            className="w-full text-left px-3 py-2 text-sm text-fg-muted hover:text-fg hover:bg-surface-hover transition-colors"
+          >
+            Email favorites
+          </button>
 
           {/* Log out */}
           <button
