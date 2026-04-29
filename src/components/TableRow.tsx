@@ -216,3 +216,4 @@ function TableRowImpl({ listing, isSelected, isFocused = false, onSelect, onUpda
 }
 
 export const TableRow = memo(TableRowImpl)
+TableRow.displayName = 'TableRow'
