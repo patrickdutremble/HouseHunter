@@ -5,8 +5,8 @@ import { refreshAllStatuses } from '@/lib/refresh-statuses'
 export const maxDuration = 60
 
 export async function POST() {
-  const supabase = createAdminClient()
   try {
+    const supabase = createAdminClient()
     const summary = await refreshAllStatuses(supabase)
     return NextResponse.json(summary)
   } catch (err) {
