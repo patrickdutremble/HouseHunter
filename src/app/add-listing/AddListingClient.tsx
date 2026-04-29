@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { ThemeToggle } from '@/components/ThemeToggle'
@@ -233,11 +234,15 @@ export function AddListingClient() {
               Added to HouseHunter
             </div>
             {imageUrl && (
-              <img
-                src={imageUrl}
-                alt="Listing photo"
-                className="w-full h-40 object-cover rounded-lg border border-border mb-4"
-              />
+              <div className="relative w-full h-40 mb-4 rounded-lg overflow-hidden border border-border">
+                <Image
+                  src={imageUrl}
+                  alt="Listing photo"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 600px"
+                  className="object-cover"
+                />
+              </div>
             )}
             <dl className="text-sm text-fg-muted space-y-1.5 mb-4">
               <Field label="Type" value={type} />
