@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { safeReturnTo } from '@/lib/safe-return-to'
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
-  const rawReturnTo = searchParams.get('returnTo')
-  const returnTo = rawReturnTo && rawReturnTo.startsWith('/') && !rawReturnTo.startsWith('//') ? rawReturnTo : '/'
+  const returnTo = safeReturnTo(searchParams.get('returnTo'))
 
   if (code) {
     const supabase = await createClient()
