@@ -13,6 +13,8 @@ export function useListings() {
   const [error, setError] = useState<string | null>(null)
   const [trashCount, setTrashCount] = useState(0)
 
+  // Mirror listings into a ref so updateListing can stay dep-free in useCallback
+  // and still read current state — needed to keep its identity stable for memoized TableRow.
   const listingsRef = useRef<Listing[]>([])
   useEffect(() => {
     listingsRef.current = listings
