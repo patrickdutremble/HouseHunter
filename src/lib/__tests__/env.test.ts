@@ -26,4 +26,9 @@ describe('requireEnv', () => {
     process.env.MY_VAR = ''
     expect(() => requireEnv('MY_VAR')).toThrow(/MY_VAR/)
   })
+
+  it('throws when the env var is whitespace-only', () => {
+    process.env.MY_VAR = '   '
+    expect(() => requireEnv('MY_VAR')).toThrow(/MY_VAR/)
+  })
 })
