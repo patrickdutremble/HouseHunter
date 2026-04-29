@@ -1,4 +1,5 @@
 import type { Listing } from '@/types/listing'
+import Image from 'next/image'
 import { formatPillPrice } from '@/lib/marker-style'
 
 interface ListingPopupProps {
@@ -10,10 +11,11 @@ export function ListingPopup({ listing, onSelect }: ListingPopupProps) {
   return (
     <div className="w-56">
       {listing.image_url && (
-        <img
+        <Image
           src={listing.image_url}
           alt={listing.full_address ?? listing.location ?? 'Listing thumbnail'}
-          loading="lazy"
+          width={224}
+          height={112}
           className="w-full h-28 object-cover rounded-md bg-surface-muted mb-2"
         />
       )}
