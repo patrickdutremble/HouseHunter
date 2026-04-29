@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import { ListingsTable } from '@/components/ListingsTable'
+import { TableSkeleton } from '@/components/TableSkeleton'
 import { DetailPanel } from '@/components/DetailPanel'
 import { ViewToggle, type ViewMode } from '@/components/ViewToggle'
 import { ThemeToggle } from '@/components/ThemeToggle'
@@ -161,8 +162,15 @@ function HomeContent() {
 
   if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center bg-bg">
-        <div className="text-fg-subtle text-sm">Loading listings...</div>
+      <div className="h-screen flex flex-col bg-bg">
+        <div className="flex items-center gap-2 px-4 py-2 bg-surface border-b border-border">
+          <div className="flex-1 h-8 rounded-lg bg-surface-muted animate-pulse" />
+          <div className="hidden sm:block h-8 w-16 rounded-lg bg-surface-muted animate-pulse" />
+          <div className="h-8 w-20 rounded-lg bg-surface-muted animate-pulse" />
+        </div>
+        <div className="flex-1 overflow-hidden">
+          <TableSkeleton />
+        </div>
       </div>
     )
   }
