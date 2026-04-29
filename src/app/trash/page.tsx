@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { UserMenu } from '@/components/UserMenu'
@@ -145,9 +146,11 @@ export default function TrashPage() {
               >
                 {/* Listing image */}
                 {listing.image_url ? (
-                  <img
+                  <Image
                     src={listing.image_url}
                     alt=""
+                    width={80}
+                    height={80}
                     className="w-20 h-20 object-cover rounded-lg border border-border shrink-0"
                   />
                 ) : (

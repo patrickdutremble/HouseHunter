@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import Image from 'next/image'
 import type { Listing } from '@/types/listing'
 
 interface ListingCardProps {
@@ -63,10 +64,11 @@ export function ListingCard({ listing, onTap, onDelete }: ListingCardProps) {
         className="w-full flex gap-3 p-3 text-left"
       >
         {listing.image_url ? (
-          <img
+          <Image
             src={listing.image_url}
             alt={address}
-            loading="lazy"
+            width={80}
+            height={80}
             className="shrink-0 w-20 h-20 rounded-lg object-cover bg-surface-muted"
             onError={e => { (e.currentTarget as HTMLImageElement).style.visibility = 'hidden' }}
           />

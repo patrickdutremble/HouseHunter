@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import Image from 'next/image'
 
 interface LocationCellProps {
   text: string | null
@@ -69,10 +70,11 @@ export function LocationCell({ text, mapQuery, editable, isSelected = false, ima
   return (
     <span className="flex items-center gap-2 min-w-0">
       {imageUrl && !imgError ? (
-        <img
+        <Image
           src={imageUrl}
           alt={text ? `${text} listing photo` : 'Listing photo'}
-          loading="lazy"
+          width={44}
+          height={36}
           className="shrink-0 w-11 h-9 rounded-md object-cover bg-surface-muted"
           onError={() => setImgError(true)}
         />
