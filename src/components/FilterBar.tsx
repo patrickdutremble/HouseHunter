@@ -22,6 +22,38 @@ const flagBtnHideActive = 'bg-surface-muted border-border-strong text-fg-muted'
 const flagBtnAllActive = 'bg-surface border-border-strong text-fg-muted'
 const flagBtnIdle = 'bg-surface border-border text-fg-subtle hover:bg-surface-hover'
 
+const iconBtnBase = 'relative inline-flex items-center justify-center w-9 h-9 rounded-lg border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent'
+const iconBtnIdle = 'bg-surface border-border text-fg-muted hover:bg-surface-hover'
+const iconBtnFilterActive = 'bg-blue-50 dark:bg-sky-900/40 border-blue-300 dark:border-sky-700 text-blue-700 dark:text-blue-300'
+const iconBtnFavActive = 'bg-amber-50 dark:bg-amber-900/30 border-amber-300 dark:border-amber-800 text-amber-700 dark:text-amber-300'
+
+const FilterIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M3 5h18l-7 9v6l-4-2v-4L3 5z" />
+  </svg>
+)
+
+const SortIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+    <path d="M3 6h18M6 12h12M9 18h6" />
+  </svg>
+)
+
+const StarIcon = ({ filled }: { filled: boolean }) => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill={filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinejoin="round" aria-hidden="true">
+    <path d="M12 3l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.8 6.2 21l1.1-6.5L2.6 9.8l6.5-.9L12 3z" />
+  </svg>
+)
+
+const CountBadge = ({ count }: { count: number }) => (
+  <span
+    aria-hidden="true"
+    className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 inline-flex items-center justify-center rounded-full bg-accent text-accent-fg text-[10px] font-semibold leading-none"
+  >
+    {count}
+  </span>
+)
+
 function usePopover() {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -59,14 +91,12 @@ export function FilterBar({
       <div ref={filterPopover.ref} className="relative">
         <button
           onClick={() => filterPopover.setOpen(!filterPopover.open)}
-          className={`
-            px-3 py-1.5 text-sm rounded-lg border transition-colors
-            ${activeCount > 0
-              ? 'bg-blue-50 dark:bg-sky-900/40 border-blue-300 dark:border-sky-700 text-blue-700 dark:text-blue-300'
-              : 'bg-surface border-border text-fg-muted hover:bg-surface-hover'}
-          `}
+          aria-label={activeCount > 0 ? `Filters (${activeCount} active)` : 'Filters'}
+          title="Filters"
+          className={`${iconBtnBase} ${activeCount > 0 ? iconBtnFilterActive : iconBtnIdle}`}
         >
-          Filters{activeCount > 0 ? ` (${activeCount})` : ''}
+          <FilterIcon />
+          {activeCount > 0 && <CountBadge count={activeCount} />}
         </button>
         {filterPopover.open && (
           <div className="absolute top-full left-0 mt-1 z-20">
@@ -82,14 +112,12 @@ export function FilterBar({
       <div ref={sortPopover.ref} className="relative">
         <button
           onClick={() => sortPopover.setOpen(!sortPopover.open)}
-          className={`
-            px-3 py-1.5 text-sm rounded-lg border transition-colors
-            ${sort.length > 0
-              ? 'bg-blue-50 dark:bg-sky-900/40 border-blue-300 dark:border-sky-700 text-blue-700 dark:text-blue-300'
-              : 'bg-surface border-border text-fg-muted hover:bg-surface-hover'}
-          `}
+          aria-label={sort.length > 0 ? `Sort (${sort.length} active)` : 'Sort'}
+          title="Sort"
+          className={`${iconBtnBase} ${sort.length > 0 ? iconBtnFilterActive : iconBtnIdle}`}
         >
-          Sort{sort.length > 0 ? ` (${sort.length})` : ''}
+          <SortIcon />
+          {sort.length > 0 && <CountBadge count={sort.length} />}
         </button>
         {sortPopover.open && (
           <div className="absolute top-full left-0 mt-1 z-20">
@@ -101,15 +129,11 @@ export function FilterBar({
       <button
         onClick={() => update('favoritesOnly', !filters.favoritesOnly)}
         aria-pressed={filters.favoritesOnly}
+        aria-label={filters.favoritesOnly ? 'Showing favorites only' : 'Show favorites only'}
         title={filters.favoritesOnly ? 'Showing favorites only' : 'Show favorites only'}
-        className={`
-          px-3 py-1.5 text-sm rounded-lg border transition-colors
-          ${filters.favoritesOnly
-            ? 'bg-amber-50 dark:bg-amber-900/30 border-amber-300 dark:border-amber-800 text-amber-700 dark:text-amber-300'
-            : 'bg-surface border-border text-fg-muted hover:bg-surface-hover'}
-        `}
+        className={`${iconBtnBase} ${filters.favoritesOnly ? iconBtnFavActive : iconBtnIdle}`}
       >
-        {filters.favoritesOnly ? '\u2605' : '\u2606'} Favorites
+        <StarIcon filled={filters.favoritesOnly} />
       </button>
 
       <div role="radiogroup" aria-label="Flag status" className="inline-flex rounded-lg overflow-hidden border border-border">

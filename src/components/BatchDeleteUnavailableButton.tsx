@@ -24,7 +24,6 @@ export function BatchDeleteUnavailableButton({ unavailableIds, beginBulkSoftDele
   const committedRef = useRef(false)
 
   const count = unavailableIds.length
-  const disabled = count === 0 || pending !== null
 
   useEffect(() => {
     if (!pending) return
@@ -92,21 +91,17 @@ export function BatchDeleteUnavailableButton({ unavailableIds, beginBulkSoftDele
     )
   }
 
+  if (count === 0) return null
+
   return (
     <div className="flex items-center gap-2">
       <button
         type="button"
         onClick={handleClick}
-        disabled={disabled}
-        title={count === 0 ? 'No unavailable listings' : `Delete ${count} unavailable listing${count !== 1 ? 's' : ''}`}
-        className={`
-          px-3 py-1.5 text-sm rounded-lg border transition-colors
-          ${disabled
-            ? 'bg-surface-muted border-border text-fg-subtle cursor-not-allowed'
-            : 'bg-surface border-border text-fg-muted hover:bg-surface-hover'}
-        `}
+        title={`Delete ${count} unavailable listing${count !== 1 ? 's' : ''}`}
+        className="px-3 py-1.5 text-sm rounded-lg border bg-surface border-border text-fg-muted hover:bg-surface-hover transition-colors"
       >
-        Delete unavailable{count > 0 ? ` (${count})` : ''}
+        Delete unavailable ({count})
       </button>
       {errorMsg && <span className="text-xs text-red-600 dark:text-red-400">{errorMsg}</span>}
     </div>
