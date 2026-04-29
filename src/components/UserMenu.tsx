@@ -58,8 +58,13 @@ export function UserMenu() {
   const initial = email[0].toUpperCase()
 
   async function handleLogout() {
-    await supabase.auth.signOut()
+    const { error } = await supabase.auth.signOut()
     setOpen(false)
+    if (error) {
+      console.error('[UserMenu] signOut failed:', error)
+      triggerRef.current?.focus()
+      return
+    }
     router.push('/login')
     router.refresh()
   }
