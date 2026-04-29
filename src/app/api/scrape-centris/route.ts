@@ -41,11 +41,19 @@ export async function POST(req: Request) {
   const supabase = await createClient()
 
   // --- Duplicate check ---
-  const { data: existing } = await supabase
+  const { data: existing, error: dupErr } = await supabase
     .from('listings')
     .select('id')
     .eq('centris_link', url)
     .maybeSingle()
+
+  if (dupErr) {
+    console.error('[scrape-centris] duplicate-check failed:', dupErr)
+    return NextResponse.json(
+      { error: 'Failed to check for existing listing' },
+      { status: 500 }
+    )
+  }
 
   if (existing) {
     return NextResponse.json(
