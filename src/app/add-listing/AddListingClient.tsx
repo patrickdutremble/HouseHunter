@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 
 const supabase = createClient()
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { UserMenu } from '@/components/UserMenu'
 
 type Status =
   | { kind: 'loading'; stage: 'inserting' | 'commutes' }
@@ -207,8 +208,9 @@ export function AddListingClient() {
 
   return (
     <div className="min-h-screen flex flex-col bg-bg">
-      <div className="flex justify-end p-4">
+      <div className="flex justify-end items-center gap-2 p-4">
         <ThemeToggle />
+        <UserMenu />
       </div>
       <div className="flex-1 flex items-center justify-center px-4 pb-8">
       <div className="w-full max-w-lg">

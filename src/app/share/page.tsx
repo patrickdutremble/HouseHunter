@@ -3,6 +3,7 @@ import { Suspense, useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { SharePreviewCard } from '@/components/SharePreviewCard'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { UserMenu } from '@/components/UserMenu'
 import { useListings } from '@/hooks/useListings'
 import { extractCentrisUrl } from '@/lib/extract-centris-url'
 import type { Listing } from '@/types/listing'
@@ -115,8 +116,9 @@ function SharePageContent() {
 
   return (
     <main className="min-h-screen bg-bg flex flex-col">
-      <div className="flex justify-end p-4">
+      <div className="flex justify-end items-center gap-2 p-4">
         <ThemeToggle />
+        <UserMenu />
       </div>
       <div className="flex-1 flex flex-col items-center justify-center p-4">
       {state.kind === 'loading' && <SharePreviewCard variant="loading" />}

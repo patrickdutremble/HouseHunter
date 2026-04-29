@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { useListings } from '@/hooks/useListings'
 import { ListingCard } from '@/components/ListingCard'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { UserMenu } from '@/components/UserMenu'
 import { extractCentrisUrl } from '@/lib/extract-centris-url'
 
 type PasteState =
@@ -91,6 +92,7 @@ export default function RecentPage() {
         <div className="font-bold text-fg">HouseHunter</div>
         <div className="flex items-center gap-2">
           <ThemeToggle />
+          <UserMenu />
           <Link href="/trash" className="relative flex items-center gap-1 text-fg-muted" aria-label={`Trash (${trashCount})`}>
           <svg width="22" height="22" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
             <path fillRule="evenodd" d="M8.75 1A1.75 1.75 0 007 2.75V3H3.5a.75.75 0 000 1.5h.62l.77 11.55A2.25 2.25 0 007.13 18h5.74a2.25 2.25 0 002.24-1.95L15.88 4.5h.62a.75.75 0 000-1.5H13v-.25A1.75 1.75 0 0011.25 1h-2.5z" clipRule="evenodd" />

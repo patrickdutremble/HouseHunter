@@ -2,6 +2,7 @@
 import { useRouter, useParams } from 'next/navigation'
 import { useListings } from '@/hooks/useListings'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { UserMenu } from '@/components/UserMenu'
 import type { Listing } from '@/types/listing'
 
 function formatPrice(price: number | null): string {
@@ -61,7 +62,10 @@ export default function DetailPage() {
         >
           ← Back
         </button>
-        <ThemeToggle />
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <UserMenu />
+        </div>
       </div>
 
       {listing.image_url ? (

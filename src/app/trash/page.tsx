@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 
 const supabase = createClient()
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { UserMenu } from '@/components/UserMenu'
 import type { Listing } from '@/types/listing'
 
 export default function TrashPage() {
@@ -121,6 +122,7 @@ export default function TrashPage() {
               </button>
             )}
             <ThemeToggle />
+            <UserMenu />
           </div>
         </div>
       </div>

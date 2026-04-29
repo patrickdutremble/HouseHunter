@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 
 const supabase = createClient()
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { UserMenu } from '@/components/UserMenu'
 import { getBestValues, type BestMap } from '@/lib/comparison'
 import { criteria, countChecked, deriveCriteria, isDerivedCriterion, type CriterionKey } from '@/lib/criteria'
 import { formatCellValue } from '@/lib/formatting'
@@ -152,6 +153,7 @@ function CompareContent() {
             {copied ? 'Copied!' : 'Copy link'}
           </button>
           <ThemeToggle />
+          <UserMenu />
         </div>
       </div>
 

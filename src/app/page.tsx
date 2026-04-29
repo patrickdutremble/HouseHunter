@@ -8,6 +8,7 @@ import { ListingsTable } from '@/components/ListingsTable'
 import { DetailPanel } from '@/components/DetailPanel'
 import { ViewToggle, type ViewMode } from '@/components/ViewToggle'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { UserMenu } from '@/components/UserMenu'
 import { useListings } from '@/hooks/useListings'
 import { extractCentrisUrl } from '@/lib/extract-centris-url'
 
@@ -272,6 +273,8 @@ function HomeContent() {
         <ViewToggle current={view} onChange={handleViewChange} />
 
         <ThemeToggle />
+
+        <UserMenu />
 
       </div>
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
@@ -9,22 +9,39 @@ export function UserMenu() {
   const supabase = createClient()
   const [email, setEmail] = useState<string | null>(null)
   const [open, setOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    let mounted = true
+    setMounted(true)
+    let active = true
     supabase.auth.getUser().then(({ data }) => {
-      if (mounted) setEmail(data.user?.email ?? null)
+      if (active) setEmail(data.user?.email ?? null)
     })
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (mounted) setEmail(session?.user?.email ?? null)
+      if (active) setEmail(session?.user?.email ?? null)
     })
     return () => {
-      mounted = false
+      active = false
       sub.subscription.unsubscribe()
     }
   }, [supabase])
 
-  if (!email) return null
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    if (!open) return
+    function handleClick(e: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [open])
+
+  if (!mounted || !email) return null
+
+  const initial = email[0].toUpperCase()
 
   async function handleLogout() {
     await supabase.auth.signOut()
@@ -34,24 +51,33 @@ export function UserMenu() {
   }
 
   return (
-    <div className="fixed top-3 right-3 z-50">
+    <div ref={containerRef} className="relative">
       <button
+        type="button"
         onClick={() => setOpen((v) => !v)}
-        className="px-3 py-1.5 rounded-md bg-white/90 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-sm text-slate-700 dark:text-slate-200 shadow-sm hover:bg-white dark:hover:bg-slate-800"
         aria-haspopup="menu"
         aria-expanded={open}
+        aria-label={`Account menu for ${email}`}
+        className="inline-flex items-center justify-center w-8 h-8 rounded-full border border-border bg-surface text-sm font-semibold text-fg-muted hover:text-fg hover:bg-surface-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
-        {email}
+        {initial}
       </button>
+
       {open && (
         <div
           role="menu"
-          className="absolute right-0 mt-1 w-44 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-lg overflow-hidden"
+          className="absolute right-0 mt-1.5 w-52 rounded-lg bg-surface border border-border shadow-lg overflow-hidden z-50"
         >
+          {/* Email display */}
+          <div className="px-3 py-2.5 border-b border-border">
+            <p className="text-xs text-fg-subtle truncate">{email}</p>
+          </div>
+
+          {/* Log out */}
           <button
             role="menuitem"
             onClick={handleLogout}
-            className="w-full text-left px-3 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700"
+            className="w-full text-left px-3 py-2 text-sm text-fg-muted hover:text-fg hover:bg-surface-hover transition-colors"
           >
             Log out
           </button>

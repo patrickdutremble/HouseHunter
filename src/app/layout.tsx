@@ -3,7 +3,6 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { ServiceWorkerRegistrar } from '@/components/ServiceWorkerRegistrar'
 import { ThemeProvider } from '@/components/ThemeProvider'
-import { UserMenu } from '@/components/UserMenu'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -43,7 +42,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="h-full antialiased font-[family-name:var(--font-inter)]">
         <ThemeProvider>
           <ServiceWorkerRegistrar />
-          <UserMenu />
           {children}
         </ThemeProvider>
       </body>
