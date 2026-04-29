@@ -8,9 +8,10 @@ async function sleep(ms: number) {
 }
 
 async function main() {
-  // Dynamic imports so env is loaded before ../src/lib/supabase runs createClient.
+  // Dynamic imports so env is loaded before client is created.
   const { fetchDriveRoute } = await import('../src/lib/commute')
-  const { supabase } = await import('../src/lib/supabase')
+  const { createAdminClient } = await import('../src/lib/supabase/admin')
+  const supabase = createAdminClient()
 
   const apiKey = process.env.GOOGLE_MAPS_API_KEY
   if (!apiKey) {
