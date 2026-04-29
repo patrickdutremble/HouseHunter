@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { TableHeader } from './TableHeader'
 import { TableRow } from './TableRow'
 import { FilterBar, type Filters } from './FilterBar'
@@ -40,10 +40,10 @@ export function ListingsTable({ listings, selectedId, onSelect, onUpdate, compar
     onToggleCompare,
   })
 
-  const handleRowSelect = (id: string) => {
+  const handleRowSelect = useCallback((id: string) => {
     setFocusedId(id)
     onSelect(id)
-  }
+  }, [onSelect])
 
   useEffect(() => {
     if (focusedId !== null && !sorted.some(l => l.id === focusedId)) {
