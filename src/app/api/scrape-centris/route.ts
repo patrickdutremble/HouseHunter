@@ -132,6 +132,9 @@ export async function POST(req: Request) {
     .single()
 
   if (insertErr || !inserted) {
+    if (insertErr) {
+      console.error('[scrape-centris] insert failed:', insertErr)
+    }
     return NextResponse.json(
       { error: insertErr?.message ?? 'Failed to insert listing' },
       { status: 500 }
