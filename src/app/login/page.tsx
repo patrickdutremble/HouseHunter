@@ -3,12 +3,12 @@
 import { Suspense, useState, useRef, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { safeReturnTo } from '@/lib/safe-return-to'
 
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const rawReturnTo = searchParams.get('returnTo')
-  const returnTo = rawReturnTo && rawReturnTo.startsWith('/') && !rawReturnTo.startsWith('//') ? rawReturnTo : '/'
+  const returnTo = safeReturnTo(searchParams.get('returnTo'))
 
   const [stage, setStage] = useState<'email' | 'otp'>('email')
   const [email, setEmail] = useState('')
