@@ -2,6 +2,12 @@
 
 **Read this section before touching the bookmarklet or the add-listing page. Do NOT re-explore the Centris DOM or the app — everything you need is below.**
 
+## Authentication
+
+The bookmarklet itself does not authenticate. It relies on the user being logged in to the HouseHunter web app in the same browser. If the user is logged in, the new tab opened by the bookmarklet inherits the session cookie and works seamlessly. If not, the new tab lands on `/login` with `returnTo=/add-listing?...` and the user completes OTP, then the params flow through to the listing-add page.
+
+No bookmarklet code changes are needed when modifying auth.
+
 ### What it is
 
 A "javascript:" bookmarklet that runs on any Centris listing page, scrapes fields from the DOM, and opens `<APP>/add-listing?...` in a new tab. The add-listing page does the duplicate check and the Supabase insert. This split exists because centris.ca's CSP blocks direct `fetch()` to Supabase.

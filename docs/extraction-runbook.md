@@ -2,6 +2,12 @@
 
 **When the user says something like "extract data for the new listings", follow the steps in this section EXACTLY. Everything you need is here — do NOT read any files under `src/` or re-explore the codebase. Doing so wastes tokens. If a detail is genuinely missing from this runbook, ask the user before reading source files.**
 
+## Authentication
+
+The app is now auth-gated. Extraction queries you run via the Supabase MCP use the service role and bypass RLS — no auth needed for those.
+
+Backfill scripts in `scripts/` that use `@supabase/supabase-js` directly with the anon key will fail under RLS. If you need a backfill script, use the service role key (only on a trusted machine, never check it in).
+
 ### Step 1 — Find pending rows
 
 Use Supabase MCP (`execute_sql`, project ID `erklsdwrhscuzkntomxu`) to run:
