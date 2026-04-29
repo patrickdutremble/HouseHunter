@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
+import Image from 'next/image'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { ThemeToggle } from '@/components/ThemeToggle'
@@ -165,11 +166,15 @@ function CompareContent() {
             <div key={listing.id} className="bg-surface rounded-lg border border-border shadow-sm overflow-hidden">
               {/* Image */}
               {listing.image_url ? (
-                <img
-                  src={listing.image_url}
-                  alt=""
-                  className="w-full h-[180px] object-cover"
-                />
+                <div className="relative w-full h-[180px]">
+                  <Image
+                    src={listing.image_url}
+                    alt=""
+                    fill
+                    sizes={`(max-width: 768px) ${Math.round(100 / listings.length)}vw, ${Math.round(800 / listings.length)}px`}
+                    className="object-cover"
+                  />
+                </div>
               ) : (
                 <div className="w-full h-[180px] bg-surface-muted flex items-center justify-center">
                   <svg className="text-fg-subtle" width="32" height="32" viewBox="0 0 20 20" fill="currentColor">

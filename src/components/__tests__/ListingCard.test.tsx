@@ -64,7 +64,7 @@ describe('ListingCard', () => {
   it('renders image when image_url is set', () => {
     render(<ListingCard listing={sample} onTap={() => {}} onDelete={() => {}} />)
     const img = screen.getByRole('img') as HTMLImageElement
-    expect(img.src).toBe('https://example.com/h.jpg')
+    expect(decodeURIComponent(img.src)).toContain('https://example.com/h.jpg')
   })
 
   it('renders placeholder when image_url is null', () => {

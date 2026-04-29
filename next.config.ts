@@ -2,7 +2,19 @@ import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'mspublic.centris.ca',
+        pathname: '/**',
+        // No `search: ''` — Centris serves images via media.ashx with required query params (id, t, w, h, sm).
+      },
+    ],
+    qualities: [75],
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 2678400, // 31 days — Centris image URLs include hashes, safe to cache long
+  },
 };
 
 export default withSentryConfig(nextConfig, {

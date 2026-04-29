@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { detailColumns } from '@/lib/columns'
 import { EditableCell } from './EditableCell'
@@ -117,11 +118,15 @@ export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPane
 
         {/* Listing image */}
         {listing.image_url && (
-          <img
-            src={listing.image_url}
-            alt="Listing photo"
-            className="w-full h-48 object-cover rounded-lg border border-border mb-5"
-          />
+          <div className="relative w-full h-48 mb-5 rounded-lg overflow-hidden border border-border">
+            <Image
+              src={listing.image_url}
+              alt="Listing photo"
+              fill
+              sizes="(max-width: 768px) 100vw, 480px"
+              className="object-cover"
+            />
+          </div>
         )}
 
         {/* Location with full address + Maps link */}

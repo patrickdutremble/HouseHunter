@@ -1,4 +1,5 @@
 'use client'
+import Image from 'next/image'
 import type { Listing } from '@/types/listing'
 
 type Variant = 'loading' | 'success' | 'duplicate' | 'error'
@@ -77,13 +78,16 @@ export function SharePreviewCard(props: SharePreviewCardProps) {
   return (
     <div className="hh-force-light w-full max-w-sm mx-auto bg-surface rounded-2xl shadow-lg overflow-hidden">
       {l?.image_url ? (
-        <img
-          src={l.image_url}
-          alt={`Photo of ${l?.full_address ?? l?.location ?? 'listing'}`}
-          loading="lazy"
-          className="w-full aspect-video object-cover bg-surface-muted"
-          onError={e => { (e.currentTarget as HTMLImageElement).style.visibility = 'hidden' }}
-        />
+        <div className="relative w-full aspect-video bg-surface-muted">
+          <Image
+            src={l.image_url}
+            alt={`Photo of ${l?.full_address ?? l?.location ?? 'listing'}`}
+            fill
+            sizes="(max-width: 640px) 100vw, 400px"
+            className="object-cover"
+            onError={e => { (e.currentTarget as HTMLImageElement).style.visibility = 'hidden' }}
+          />
+        </div>
       ) : (
         <div className="w-full aspect-video bg-surface-muted" />
       )}

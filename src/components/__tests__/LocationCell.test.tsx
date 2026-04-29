@@ -43,7 +43,7 @@ describe('LocationCell thumbnail', () => {
       />
     )
     const img = screen.getByRole('img') as HTMLImageElement
-    expect(img.src).toBe('https://example.com/house.jpg')
+    expect(decodeURIComponent(img.src)).toContain('https://example.com/house.jpg')
   })
 
   it('renders a placeholder icon when imageUrl is null', () => {
