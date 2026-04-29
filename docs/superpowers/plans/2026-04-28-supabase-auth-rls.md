@@ -4,7 +4,7 @@
 
 **Goal:** Lock down HouseHunter with Supabase email-OTP auth, a Next.js middleware gate, and Row Level Security on the `listings` table — so only allowlisted users can read or write.
 
-**Architecture:** Add `@supabase/ssr` for cookie-based session sharing across browser, server components, server routes, and middleware. Replace the single `src/lib/supabase.ts` with a folder of focused client factories. Introduce a root `middleware.ts` that redirects unauthenticated requests to `/login`. Enable RLS on `listings` with a single `auth.uid() IS NOT NULL` policy as a defense-in-depth safety net.
+**Architecture:** Add `@supabase/ssr` for cookie-based session sharing across browser, server components, server routes, and middleware. Replace the single `src/lib/supabase.ts` with a folder of focused client factories. Introduce a root `proxy.ts` (Next.js 16 renamed middleware → proxy) that redirects unauthenticated requests to `/login`. Enable RLS on `listings` with a single `auth.uid() IS NOT NULL` policy as a defense-in-depth safety net.
 
 **Tech Stack:** Next.js 16 (App Router), `@supabase/supabase-js` ^2.102.1 (already installed), `@supabase/ssr` (to be added), Vitest for unit tests, Supabase Auth (email OTP), PostgreSQL RLS.
 
@@ -16,7 +16,7 @@
 
 **New files:**
 
-- `middleware.ts` (project root) — Next.js middleware. Imports `updateSession` from the supabase middleware helper.
+- `proxy.ts` (project root) — Next.js middleware (renamed from middleware.ts in Next 16). Imports `updateSession` from the supabase middleware helper.
 - `src/lib/supabase/client.ts` — browser-side Supabase client factory (replaces use of old `src/lib/supabase.ts`).
 - `src/lib/supabase/server.ts` — server-side cookie-aware Supabase client factory.
 - `src/lib/supabase/middleware.ts` — middleware-specific helper that refreshes session and returns a redirect response when needed.
@@ -270,7 +270,7 @@ Run:
 npx tsc --noEmit
 ```
 
-Expected: no errors. (Note: `shouldGate` is referenced in `middleware.ts` but doesn't exist yet — this will surface as a missing-module error. That's OK; we create it in Task 3 next. If tsc errors only on that, it's expected.)
+Expected: no errors. (Note: `shouldGate` is referenced in `proxy.ts` but doesn't exist yet — this will surface as a missing-module error. That's OK; we create it in Task 3 next. If tsc errors only on that, it's expected.)
 
 - [ ] **Step 6: Commit**
 
@@ -1035,11 +1035,11 @@ git commit -m "refactor(cron): use admin client factory"
 ## Task 10: Wire root middleware
 
 **Files:**
-- Create: `middleware.ts` (project root)
+- Create: `proxy.ts` (project root)
 
 - [ ] **Step 1: Create the middleware**
 
-Create `middleware.ts` at the project root:
+Create `proxy.ts` at the project root:
 
 ```typescript
 import { type NextRequest } from 'next/server'
@@ -1098,7 +1098,7 @@ If login fails: check browser console for errors, check that the dashboard confi
 - [ ] **Step 4: Stop dev server and commit**
 
 ```bash
-git add middleware.ts
+git add proxy.ts
 git commit -m "feat(auth): add root middleware to gate unauthenticated requests"
 ```
 
@@ -1488,6 +1488,6 @@ No gaps.
 
 **Placeholder scan:** No "TBD," no "implement later," no vague "add error handling" — all errors are concrete with literal copy. All code blocks are complete.
 
-**Type consistency:** `createClient()` is the function name in client.ts, server.ts; `createAdminClient()` in admin.ts (intentionally distinct so callers can't confuse it with the user-scoped clients). `updateSession(request)` is the middleware helper name everywhere it's referenced. `shouldGate(pathname)` matches between definition (Task 3) and consumer (Task 2's middleware.ts).
+**Type consistency:** `createClient()` is the function name in client.ts, server.ts; `createAdminClient()` in admin.ts (intentionally distinct so callers can't confuse it with the user-scoped clients). `updateSession(request)` is the middleware helper name everywhere it's referenced. `shouldGate(pathname)` matches between definition (Task 3) and consumer (Task 2's proxy.ts).
 
 One minor inconsistency caught and fixed inline: the auth callback route uses `exchangeCodeForSession` but for OTP the actual session is set by `verifyOtp` client-side; the callback route is documented as a fallback for any link-based emails Supabase might send. This is noted in the task description.

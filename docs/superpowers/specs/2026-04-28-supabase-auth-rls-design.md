@@ -40,7 +40,7 @@ Lock down the HouseHunter app and its Supabase database so that only allowlisted
 
 **Enforcement:**
 
-- **`middleware.ts`** at the project root runs before every request. Reads the session cookie via `src/lib/supabase/middleware.ts`, refreshes it if near expiry, and redirects unauthenticated requests to `/login?returnTo=<original path with query>`. Excludes the cron path (`/api/cron/*`), Next.js internals (`/_next/*`), the login page itself, and the auth callback route.
+- **`proxy.ts`** at the project root runs before every request. Reads the session cookie via `src/lib/supabase/middleware.ts`, refreshes it if near expiry, and redirects unauthenticated requests to `/login?returnTo=<original path with query>`. Excludes the cron path (`/api/cron/*`), Next.js internals (`/_next/*`), the login page itself, and the auth callback route.
 - **Row Level Security** enabled on the `listings` table. A single policy named `authenticated_full_access` permits all operations (SELECT, INSERT, UPDATE, DELETE) when `auth.uid() IS NOT NULL`. The cron uses the service-role client, which bypasses RLS by design.
 
 **Public surface:** none. The bookmarklet target (`/add-listing`) is gated like every other page.
@@ -49,7 +49,7 @@ Lock down the HouseHunter app and its Supabase database so that only allowlisted
 
 ### New files
 
-- **`middleware.ts`** (project root) — ~25 lines. Imports the helper from `src/lib/supabase/middleware.ts`, applies the redirect rule, and sets the `matcher` config to exclude internals.
+- **`proxy.ts`** (project root) — ~25 lines. Imports the helper from `src/lib/supabase/middleware.ts`, applies the redirect rule, and sets the `matcher` config to exclude internals.
 - **`src/lib/supabase/client.ts`** — ~10 lines. Exports `createClient()` that wraps `createBrowserClient` from `@supabase/ssr`.
 - **`src/lib/supabase/server.ts`** — ~20 lines. Exports `createClient()` that wraps `createServerClient` from `@supabase/ssr` and wires it to Next.js's `cookies()` helper.
 - **`src/lib/supabase/middleware.ts`** — ~30 lines. Exports `updateSession(request)` that creates a middleware client, refreshes the session, and returns either a redirect response or a passthrough response with refreshed cookies.
