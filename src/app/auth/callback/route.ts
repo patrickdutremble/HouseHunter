@@ -13,7 +13,7 @@ export async function GET(request: Request) {
     if (!error) {
       return NextResponse.redirect(`${origin}${returnTo}`)
     }
-    console.error('[auth/callback] exchangeCodeForSession failed:', error.message)
+    console.error('[auth/callback] exchangeCodeForSession failed:', error)
   } else {
     console.error('[auth/callback] missing code parameter')
   }
