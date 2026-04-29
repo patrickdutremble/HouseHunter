@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'mspublic.centris.ca',
         pathname: '/**',
-        search: '',
+        // No `search: ''` — Centris serves images via media.ashx with required query params (id, t, w, h, sm).
       },
     ],
     qualities: [75],

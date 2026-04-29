@@ -73,6 +73,8 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'mspublic.centris.ca',
         pathname: '/**',
+        // Centris serves images through media.ashx with required ?id=&t=&w=&h=&sm= query params,
+        // so we cannot lock `search` to ''. The pathname allowlist is the security boundary.
       },
     ],
     qualities: [75],
