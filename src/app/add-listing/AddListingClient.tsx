@@ -4,10 +4,10 @@ import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-
-const supabase = createClient()
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { UserMenu } from '@/components/UserMenu'
+
+const supabase = createClient()
 
 type Status =
   | { kind: 'loading'; stage: 'inserting' | 'commutes' }

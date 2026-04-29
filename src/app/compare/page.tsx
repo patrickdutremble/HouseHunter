@@ -4,8 +4,6 @@ import { useState, useEffect, useMemo, useRef, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-
-const supabase = createClient()
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { UserMenu } from '@/components/UserMenu'
 import { getBestValues, type BestMap } from '@/lib/comparison'
@@ -13,6 +11,8 @@ import { criteria, countChecked, deriveCriteria, isDerivedCriterion, type Criter
 import { formatCellValue } from '@/lib/formatting'
 import type { ColumnFormat } from '@/lib/columns'
 import type { Listing } from '@/types/listing'
+
+const supabase = createClient()
 
 interface CompareField {
   key: string

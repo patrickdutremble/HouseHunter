@@ -3,11 +3,11 @@
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-
-const supabase = createClient()
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { UserMenu } from '@/components/UserMenu'
 import type { Listing } from '@/types/listing'
+
+const supabase = createClient()
 
 export default function TrashPage() {
   const [trashedListings, setTrashedListings] = useState<Listing[]>([])
