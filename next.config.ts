@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'mspublic.centris.ca',
         pathname: '/**',
+        search: '',
       },
     ],
     qualities: [75],
