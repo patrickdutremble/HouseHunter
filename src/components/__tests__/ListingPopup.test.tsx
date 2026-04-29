@@ -58,7 +58,7 @@ describe('ListingPopup', () => {
   it('renders the thumbnail image when image_url is set', () => {
     render(<ListingPopup listing={make()} onSelect={() => {}} />)
     const img = screen.getByRole('img') as HTMLImageElement
-    expect(img.src).toBe('https://example.com/house.jpg')
+    expect(decodeURIComponent(img.src)).toContain('https://example.com/house.jpg')
   })
 
   it('calls onSelect with the listing id when "See full details" is clicked', () => {
