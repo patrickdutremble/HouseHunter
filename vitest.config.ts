@@ -12,7 +12,7 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
       'server-only': path.resolve(
         __dirname,
-        './node_modules/next/dist/build/jest/__mocks__/empty.js'
+        './node_modules/next/dist/compiled/server-only/empty.js'
       ),
     },
   },
