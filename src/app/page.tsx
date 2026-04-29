@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, useCallback, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import dynamic from 'next/dynamic'
@@ -48,7 +48,7 @@ function HomeContent() {
     router.replace(query ? `/?${query}` : '/')
   }
 
-  const toggleCompare = (id: string) => {
+  const toggleCompare = useCallback((id: string) => {
     setCompareIds(prev => {
       if (prev.has(id)) {
         const next = new Set(prev)
@@ -65,7 +65,7 @@ function HomeContent() {
       setCompareMaxWarning(false)
       return next
     })
-  }
+  }, [])
 
   useEffect(() => {
     if (!compareMaxWarning) return
