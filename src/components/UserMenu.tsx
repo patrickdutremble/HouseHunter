@@ -11,6 +11,7 @@ export function UserMenu() {
   const [open, setOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     setMounted(true)
@@ -39,6 +40,19 @@ export function UserMenu() {
     return () => document.removeEventListener('mousedown', handleClick)
   }, [open])
 
+  // Close on Escape and restore focus to the trigger
+  useEffect(() => {
+    if (!open) return
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        setOpen(false)
+        triggerRef.current?.focus()
+      }
+    }
+    document.addEventListener('keydown', handleKey)
+    return () => document.removeEventListener('keydown', handleKey)
+  }, [open])
+
   if (!mounted || !email) return null
 
   const initial = email[0].toUpperCase()
@@ -53,6 +67,7 @@ export function UserMenu() {
   return (
     <div ref={containerRef} className="relative">
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="menu"
