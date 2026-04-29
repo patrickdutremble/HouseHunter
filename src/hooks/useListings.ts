@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
 const supabase = createClient()
@@ -12,6 +12,13 @@ export function useListings() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [trashCount, setTrashCount] = useState(0)
+
+  // Mirror listings into a ref so updateListing can stay dep-free in useCallback
+  // and still read current state — needed to keep its identity stable for memoized TableRow.
+  const listingsRef = useRef<Listing[]>([])
+  useEffect(() => {
+    listingsRef.current = listings
+  }, [listings])
 
   const fetchListings = useCallback(async () => {
     setLoading(true)
@@ -46,13 +53,13 @@ export function useListings() {
     fetchTrashCount()
   }, [fetchListings, fetchTrashCount])
 
-  const updateListing = async (id: string, field: string, value: string | number | boolean | null | Record<string, boolean>) => {
+  const updateListing = useCallback(async (id: string, field: string, value: string | number | boolean | null | Record<string, boolean>) => {
     const updates: Record<string, unknown> = { [field]: value }
 
     // Recalculate derived fields if a source field changed
     const recalcFields = ['price', 'taxes_yearly', 'common_fees_yearly', 'hydro_yearly', 'liveable_area_sqft']
     if (recalcFields.includes(field)) {
-      const current = listings.find(l => l.id === id)
+      const current = listingsRef.current.find(l => l.id === id)
       if (current) {
         const input = {
           price: field === 'price' ? (value as number) : current.price,
@@ -81,7 +88,7 @@ export function useListings() {
       prev.map(l => (l.id === id ? { ...l, ...updates } as Listing : l))
     )
     return true
-  }
+  }, [])
 
   const deleteListing = async (id: string) => {
     const { error: deleteError } = await supabase

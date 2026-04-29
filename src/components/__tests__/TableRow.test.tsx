@@ -64,6 +64,11 @@ beforeAll(() => {
 })
 
 describe('TableRow', () => {
+  it('is wrapped in React.memo', () => {
+    const REACT_MEMO_TYPE = Symbol.for('react.memo')
+    expect((TableRow as unknown as { $$typeof?: symbol }).$$typeof).toBe(REACT_MEMO_TYPE)
+  })
+
   it('renders no Unavailable pill when active', () => {
     renderRow(BASE)
     expect(screen.queryByTestId('unavailable-pill')).toBeNull()
