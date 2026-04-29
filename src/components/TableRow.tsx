@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { memo, useEffect, useRef } from 'react'
 import { tableColumns } from '@/lib/columns'
 import { criteria, countChecked, deriveCriteria } from '@/lib/criteria'
 import { EditableCell } from './EditableCell'
@@ -56,7 +56,7 @@ function getRowStateClass(
   return 'hover:bg-surface-hover'
 }
 
-export function TableRow({ listing, isSelected, isFocused = false, onSelect, onUpdate, isCompared, onToggleCompare }: TableRowProps) {
+function TableRowImpl({ listing, isSelected, isFocused = false, onSelect, onUpdate, isCompared, onToggleCompare }: TableRowProps) {
   const rowRef = useRef<HTMLTableRowElement>(null)
   const hasHighFees = (listing.common_fees_yearly ?? 0) > 6000
   const hasFlags = listing.notes && (
@@ -214,3 +214,5 @@ export function TableRow({ listing, isSelected, isFocused = false, onSelect, onU
     </tr>
   )
 }
+
+export const TableRow = memo(TableRowImpl)
