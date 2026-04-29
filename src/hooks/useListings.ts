@@ -99,5 +99,32 @@ export function useListings() {
     return true
   }
 
-  return { listings, loading, error, fetchListings, updateListing, deleteListing, trashCount }
+  const beginBulkSoftDelete = (ids: string[]) => {
+    const idSet = new Set(ids)
+    const removed = listings.filter(l => idSet.has(l.id))
+    setListings(prev => prev.filter(l => !idSet.has(l.id)))
+
+    const commit = async () => {
+      const { error: deleteError } = await supabase
+        .from('listings')
+        .update({ deleted_at: new Date().toISOString() })
+        .in('id', ids)
+
+      if (deleteError) {
+        setError(deleteError.message)
+        setListings(prev => [...removed, ...prev])
+        return false
+      }
+      fetchTrashCount()
+      return true
+    }
+
+    const undo = () => {
+      setListings(prev => [...removed, ...prev])
+    }
+
+    return { commit, undo, count: removed.length }
+  }
+
+  return { listings, loading, error, fetchListings, updateListing, deleteListing, beginBulkSoftDelete, trashCount }
 }

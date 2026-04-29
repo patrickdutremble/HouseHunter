@@ -23,7 +23,7 @@ const MapView = dynamic(() => import('@/components/MapView'), {
 type ScrapeStatus = 'idle' | 'loading' | 'success' | 'error' | 'duplicate'
 
 function HomeContent() {
-  const { listings, loading, error, fetchListings, updateListing, deleteListing, trashCount } = useListings()
+  const { listings, loading, error, fetchListings, updateListing, deleteListing, beginBulkSoftDelete, trashCount } = useListings()
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [centrisUrl, setCentrisUrl] = useState('')
   const [scrapeStatus, setScrapeStatus] = useState<ScrapeStatus>('idle')
@@ -291,6 +291,7 @@ function HomeContent() {
               compareIds={compareIds}
               onToggleCompare={toggleCompare}
               onRefreshed={fetchListings}
+              beginBulkSoftDelete={beginBulkSoftDelete}
             />
           )}
         </div>

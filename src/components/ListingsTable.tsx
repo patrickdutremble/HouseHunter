@@ -5,6 +5,7 @@ import { TableHeader } from './TableHeader'
 import { TableRow } from './TableRow'
 import { FilterBar, type Filters } from './FilterBar'
 import { RefreshStatusesButton } from './RefreshStatusesButton'
+import { BatchDeleteUnavailableButton } from './BatchDeleteUnavailableButton'
 import { timeAgo } from '@/lib/time-ago'
 import { useSort } from '@/hooks/useSort'
 import { useTableKeyboard } from '@/hooks/useTableKeyboard'
@@ -19,9 +20,10 @@ interface ListingsTableProps {
   compareIds: Set<string>
   onToggleCompare: (id: string) => void
   onRefreshed?: () => void
+  beginBulkSoftDelete?: (ids: string[]) => { commit: () => Promise<boolean>; undo: () => void; count: number }
 }
 
-export function ListingsTable({ listings, selectedId, onSelect, onUpdate, compareIds, onToggleCompare, onRefreshed }: ListingsTableProps) {
+export function ListingsTable({ listings, selectedId, onSelect, onUpdate, compareIds, onToggleCompare, onRefreshed, beginBulkSoftDelete }: ListingsTableProps) {
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS)
   const [focusedId, setFocusedId] = useState<string | null>(null)
 
@@ -54,6 +56,11 @@ export function ListingsTable({ listings, selectedId, onSelect, onUpdate, compar
     return Array.from(types).sort()
   }, [listings])
 
+  const unavailableIds = useMemo(
+    () => listings.filter(l => l.status === 'unavailable').map(l => l.id),
+    [listings],
+  )
+
   const lastCheckedAgo = useMemo(() => {
     const latest = listings
       .map(l => l.status_checked_at)
@@ -75,6 +82,13 @@ export function ListingsTable({ listings, selectedId, onSelect, onUpdate, compar
             onSortChange={setSort}
           />
           <RefreshStatusesButton onRefreshed={() => onRefreshed?.()} />
+          {beginBulkSoftDelete && (
+            <BatchDeleteUnavailableButton
+              unavailableIds={unavailableIds}
+              beginBulkSoftDelete={beginBulkSoftDelete}
+              onDeleted={() => onRefreshed?.()}
+            />
+          )}
           {lastCheckedAgo && (
             <span className="text-xs text-fg-subtle">Last checked: {lastCheckedAgo}</span>
           )}
