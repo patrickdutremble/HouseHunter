@@ -90,14 +90,15 @@ export function parseCentrisHtml(html: string): CentrisParseResult {
   let liveable_area_sqft: number | null = null
   const areaRaw = getCarac(/^(net area|living area|superficie (nette|habitable))$/i)
   if (areaRaw) {
-    const n = parseFloat(areaRaw.replace(/,/g, ''))
+    const n = parseFloat(areaRaw.replace(/[\s,]/g, ''))
     if (!isNaN(n)) {
       liveable_area_sqft = /m²|m2/i.test(areaRaw) ? Math.round(n * 10.764) : Math.round(n)
     }
   }
 
   // --- Parking ---
-  const parking = getCarac(/^(parking \(total\)|stationnement \(total\))$/i)
+  let parking = getCarac(/^(parking|stationnement)\s+\(?total\)?$/i)
+  if (parking) parking = parking.replace(/^Allée\b/, 'Driveway')
 
   // --- Year built ---
   let year_built: number | null = null
