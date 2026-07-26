@@ -111,10 +111,10 @@ describe('getBestValues', () => {
     expect(best.liveable_area_sqft).toEqual(new Set(['b']))
   })
 
-  it('picks shortest commute (parses "1:15" as 75 minutes)', () => {
+  it('picks shortest commute from stored "N min" values', () => {
     const listings = [
-      makeListing({ id: 'a', commute_school_car: '0:45' }),
-      makeListing({ id: 'b', commute_school_car: '1:15' }),
+      makeListing({ id: 'a', commute_school_car: '9 min' }),
+      makeListing({ id: 'b', commute_school_car: '12 min' }),
     ]
     const best = getBestValues(listings)
     expect(best.commute_school_car).toEqual(new Set(['a']))

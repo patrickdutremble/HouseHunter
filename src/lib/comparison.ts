@@ -1,4 +1,5 @@
 import { criteria, countChecked, deriveCriteria, type CriterionKey } from '@/lib/criteria'
+import { parseDurationToMinutes } from '@/lib/duration'
 import type { Listing } from '@/types/listing'
 
 export type BestMap = {
@@ -25,14 +26,6 @@ function parseBedrooms(value: string | null): number | null {
   const parts = value.split('+').map(s => parseInt(s.trim(), 10))
   if (parts.some(isNaN)) return null
   return parts.reduce((a, b) => a + b, 0)
-}
-
-/** Parse "H:MM" duration strings into total minutes. */
-function parseDuration(value: string | null): number | null {
-  if (value === null || value === '') return null
-  const match = value.match(/^(\d+):(\d{2})$/)
-  if (!match) return null
-  return parseInt(match[1], 10) * 60 + parseInt(match[2], 10)
 }
 
 /** Parse parking string into a number. */
@@ -104,8 +97,8 @@ export function getBestValues(listings: Listing[]): BestMap {
     downpayment: findBest(listings, l => l.downpayment, 'min'),
     monthly_mortgage: findBest(listings, l => l.monthly_mortgage, 'min'),
     total_monthly_cost: findBest(listings, l => l.total_monthly_cost, 'min'),
-    commute_school_car: findBest(listings, l => parseDuration(l.commute_school_car), 'min'),
-    commute_pvm_transit: findBest(listings, l => parseDuration(l.commute_pvm_transit), 'min'),
+    commute_school_car: findBest(listings, l => parseDurationToMinutes(l.commute_school_car), 'min'),
+    commute_pvm_transit: findBest(listings, l => parseDurationToMinutes(l.commute_pvm_transit), 'min'),
     criteria_count: findBest(listings, l => countChecked(deriveCriteria(l)), 'max'),
   } as BestMap
 
