@@ -1,3 +1,5 @@
+import { parseDurationToMinutes } from '@/lib/duration'
+
 export type CriterionKey =
   | 'no_above_neighbors'
   | 'school_within_20min'
@@ -64,8 +66,8 @@ export function deriveCriteria(
   listing: DerivableListing
 ): Record<CriterionKey, boolean> {
   const bedrooms = parseLeadingInt(listing.bedrooms)
-  const schoolMin = parseLeadingInt(listing.commute_school_car)
-  const pvmMin = parseLeadingInt(listing.commute_pvm_transit)
+  const schoolMin = parseDurationToMinutes(listing.commute_school_car)
+  const pvmMin = parseDurationToMinutes(listing.commute_pvm_transit)
 
   return {
     no_above_neighbors: listing.criteria?.no_above_neighbors === true,

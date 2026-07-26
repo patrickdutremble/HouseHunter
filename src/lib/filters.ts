@@ -1,4 +1,5 @@
 import type { Listing } from '@/types/listing'
+import { parseDurationToMinutes } from '@/lib/duration'
 
 export type FlagStatus = 'all' | 'only' | 'hide'
 
@@ -26,12 +27,6 @@ export const EMPTY_FILTERS: Filters = {
   maxCommutePvm: '',
   maxMonthlyCost: '',
   hasGarage: false,
-}
-
-function parseCommuteMinutes(s: string | null): number | null {
-  if (!s) return null
-  const n = parseInt(s, 10)
-  return isNaN(n) ? null : n
 }
 
 const GARAGE_RE = /\b\d+\s*garage/i
@@ -75,14 +70,14 @@ export function applyFilters(listings: Listing[], filters: Filters): Listing[] {
     if (filters.maxCommuteSchool) {
       const max = parseInt(filters.maxCommuteSchool, 10)
       if (!isNaN(max)) {
-        const mins = parseCommuteMinutes(l.commute_school_car)
+        const mins = parseDurationToMinutes(l.commute_school_car)
         if (mins == null || mins > max) return false
       }
     }
     if (filters.maxCommutePvm) {
       const max = parseInt(filters.maxCommutePvm, 10)
       if (!isNaN(max)) {
-        const mins = parseCommuteMinutes(l.commute_pvm_transit)
+        const mins = parseDurationToMinutes(l.commute_pvm_transit)
         if (mins == null || mins > max) return false
       }
     }
