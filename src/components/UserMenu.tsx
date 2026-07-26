@@ -60,7 +60,7 @@ export function UserMenu() {
   async function handleEmailFavorites() {
     const { data, error } = await supabase
       .from('listings')
-      .select('centris_link')
+      .select('centris_link, notes')
       .eq('favorite', true)
       .is('deleted_at', null)
       .not('centris_link', 'is', null)
@@ -72,17 +72,22 @@ export function UserMenu() {
       return
     }
 
-    const links = (data ?? [])
-      .map((l) => l.centris_link)
-      .filter((link): link is string => Boolean(link))
+    const entries = (data ?? []).filter(
+      (l): l is { centris_link: string; notes: string | null } => Boolean(l.centris_link),
+    )
 
-    if (links.length === 0) {
+    if (entries.length === 0) {
       window.alert('No favorited listings with Centris links.')
       return
     }
 
-    const subject = `Favorited listings (${links.length})`
-    const body = links.join('\n')
+    const subject = `Favorited listings (${entries.length})`
+    const body = entries
+      .map((l) => {
+        const note = l.notes?.trim()
+        return `${l.centris_link}\nNote: ${note ? note : '(none)'}`
+      })
+      .join('\n\n')
     window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
   }
 
