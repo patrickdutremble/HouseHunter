@@ -126,7 +126,12 @@ function HomeContent() {
         body: JSON.stringify({ url }),
       })
 
-      let data: any
+      let data: {
+        listingId?: string
+        listing?: { id?: string }
+        error?: string
+        commuteNote?: string
+      }
       try {
         data = await res.json()
       } catch {

@@ -24,6 +24,9 @@ export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPane
 
   useEffect(() => {
     setPendingCriteria(listing.criteria ?? {})
+    // Intentionally reset only when switching to a different listing, not on
+    // every criteria edit.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [listing.id])
   return (
     <div className="w-[420px] border-l border-border bg-surface flex flex-col h-full shadow-lg">

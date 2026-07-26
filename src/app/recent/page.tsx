@@ -46,7 +46,7 @@ export default function RecentPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: extracted }),
       })
-      let data: any
+      let data: { error?: string }
       try {
         data = await res.json()
       } catch {
