@@ -1,4 +1,5 @@
 import type { ColumnFormat } from './columns'
+import { parseDurationToMinutes } from './duration'
 
 const EM_DASH = '—'
 
@@ -23,27 +24,11 @@ function formatYear(value: number | null): string {
 
 function formatDuration(value: string | null): string {
   if (value === null || value === undefined || value === '') return EM_DASH
-  const s = String(value).trim()
-
-  // Try to extract hours and minutes from the Google Directions text (e.g. "32 mins", "1 hour 15 mins", "2 hours").
-  const hoursMatch = s.match(/(\d+)\s*(?:hours?|hrs?|h)\b/i)
-  const minsMatch = s.match(/(\d+)\s*(?:minutes?|mins?|m)\b/i)
-
-  let hours = hoursMatch ? parseInt(hoursMatch[1], 10) : 0
-  let mins = minsMatch ? parseInt(minsMatch[1], 10) : 0
-
-  if (!hoursMatch && !minsMatch) {
-    // Fall back to treating the whole string as a minute count.
-    const pureNum = parseInt(s, 10)
-    if (isNaN(pureNum)) return s
-    hours = Math.floor(pureNum / 60)
-    mins = pureNum % 60
-  }
-
-  // Normalize: carry minutes >= 60 into hours
-  hours += Math.floor(mins / 60)
-  mins = mins % 60
-
+  const total = parseDurationToMinutes(value)
+  // Preserve non-numeric text (e.g. "unknown") rather than showing an em dash.
+  if (total === null) return String(value).trim()
+  const hours = Math.floor(total / 60)
+  const mins = total % 60
   return `${hours}:${mins.toString().padStart(2, '0')}`
 }
 
