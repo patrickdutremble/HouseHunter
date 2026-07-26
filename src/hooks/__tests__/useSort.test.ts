@@ -70,6 +70,20 @@ describe('useSort — multi-level', () => {
     expect(result.current.sorted.map(l => l.id)).toEqual(['a', 'c', 'b'])
   })
 
+  it('sorts commute_school_car by minutes, not text, with blanks last', () => {
+    const ls = [
+      mk({ id: 'a', commute_school_car: '32 min' }),
+      mk({ id: 'b', commute_school_car: '9 min' }),
+      mk({ id: 'c', commute_school_car: null }),
+      mk({ id: 'd', commute_school_car: '10 min' }),
+    ]
+    const { result } = renderHook(() => useSort(ls))
+    act(() => result.current.setSort([{ column: 'commute_school_car', direction: 'asc' }]))
+    expect(result.current.sorted.map(l => l.id)).toEqual(['b', 'd', 'a', 'c'])
+    act(() => result.current.setSort([{ column: 'commute_school_car', direction: 'desc' }]))
+    expect(result.current.sorted.map(l => l.id)).toEqual(['a', 'd', 'b', 'c'])
+  })
+
   it('criteria_count still works as primary', () => {
     const ls = [
       mk({ id: 'a', criteria: { k1: true, k2: true } }),

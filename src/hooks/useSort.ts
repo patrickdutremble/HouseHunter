@@ -2,6 +2,8 @@
 
 import { useState, useMemo, useCallback } from 'react'
 import { countChecked, deriveCriteria } from '@/lib/criteria'
+import { columns } from '@/lib/columns'
+import { parseDurationToMinutes } from '@/lib/duration'
 import type { Listing } from '@/types/listing'
 
 export type SortDirection = 'asc' | 'desc'
@@ -11,8 +13,15 @@ export interface SortLevel {
 }
 export type SortState = SortLevel[]
 
+const durationColumnKeys = new Set(
+  columns.filter(c => c.format === 'duration').map(c => c.key)
+)
+
 function getValue(l: Listing, column: string): unknown {
   if (column === 'criteria_count') return countChecked(deriveCriteria(l))
+  if (durationColumnKeys.has(column)) {
+    return parseDurationToMinutes(l[column as keyof Listing] as string | null)
+  }
   return l[column as keyof Listing]
 }
 
