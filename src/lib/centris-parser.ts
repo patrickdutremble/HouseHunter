@@ -20,11 +20,25 @@ export function parseCentrisHtml(html: string): CentrisParseResult {
   const $ = cheerio.load(html)
 
   // --- Price ---
+  // Centris's new (BEM) layout exposes a clean integer in meta[itemprop=price];
+  // fall back through the newer card selectors and finally the legacy .price span.
   let price: number | null = null
-  const priceEl = $('.price span.text-nowrap').first().text() || $('.price span').first().text()
-  if (priceEl) {
-    const digits = priceEl.replace(/[^\d]/g, '')
+  const priceMeta = $('meta[itemprop="price"]').attr('content')
+  if (priceMeta) {
+    const digits = priceMeta.replace(/[^\d]/g, '')
     if (digits) price = Number(digits)
+  }
+  if (price === null) {
+    const priceEl =
+      $('#BuyPrice').first().text() ||
+      $('.property-summary-header__price-value').first().text() ||
+      $('.property-price-card__price-value').first().text() ||
+      $('.price span.text-nowrap').first().text() ||
+      $('.price span').first().text()
+    if (priceEl) {
+      const digits = priceEl.replace(/[^\d]/g, '')
+      if (digits) price = Number(digits)
+    }
   }
 
   // --- Property type (from first h1 matching "... for sale / à vendre") ---
@@ -61,7 +75,26 @@ export function parseCentrisHtml(html: string): CentrisParseResult {
   })
 
   // --- Financial details helper (yearly table) ---
-  function extractYearly(rx: RegExp): number | null {
+  // Centris rewrote this section to a BEM scheme: the container holds a section
+  // title and a --yearly table whose total row carries the value. Try that first,
+  // then fall back to the legacy markup for any pages still served the old way.
+  function extractYearlyNew(rx: RegExp): number | null {
+    let result: number | null = null
+    $('.financial-details-table-container').each((_i, el) => {
+      if (result !== null) return
+      const titleEl = $(el).find('.financial-details-table-section-title')
+      if (!titleEl.length || !rx.test(titleEl.text().trim())) return
+      const totalEl = $(el).find(
+        '.financial-details-table--yearly .financial-details-table__row--total .financial-details-table__value'
+      )
+      if (!totalEl.length) return
+      const digits = totalEl.first().text().replace(/[^\d]/g, '')
+      if (digits) result = Number(digits)
+    })
+    return result
+  }
+
+  function extractYearlyOld(rx: RegExp): number | null {
     let result: number | null = null
     $('.financial-details-table-yearly').each((_i, el) => {
       if (result !== null) return
@@ -73,6 +106,10 @@ export function parseCentrisHtml(html: string): CentrisParseResult {
       if (digits) result = Number(digits)
     })
     return result
+  }
+
+  function extractYearly(rx: RegExp): number | null {
+    return extractYearlyNew(rx) ?? extractYearlyOld(rx)
   }
 
   const taxes_yearly = extractYearly(/^taxes$/i)
