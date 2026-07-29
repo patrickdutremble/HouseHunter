@@ -67,7 +67,7 @@ export function parseCentrisHtml(html: string): CentrisParseResult {
   $('h2').each((_i, el) => {
     if (full_address) return
     const text = $(el).text().trim().replace(/\s+/g, ' ')
-    if (/^\d+[\s,]/.test(text) && text.includes(',')) {
+    if (/^\d+[A-Za-z0-9-]*[\s,]/.test(text) && text.includes(',')) {
       full_address = text
       const parts = text.split(',').map(p => p.trim()).filter(Boolean)
       location = parts[parts.length - 1] || null

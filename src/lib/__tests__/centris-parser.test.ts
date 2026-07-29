@@ -64,6 +64,23 @@ const oldLayoutFinancials = `
     <div class="financial-details-table-total">$3,600</div>
   </div>`
 
+describe('parseCentrisHtml — address', () => {
+  it('reads an address whose civic number ends in a letter (e.g. 6040Z)', () => {
+    const html = `<html><body>
+      <h2>RE/MAX 2000</h2>
+      <h2>6040Z, Rue Pageau, Laval (Auteuil)</h2>
+    </body></html>`
+    const result = parseCentrisHtml(html)
+    expect(result.full_address).toBe('6040Z, Rue Pageau, Laval (Auteuil)')
+    expect(result.location).toBe('Laval (Auteuil)')
+  })
+
+  it('reads a plain numeric civic-number address', () => {
+    const html = `<html><body><h2>1655, Avenue des Lacasse, Laval (Auteuil)</h2></body></html>`
+    expect(parseCentrisHtml(html).full_address).toBe('1655, Avenue des Lacasse, Laval (Auteuil)')
+  })
+})
+
 describe('parseCentrisHtml — price', () => {
   it('reads price from meta[itemprop=price] (new layout)', () => {
     const html = `<html><body><meta itemprop="price" content="649000"></body></html>`
