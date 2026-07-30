@@ -93,6 +93,31 @@ describe('parseCentrisHtml — price', () => {
   })
 })
 
+describe('parseCentrisHtml — image', () => {
+  it('uses og:image when present', () => {
+    const html = `<html><head>
+      <meta property="og:image" content="https://mspublic.centris.ca/media.ashx?id=ABC&t=pi&w=1260&h=1024&sm=c">
+    </head><body></body></html>`
+    expect(parseCentrisHtml(html).image_url).toBe(
+      'https://mspublic.centris.ca/media.ashx?id=ABC&t=pi&w=1260&h=1024&sm=c'
+    )
+  })
+
+  it('falls back to the property photo (t=pi), never the broker headshot (t=c) or agency logo (t=b)', () => {
+    // No og:image (as on Centris summary/search pages). The broker headshot and
+    // agency logo appear BEFORE the property photo in DOM order, so a naive
+    // .first() would grab the headshot.
+    const html = `<html><body>
+      <img src="https://mspublic.centris.ca/media.ashx?id=BROKER&t=c&w=190&h=220&sm=m">
+      <img src="https://mspublic.centris.ca/media.ashx?id=AGENCY&t=b&w=120&h=90">
+      <img src="https://mspublic.centris.ca/media.ashx?id=HOUSE&t=pi&w=640&h=480&sm=c">
+    </body></html>`
+    expect(parseCentrisHtml(html).image_url).toBe(
+      'https://mspublic.centris.ca/media.ashx?id=HOUSE&t=pi&w=640&h=480&sm=c'
+    )
+  })
+})
+
 describe('parseCentrisHtml — financial details', () => {
   it('reads yearly taxes and fees from the new BEM markup', () => {
     const html = `<html><body>${newLayoutFinancials}</body></html>`

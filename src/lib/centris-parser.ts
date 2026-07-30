@@ -168,7 +168,12 @@ export function parseCentrisHtml(html: string): CentrisParseResult {
   if (ogImg) {
     image_url = ogImg
   } else {
-    const fallback = $('.main-img img, .photo-gallery img, .primary-photo img, img[src*="mspublic.centris.ca"]').first().attr('src')
+    // Centris serves broker headshots (t=c) and agency logos (t=b) from the same
+    // mspublic host as property photos (t=pi), and they appear first in the DOM.
+    // Only a property photo is a valid listing image, so target t=pi explicitly.
+    const fallback =
+      $('img[src*="mspublic.centris.ca"][src*="t=pi"]').first().attr('src') ||
+      $('.main-img img, .photo-gallery img, .primary-photo img').first().attr('src')
     if (fallback) image_url = fallback
   }
 

@@ -98,7 +98,7 @@
     "var img=null;",
     "var ogEl=document.querySelector('meta[property=\"og:image\"]');",
     "if(ogEl)img=ogEl.getAttribute('content');",
-    "if(!img){var imgEl=document.querySelector('.main-img img, .photo-gallery img, .primary-photo img, img[src*=\"mspublic.centris.ca\"]');if(imgEl)img=imgEl.src;}",
+    "if(!img){var imgEl=document.querySelector('img[src*=\"mspublic.centris.ca\"][src*=\"t=pi\"]')||document.querySelector('.main-img img, .photo-gallery img, .primary-photo img');if(imgEl)img=imgEl.src;}",
     "var p=new URLSearchParams();",
     "p.set('url',url);",
     "if(loc)p.set('location',loc);",
