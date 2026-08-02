@@ -79,4 +79,31 @@ describe('FilterBar flag status control', () => {
     fireEvent.click(screen.getByRole('radio', { name: /^All$/ }))
     expect(onChange).toHaveBeenLastCalledWith(expect.objectContaining({ flagStatus: 'all' }))
   })
+
+  it('shows the sort button by default', () => {
+    render(
+      <FilterBar
+        propertyTypes={[]}
+        filters={EMPTY_FILTERS}
+        onFilterChange={() => {}}
+        sort={[]}
+        onSortChange={() => {}}
+      />
+    )
+    expect(screen.getByRole('button', { name: /^Sort$/ })).toBeInTheDocument()
+  })
+
+  it('hides the sort button when showSort is false', () => {
+    render(
+      <FilterBar
+        propertyTypes={[]}
+        filters={EMPTY_FILTERS}
+        onFilterChange={() => {}}
+        sort={[]}
+        onSortChange={() => {}}
+        showSort={false}
+      />
+    )
+    expect(screen.queryByRole('button', { name: /^Sort$/ })).not.toBeInTheDocument()
+  })
 })

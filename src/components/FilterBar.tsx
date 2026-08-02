@@ -14,6 +14,7 @@ interface FilterBarProps {
   onFilterChange: (filters: Filters) => void
   sort: SortState
   onSortChange: (next: SortState) => void
+  showSort?: boolean
 }
 
 const flagBtnBase = 'px-3 py-1.5 text-sm border transition-colors'
@@ -76,6 +77,7 @@ export function FilterBar({
   onFilterChange,
   sort,
   onSortChange,
+  showSort = true,
 }: FilterBarProps) {
   const filterPopover = usePopover()
   const sortPopover = usePopover()
@@ -109,22 +111,24 @@ export function FilterBar({
         )}
       </div>
 
-      <div ref={sortPopover.ref} className="relative">
-        <button
-          onClick={() => sortPopover.setOpen(!sortPopover.open)}
-          aria-label={sort.length > 0 ? `Sort (${sort.length} active)` : 'Sort'}
-          title="Sort"
-          className={`${iconBtnBase} ${sort.length > 0 ? iconBtnFilterActive : iconBtnIdle}`}
-        >
-          <SortIcon />
-          {sort.length > 0 && <CountBadge count={sort.length} />}
-        </button>
-        {sortPopover.open && (
-          <div className="absolute top-full left-0 mt-1 z-20">
-            <SortPanel sort={sort} onChange={onSortChange} />
-          </div>
-        )}
-      </div>
+      {showSort && (
+        <div ref={sortPopover.ref} className="relative">
+          <button
+            onClick={() => sortPopover.setOpen(!sortPopover.open)}
+            aria-label={sort.length > 0 ? `Sort (${sort.length} active)` : 'Sort'}
+            title="Sort"
+            className={`${iconBtnBase} ${sort.length > 0 ? iconBtnFilterActive : iconBtnIdle}`}
+          >
+            <SortIcon />
+            {sort.length > 0 && <CountBadge count={sort.length} />}
+          </button>
+          {sortPopover.open && (
+            <div className="absolute top-full left-0 mt-1 z-20">
+              <SortPanel sort={sort} onChange={onSortChange} />
+            </div>
+          )}
+        </div>
+      )}
 
       <button
         onClick={() => update('favoritesOnly', !filters.favoritesOnly)}
