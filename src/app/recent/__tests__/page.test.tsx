@@ -210,4 +210,23 @@ describe('/recent page', () => {
       expect(updateListingMock).toHaveBeenCalledWith('card-1', 'favorite', true)
     )
   })
+
+  it('shows an error when the favorite write fails', async () => {
+    mockListings = [makeListing({ id: 'card-1', favorite: false })]
+    updateListingMock.mockResolvedValue(false)
+    render(<RecentPage />, { wrapper: ThemeProvider })
+    fireEvent.click(screen.getByTitle('Add to favorites'))
+    await waitFor(() =>
+      expect(screen.getByText(/couldn't update favorite/i)).toBeInTheDocument()
+    )
+  })
+
+  it('tapping the star on a favorite listing clears the flag', async () => {
+    mockListings = [makeListing({ id: 'card-1', favorite: true })]
+    render(<RecentPage />, { wrapper: ThemeProvider })
+    fireEvent.click(screen.getByTitle('Remove from favorites'))
+    await waitFor(() =>
+      expect(updateListingMock).toHaveBeenCalledWith('card-1', 'favorite', false)
+    )
+  })
 })

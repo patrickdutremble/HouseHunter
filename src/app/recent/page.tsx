@@ -16,7 +16,7 @@ export default function RecentPage() {
 
   const [query, setQuery] = useState('')
   const [favoritesOnly, setFavoritesOnly] = useState(false)
-  const [deleteError, setDeleteError] = useState<string | null>(null)
+  const [actionError, setActionError] = useState<string | null>(null)
 
   const sorted = [...listings].sort(
     (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
@@ -29,17 +29,22 @@ export default function RecentPage() {
     router.push(`/recent/${id}`)
   }
 
-  function onToggleFavorite(id: string, next: boolean) {
-    updateListing(id, 'favorite', next)
+  async function onToggleFavorite(id: string, next: boolean) {
+    const ok = await updateListing(id, 'favorite', next)
+    if (!ok) {
+      setActionError("Couldn't update favorite — try again")
+      return
+    }
+    setActionError(null)
   }
 
   async function onDeleteCard(id: string) {
     const ok = await deleteListing(id)
     if (!ok) {
-      setDeleteError("Couldn't delete — try again")
+      setActionError("Couldn't delete — try again")
       return
     }
-    setDeleteError(null)
+    setActionError(null)
     await fetchListings()
   }
 
@@ -102,8 +107,8 @@ export default function RecentPage() {
             <StarIcon filled={favoritesOnly} size={22} />
           </button>
         </div>
-        {deleteError && (
-          <div className="text-sm text-red-600 dark:text-red-300">{deleteError}</div>
+        {actionError && (
+          <div className="text-sm text-red-600 dark:text-red-300">{actionError}</div>
         )}
 
         {listings.length === 0 ? (
