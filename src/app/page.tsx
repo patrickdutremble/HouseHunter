@@ -41,8 +41,8 @@ function HomeContent() {
     const params = new URLSearchParams(searchParams.toString())
     if (next === 'map') params.set('view', 'map')
     else params.delete('view')
-    const query = params.toString()
-    router.replace(query ? `/?${query}` : '/')
+    const queryString = params.toString()
+    router.replace(queryString ? `/?${queryString}` : '/')
   }
 
   const toggleCompare = useCallback((id: string) => {
