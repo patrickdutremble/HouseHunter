@@ -76,18 +76,22 @@ matched":
 ## Data flow
 
 `useListings()` already selects every non-deleted listing ordered by
-`created_at` descending. No query change is needed; the existing
-`.slice(0, 10)` and the re-sort above it are removed.
+`created_at` descending. No query change is needed; only the existing
+`.slice(0, 10)` is removed. The page-level newest-first sort is kept so the
+page does not silently depend on the hook's ordering.
 
 Filtering mirrors the web app exactly, using the same shared helpers:
 
 ```ts
-const searched = useMemo(() => filterListings(listings, query), [listings, query])
-const filtered = useMemo(
-  () => applyFilters(searched, { ...EMPTY_FILTERS, favoritesOnly }),
-  [searched, favoritesOnly]
+const sorted = [...listings].sort(
+  (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
 )
+const searched = filterListings(sorted, query)
+const filtered = applyFilters(searched, { ...EMPTY_FILTERS, favoritesOnly })
 ```
+
+These are plain derived values rather than `useMemo`, matching the existing
+style of the file. The lists are small enough that memoization buys nothing.
 
 - `filterListings` (`@/lib/search-listings`) — case-insensitive substring match
   over `location`, `full_address`, and `notes`. Empty query returns the input
