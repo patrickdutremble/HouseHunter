@@ -12,6 +12,7 @@ vi.mock('next/navigation', () => ({
 let mockListings: Listing[] = []
 const fetchListingsMock = vi.fn(async () => {})
 const deleteListingMock = vi.fn(async () => true)
+const updateListingMock = vi.fn(async () => true)
 
 vi.mock('@/hooks/useListings', () => ({
   useListings: () => ({
@@ -19,7 +20,7 @@ vi.mock('@/hooks/useListings', () => ({
     loading: false,
     error: null,
     fetchListings: fetchListingsMock,
-    updateListing: vi.fn(),
+    updateListing: updateListingMock,
     deleteListing: deleteListingMock,
     trashCount: 3,
   }),
@@ -75,6 +76,8 @@ describe('/recent page', () => {
     fetchListingsMock.mockResolvedValue(undefined)
     deleteListingMock.mockReset()
     deleteListingMock.mockResolvedValue(true)
+    updateListingMock.mockReset()
+    updateListingMock.mockResolvedValue(true)
     mockListings = []
   })
   afterEach(() => {
@@ -197,5 +200,14 @@ describe('/recent page', () => {
     render(<RecentPage />, { wrapper: ThemeProvider })
     expect(screen.getByText(/no listings yet/i)).toBeInTheDocument()
     expect(screen.queryByText(/no listings match/i)).toBeNull()
+  })
+
+  it('tapping a card star writes the favorite flag', async () => {
+    mockListings = [makeListing({ id: 'card-1', favorite: false })]
+    render(<RecentPage />, { wrapper: ThemeProvider })
+    fireEvent.click(screen.getByTitle('Add to favorites'))
+    await waitFor(() =>
+      expect(updateListingMock).toHaveBeenCalledWith('card-1', 'favorite', true)
+    )
   })
 })

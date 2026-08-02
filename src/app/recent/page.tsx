@@ -11,7 +11,7 @@ import { applyFilters, EMPTY_FILTERS } from '@/lib/filters'
 
 export default function RecentPage() {
   const router = useRouter()
-  const { listings, deleteListing, fetchListings, trashCount } = useListings()
+  const { listings, deleteListing, updateListing, fetchListings, trashCount } = useListings()
 
   const [query, setQuery] = useState('')
   const [favoritesOnly, setFavoritesOnly] = useState(false)
@@ -26,6 +26,10 @@ export default function RecentPage() {
 
   function onTapCard(id: string) {
     router.push(`/recent/${id}`)
+  }
+
+  function onToggleFavorite(id: string, next: boolean) {
+    updateListing(id, 'favorite', next)
   }
 
   async function onDeleteCard(id: string) {
@@ -130,7 +134,13 @@ export default function RecentPage() {
         ) : (
           <div className="space-y-2">
             {filtered.map(l => (
-              <ListingCard key={l.id} listing={l} onTap={onTapCard} onDelete={onDeleteCard} />
+              <ListingCard
+                key={l.id}
+                listing={l}
+                onTap={onTapCard}
+                onDelete={onDeleteCard}
+                onToggleFavorite={onToggleFavorite}
+              />
             ))}
           </div>
         )}
