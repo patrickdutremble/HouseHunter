@@ -6,72 +6,20 @@ import { useListings } from '@/hooks/useListings'
 import { ListingCard } from '@/components/ListingCard'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { UserMenu } from '@/components/UserMenu'
-import { extractCentrisUrl } from '@/lib/extract-centris-url'
-
-type PasteState =
-  | { kind: 'idle' }
-  | { kind: 'loading' }
-  | { kind: 'success' }
-  | { kind: 'duplicate' }
-  | { kind: 'error'; message: string }
+import { filterListings } from '@/lib/search-listings'
 
 export default function RecentPage() {
   const router = useRouter()
   const { listings, deleteListing, fetchListings, trashCount } = useListings()
 
-  const [url, setUrl] = useState('')
-  const [paste, setPaste] = useState<PasteState>({ kind: 'idle' })
+  const [query, setQuery] = useState('')
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   const sorted = [...listings].sort(
     (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   )
 
-  async function handlePasteFromClipboard() {
-    try {
-      const text = await navigator.clipboard.readText()
-      if (text) setUrl(text.trim())
-    } catch {
-      // Clipboard blocked — user can type the URL.
-    }
-  }
-
-  async function handleAdd() {
-    const trimmed = url.trim()
-    if (!trimmed) return
-    const extracted = extractCentrisUrl(trimmed) ?? trimmed
-    setPaste({ kind: 'loading' })
-    try {
-      const res = await fetch('/api/scrape-centris', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: extracted }),
-      })
-      let data: { error?: string }
-      try {
-        data = await res.json()
-      } catch {
-        if (!res.ok) {
-          setPaste({ kind: 'error', message: `Server error (${res.status})` })
-        } else {
-          setPaste({ kind: 'error', message: 'Unexpected server response' })
-        }
-        return
-      }
-      if (res.status === 409) {
-        setPaste({ kind: 'duplicate' })
-        return
-      }
-      if (!res.ok) {
-        setPaste({ kind: 'error', message: data.error || 'Something went wrong' })
-        return
-      }
-      await fetchListings()
-      setUrl('')
-      setPaste({ kind: 'success' })
-    } catch {
-      setPaste({ kind: 'error', message: 'Network error — check your connection' })
-    }
-  }
+  const searched = filterListings(sorted, query)
 
   function onTapCard(id: string) {
     router.push(`/recent/${id}`)
@@ -80,9 +28,10 @@ export default function RecentPage() {
   async function onDeleteCard(id: string) {
     const ok = await deleteListing(id)
     if (!ok) {
-      setPaste({ kind: 'error', message: "Couldn't delete — try again" })
+      setDeleteError("Couldn't delete — try again")
       return
     }
+    setDeleteError(null)
     await fetchListings()
   }
 
@@ -107,56 +56,40 @@ export default function RecentPage() {
       </header>
 
       <section className="p-4 space-y-3">
-        <div className="bg-surface rounded-xl shadow-sm border border-border p-4 space-y-2">
-          <div className="flex gap-2">
-            <input
-              type="url"
-              value={url}
-              onChange={e => {
-                setUrl(e.target.value)
-                if (paste.kind !== 'loading' && paste.kind !== 'idle') {
-                  setPaste({ kind: 'idle' })
-                }
-              }}
-              placeholder="Paste a Centris URL"
-              className="flex-1 border border-border-strong rounded-lg px-3 py-2 text-sm"
-            />
+        <div className="relative sticky top-14 z-10 bg-bg py-1 -my-1">
+          <input
+            type="text"
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Escape') setQuery('') }}
+            placeholder="Search address or notes…"
+            aria-label="Search listings"
+            className="w-full border border-border-strong rounded-lg pl-3 pr-9 py-2.5 text-sm bg-surface text-fg placeholder:text-fg-subtle"
+          />
+          {query && (
             <button
               type="button"
-              onClick={handlePasteFromClipboard}
-              className="px-3 py-2 rounded-lg bg-surface-muted text-fg text-sm"
+              onClick={() => setQuery('')}
+              aria-label="Clear search"
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-fg-subtle"
             >
-              Paste
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                <path d="M5 5l10 10M15 5L5 15" />
+              </svg>
             </button>
-          </div>
-          <button
-            type="button"
-            onClick={handleAdd}
-            disabled={paste.kind === 'loading' || !url.trim()}
-            className="w-full py-3 rounded-lg bg-accent text-accent-fg font-medium hover:bg-sky-700 dark:hover:bg-sky-300 active:bg-sky-800 dark:active:bg-sky-200 disabled:opacity-50 transition-colors"
-          >
-            {paste.kind === 'loading' ? 'Adding…' : 'Add'}
-          </button>
-          {paste.kind === 'success' && (
-            <div className="text-sm text-green-700 dark:text-green-300">Added</div>
-          )}
-          {paste.kind === 'duplicate' && (
-            <div className="text-sm text-amber-700 dark:text-amber-300">Already saved</div>
-          )}
-          {paste.kind === 'error' && (
-            <div className="text-sm text-red-600 dark:text-red-300">{paste.message}</div>
           )}
         </div>
+        {deleteError && (
+          <div className="text-sm text-red-600 dark:text-red-300">{deleteError}</div>
+        )}
 
-        <h2 className="text-xs uppercase tracking-wide text-fg-subtle font-semibold pt-2">Recent</h2>
-
-        {sorted.length === 0 ? (
+        {searched.length === 0 ? (
           <div className="text-center text-fg-subtle text-sm py-12 px-4">
-            No listings yet — paste a URL above or share one from the Centris app.
+            No listings yet — share one from the Centris app.
           </div>
         ) : (
           <div className="space-y-2">
-            {sorted.map(l => (
+            {searched.map(l => (
               <ListingCard key={l.id} listing={l} onTap={onTapCard} onDelete={onDeleteCard} />
             ))}
           </div>

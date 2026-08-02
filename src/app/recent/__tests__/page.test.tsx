@@ -81,11 +81,39 @@ describe('/recent page', () => {
     vi.unstubAllGlobals()
   })
 
-  it('renders the paste card and empty state when there are no listings', () => {
+  it('renders the search bar and the empty-database state when there are no listings', () => {
     mockListings = []
     render(<RecentPage />, { wrapper: ThemeProvider })
-    expect(screen.getByPlaceholderText(/paste a centris url/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/search listings/i)).toBeInTheDocument()
+    expect(screen.queryByPlaceholderText(/paste a centris url/i)).toBeNull()
     expect(screen.getByText(/no listings yet/i)).toBeInTheDocument()
+  })
+
+  it('filters cards by the search query across address and notes', () => {
+    mockListings = [
+      makeListing({ id: 'a', full_address: '123 rue Main', notes: null }),
+      makeListing({ id: 'b', full_address: '456 boulevard Cartier', notes: null }),
+      makeListing({ id: 'c', full_address: '789 avenue Park', notes: 'near cartier park' }),
+    ]
+    render(<RecentPage />, { wrapper: ThemeProvider })
+    fireEvent.change(screen.getByLabelText(/search listings/i), { target: { value: 'cartier' } })
+    expect(screen.getAllByTestId('listing-card-body').length).toBe(2)
+    expect(screen.getByText('456 boulevard Cartier')).toBeInTheDocument()
+    expect(screen.getByText('789 avenue Park')).toBeInTheDocument()
+  })
+
+  it('restores the full list when the clear-search button is tapped', () => {
+    mockListings = [
+      makeListing({ id: 'a', full_address: '123 rue Main' }),
+      makeListing({ id: 'b', full_address: '456 boulevard Cartier' }),
+    ]
+    render(<RecentPage />, { wrapper: ThemeProvider })
+    const input = screen.getByLabelText(/search listings/i) as HTMLInputElement
+    fireEvent.change(input, { target: { value: 'cartier' } })
+    expect(screen.getAllByTestId('listing-card-body').length).toBe(1)
+    fireEvent.click(screen.getByRole('button', { name: /clear search/i }))
+    expect(input.value).toBe('')
+    expect(screen.getAllByTestId('listing-card-body').length).toBe(2)
   })
 
   it('renders every listing, newest first', () => {
@@ -100,71 +128,11 @@ describe('/recent page', () => {
     expect(cards[11]).toHaveTextContent('City-0')
   })
 
-  it('POSTs to /api/scrape-centris on Add, clears input on success', async () => {
-    const fetchMock = vi.fn(async () => ({
-      ok: true,
-      status: 200,
-      json: async () => ({ listing: makeListing({ id: 'new-1' }) }),
-    }))
-    vi.stubGlobal('fetch', fetchMock)
-    render(<RecentPage />, { wrapper: ThemeProvider })
-    const input = screen.getByPlaceholderText(/paste a centris url/i) as HTMLInputElement
-    fireEvent.change(input, { target: { value: 'https://centris.ca/new' } })
-    fireEvent.click(screen.getByRole('button', { name: /^add$/i }))
-    await waitFor(() => expect(fetchMock).toHaveBeenCalled())
-    expect(JSON.parse((fetchMock.mock.calls[0][1] as RequestInit).body as string)).toEqual({ url: 'https://centris.ca/new' })
-    await waitFor(() => expect(screen.getByText(/added/i)).toBeInTheDocument())
-    await waitFor(() => expect(fetchListingsMock).toHaveBeenCalled())
-    expect(input.value).toBe('')
-  })
-
-  it('shows amber Already saved inline feedback on 409', async () => {
-    const fetchMock = vi.fn(async () => ({
-      ok: false,
-      status: 409,
-      json: async () => ({ listingId: 'x', error: 'Duplicate' }),
-    }))
-    vi.stubGlobal('fetch', fetchMock)
-    render(<RecentPage />, { wrapper: ThemeProvider })
-    fireEvent.change(screen.getByPlaceholderText(/paste a centris url/i), { target: { value: 'https://centris.ca/d' } })
-    fireEvent.click(screen.getByRole('button', { name: /^add$/i }))
-    await waitFor(() => expect(screen.getByText(/already saved/i)).toBeInTheDocument())
-  })
-
-  it('shows red error message on 500', async () => {
-    const fetchMock = vi.fn(async () => ({
-      ok: false,
-      status: 500,
-      json: async () => ({ error: 'Boom' }),
-    }))
-    vi.stubGlobal('fetch', fetchMock)
-    render(<RecentPage />, { wrapper: ThemeProvider })
-    fireEvent.change(screen.getByPlaceholderText(/paste a centris url/i), { target: { value: 'https://centris.ca/bad' } })
-    fireEvent.click(screen.getByRole('button', { name: /^add$/i }))
-    await waitFor(() => expect(screen.getByText(/boom/i)).toBeInTheDocument())
-  })
-
   it('trash link shows trashCount badge and targets /trash', () => {
     render(<RecentPage />, { wrapper: ThemeProvider })
     const trash = screen.getByRole('link', { name: /trash/i }) as HTMLAnchorElement
     expect(trash.getAttribute('href')).toBe('/trash')
     expect(screen.getByText('3')).toBeInTheDocument()
-  })
-
-  it('clears the success banner when the user edits the URL input', async () => {
-    const fetchMock = vi.fn(async () => ({
-      ok: true,
-      status: 200,
-      json: async () => ({ listing: makeListing({ id: 'new' }) }),
-    }))
-    vi.stubGlobal('fetch', fetchMock)
-    render(<RecentPage />, { wrapper: ThemeProvider })
-    const input = screen.getByPlaceholderText(/paste a centris/i) as HTMLInputElement
-    fireEvent.change(input, { target: { value: 'https://www.centris.ca/x' } })
-    fireEvent.click(screen.getByRole('button', { name: /^add$/i }))
-    await waitFor(() => expect(screen.getByText(/added/i)).toBeInTheDocument())
-    fireEvent.change(input, { target: { value: 'https://www.centris.ca/y' } })
-    expect(screen.queryByText(/added/i)).not.toBeInTheDocument()
   })
 
   it('surfaces error if card delete fails', async () => {
@@ -177,18 +145,5 @@ describe('/recent page', () => {
     await waitFor(() => expect(deleteListingMock).toHaveBeenCalledWith('card-1'))
     await waitFor(() => expect(screen.getByText(/couldn't delete/i)).toBeInTheDocument())
     confirmSpy.mockRestore()
-  })
-
-  it('shows a server error message when the response is not JSON', async () => {
-    const fetchMock = vi.fn(async () => ({
-      ok: false,
-      status: 502,
-      json: async () => { throw new SyntaxError('Unexpected token <') },
-    }))
-    vi.stubGlobal('fetch', fetchMock)
-    render(<RecentPage />, { wrapper: ThemeProvider })
-    fireEvent.change(screen.getByPlaceholderText(/paste a centris/i), { target: { value: 'https://www.centris.ca/x' } })
-    fireEvent.click(screen.getByRole('button', { name: /^add$/i }))
-    await waitFor(() => expect(screen.getByText(/server error \(502\)/i)).toBeInTheDocument())
   })
 })
