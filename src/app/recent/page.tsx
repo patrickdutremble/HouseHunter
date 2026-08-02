@@ -37,7 +37,7 @@ export default function RecentPage() {
 
   return (
     <main className="min-h-screen bg-bg pb-8">
-      <header className="sticky top-0 z-10 bg-surface border-b border-border h-14 px-4 flex items-center justify-between gap-2">
+      <header className="sticky top-0 z-[60] bg-surface border-b border-border h-14 px-4 flex items-center justify-between gap-2">
         <div className="font-bold text-fg">HouseHunter</div>
         <div className="flex items-center gap-2">
           <ThemeToggle />
@@ -56,7 +56,7 @@ export default function RecentPage() {
       </header>
 
       <section className="p-4 space-y-3">
-        <div className="relative sticky top-14 z-10 bg-bg py-1 -my-1">
+        <div className="relative sticky top-14 z-[60] bg-bg py-1 -my-1">
           <input
             type="text"
             value={query}
