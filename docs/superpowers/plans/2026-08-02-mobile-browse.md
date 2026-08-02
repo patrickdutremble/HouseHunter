@@ -572,10 +572,12 @@ import { applyFilters, EMPTY_FILTERS } from '@/lib/filters'
   const filtered = applyFilters(searched, { ...EMPTY_FILTERS, favoritesOnly })
 ```
 
-**3d.** Wrap the search input and a new star toggle in a flex row. Replace the **entire** sticky row block written in Task 3 step 3g — from `<div className="relative sticky top-14 ...">` through its closing `</div>` — with this:
+**3d.** Wrap the search input and a new star toggle in a flex row. Replace the **entire** sticky row block written in Task 3 step 3g — from `<div className="relative sticky top-14 ...">` through its closing `</div>` — with this.
+
+Note the `z-[60]`: commit `aa8d3b9` raised both the header and this row from `z-10` so they sit above `ListingCard`'s `z-50` menu and favorite buttons, which otherwise painted over the sticky chrome while scrolling. `z-50` would not be enough — the cards come later in the DOM, so a tie goes to them. Keep `z-[60]`.
 
 ```tsx
-        <div className="sticky top-14 z-10 bg-bg py-1 -my-1 flex items-center gap-2">
+        <div className="sticky top-14 z-[60] bg-bg py-1 -my-1 flex items-center gap-2">
           <div className="relative flex-1 min-w-0">
             <input
               type="text"
