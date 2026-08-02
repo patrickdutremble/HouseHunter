@@ -7,12 +7,14 @@ import { ListingCard } from '@/components/ListingCard'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { UserMenu } from '@/components/UserMenu'
 import { filterListings } from '@/lib/search-listings'
+import { applyFilters, EMPTY_FILTERS } from '@/lib/filters'
 
 export default function RecentPage() {
   const router = useRouter()
   const { listings, deleteListing, fetchListings, trashCount } = useListings()
 
   const [query, setQuery] = useState('')
+  const [favoritesOnly, setFavoritesOnly] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
 
   const sorted = [...listings].sort(
@@ -20,6 +22,7 @@ export default function RecentPage() {
   )
 
   const searched = filterListings(sorted, query)
+  const filtered = applyFilters(searched, { ...EMPTY_FILTERS, favoritesOnly })
 
   function onTapCard(id: string) {
     router.push(`/recent/${id}`)
@@ -56,40 +59,77 @@ export default function RecentPage() {
       </header>
 
       <section className="p-4 space-y-3">
-        <div className="relative sticky top-14 z-[60] bg-bg py-1 -my-1">
-          <input
-            type="text"
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-            onKeyDown={e => { if (e.key === 'Escape') setQuery('') }}
-            placeholder="Search address or notes…"
-            aria-label="Search listings"
-            className="w-full border border-border-strong rounded-lg pl-3 pr-9 py-2.5 text-sm bg-surface text-fg placeholder:text-fg-subtle"
-          />
-          {query && (
-            <button
-              type="button"
-              onClick={() => setQuery('')}
-              aria-label="Clear search"
-              className="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-fg-subtle"
+        <div className="sticky top-14 z-[60] bg-bg py-1 -my-1 flex items-center gap-2">
+          <div className="relative flex-1 min-w-0">
+            <input
+              type="text"
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Escape') setQuery('') }}
+              placeholder="Search address or notes…"
+              aria-label="Search listings"
+              className="w-full border border-border-strong rounded-lg pl-3 pr-9 py-2.5 text-sm bg-surface text-fg placeholder:text-fg-subtle"
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={() => setQuery('')}
+                aria-label="Clear search"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-fg-subtle"
+              >
+                <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  <path d="M5 5l10 10M15 5L5 15" />
+                </svg>
+              </button>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={() => setFavoritesOnly(v => !v)}
+            aria-pressed={favoritesOnly}
+            aria-label={favoritesOnly ? 'Show all listings' : 'Show favorites only'}
+            className={`shrink-0 w-11 h-11 flex items-center justify-center rounded-lg border transition-colors ${
+              favoritesOnly
+                ? 'border-amber-500 text-amber-500 bg-amber-50 dark:bg-amber-900/30'
+                : 'border-border-strong text-fg-subtle bg-surface'
+            }`}
+          >
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 20 20"
+              fill={favoritesOnly ? 'currentColor' : 'none'}
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinejoin="round"
+              aria-hidden="true"
             >
-              <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                <path d="M5 5l10 10M15 5L5 15" />
-              </svg>
-            </button>
-          )}
+              <path d="M10 2.5l2.39 4.84 5.34.78-3.86 3.76.91 5.32L10 14.8l-4.78 2.51.91-5.32L2.27 8.12l5.34-.78L10 2.5z" />
+            </svg>
+          </button>
         </div>
         {deleteError && (
           <div className="text-sm text-red-600 dark:text-red-300">{deleteError}</div>
         )}
 
-        {searched.length === 0 ? (
+        {listings.length === 0 ? (
           <div className="text-center text-fg-subtle text-sm py-12 px-4">
             No listings yet — share one from the Centris app.
           </div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center text-fg-subtle text-sm py-12 px-4">
+            <div>No listings match</div>
+            <button
+              type="button"
+              onClick={() => { setQuery(''); setFavoritesOnly(false) }}
+              className="mt-3 px-4 py-2 rounded-lg bg-surface border border-border-strong text-fg text-sm"
+            >
+              Clear
+            </button>
+          </div>
         ) : (
           <div className="space-y-2">
-            {searched.map(l => (
+            {filtered.map(l => (
               <ListingCard key={l.id} listing={l} onTap={onTapCard} onDelete={onDeleteCard} />
             ))}
           </div>

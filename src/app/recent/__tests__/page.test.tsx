@@ -146,4 +146,49 @@ describe('/recent page', () => {
     await waitFor(() => expect(screen.getByText(/couldn't delete/i)).toBeInTheDocument())
     confirmSpy.mockRestore()
   })
+
+  it('shows only favorites when the star toggle is on, and all listings when off', () => {
+    mockListings = [
+      makeListing({ id: 'a', full_address: 'Fav place', favorite: true }),
+      makeListing({ id: 'b', full_address: 'Other place', favorite: false }),
+    ]
+    render(<RecentPage />, { wrapper: ThemeProvider })
+    expect(screen.getAllByTestId('listing-card-body').length).toBe(2)
+    fireEvent.click(screen.getByRole('button', { name: /show favorites only/i }))
+    expect(screen.getAllByTestId('listing-card-body').length).toBe(1)
+    expect(screen.getByText('Fav place')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /show all listings/i }))
+    expect(screen.getAllByTestId('listing-card-body').length).toBe(2)
+  })
+
+  it('applies the search query and the favorites toggle together', () => {
+    mockListings = [
+      makeListing({ id: 'a', full_address: '123 rue Cartier', favorite: true }),
+      makeListing({ id: 'b', full_address: '456 rue Cartier', favorite: false }),
+      makeListing({ id: 'c', full_address: '789 rue Main', favorite: true }),
+    ]
+    render(<RecentPage />, { wrapper: ThemeProvider })
+    fireEvent.change(screen.getByLabelText(/search listings/i), { target: { value: 'cartier' } })
+    fireEvent.click(screen.getByRole('button', { name: /show favorites only/i }))
+    expect(screen.getAllByTestId('listing-card-body').length).toBe(1)
+    expect(screen.getByText('123 rue Cartier')).toBeInTheDocument()
+  })
+
+  it('shows the no-match state and its Clear button resets both filters', () => {
+    mockListings = [makeListing({ id: 'a', full_address: '123 rue Main' })]
+    render(<RecentPage />, { wrapper: ThemeProvider })
+    fireEvent.change(screen.getByLabelText(/search listings/i), { target: { value: 'zzzz' } })
+    expect(screen.getByText(/no listings match/i)).toBeInTheDocument()
+    expect(screen.queryByText(/no listings yet/i)).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: /^clear$/i }))
+    expect(screen.getAllByTestId('listing-card-body').length).toBe(1)
+    expect((screen.getByLabelText(/search listings/i) as HTMLInputElement).value).toBe('')
+  })
+
+  it('shows the empty-database state, not the no-match state, when nothing is saved', () => {
+    mockListings = []
+    render(<RecentPage />, { wrapper: ThemeProvider })
+    expect(screen.getByText(/no listings yet/i)).toBeInTheDocument()
+    expect(screen.queryByText(/no listings match/i)).toBeNull()
+  })
 })
