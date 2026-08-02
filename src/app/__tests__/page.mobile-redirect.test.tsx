@@ -58,6 +58,6 @@ describe('/ mobile redirect', () => {
   it('renders nothing on narrow viewports (no desktop flash)', () => {
     mockMatchMedia(true)
     const { container } = render(<HomePage />, { wrapper: ThemeProvider })
-    expect(container.querySelector('input[type="url"]')).toBeNull()
+    expect(container.querySelector('input[aria-label="Search listings"]')).toBeNull()
   })
 })
