@@ -119,6 +119,25 @@ export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPane
           </div>
         </div>
 
+        {/* Notes */}
+        <div className="flex items-start justify-between py-1.5 border-b border-border mb-5">
+          <span className="text-xs font-medium text-fg-subtle uppercase tracking-wide w-32 shrink-0 pt-0.5">
+            Notes
+          </span>
+          <div className="flex-1 text-sm text-fg-muted min-w-0">
+            <EditableCell
+              value={listing.notes}
+              format="text"
+              editable
+              align="left"
+              wrap
+              multiline
+              isSelected={true}
+              onSave={(newValue) => onUpdate(listing.id, 'notes', newValue)}
+            />
+          </div>
+        </div>
+
         {/* Listing image */}
         {listing.image_url && (
           <div className="relative w-full h-48 mb-5 rounded-lg overflow-hidden border border-border">
@@ -150,6 +169,7 @@ export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPane
         <div className="space-y-3">
           {detailColumns.map(col => {
             if (col.key === 'location') return null
+            if (col.key === 'notes') return null
 
             const value = listing[col.key as keyof Listing]
 
@@ -165,7 +185,6 @@ export function DetailPanel({ listing, onClose, onUpdate, onDelete }: DetailPane
                     editable={col.editable}
                     align="left"
                     wrap
-                    multiline={col.key === 'notes'}
                     isSelected={true}
                     onSave={(newValue) => onUpdate(listing.id, col.key, newValue)}
                   />
