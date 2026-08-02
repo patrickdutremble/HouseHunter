@@ -101,8 +101,10 @@ export function ListingCard({ listing, onTap, onDelete, onToggleFavorite }: List
         </svg>
       </button>
 
+      {/* Bottom-right, padded for a mobile-sized tap area — the top-right
+          corner belongs to the "More" menu button. */}
       {onToggleFavorite && (
-        <div className="absolute bottom-2 right-2 z-50">
+        <div className="absolute bottom-0 right-0 z-50 p-2">
           <FavoriteButton
             value={listing.favorite}
             onToggle={() => onToggleFavorite(listing.id, !listing.favorite)}
