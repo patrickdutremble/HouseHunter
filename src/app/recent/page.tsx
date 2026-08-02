@@ -22,9 +22,9 @@ export default function RecentPage() {
   const [url, setUrl] = useState('')
   const [paste, setPaste] = useState<PasteState>({ kind: 'idle' })
 
-  const recent = [...listings]
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-    .slice(0, 10)
+  const sorted = [...listings].sort(
+    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  )
 
   async function handlePasteFromClipboard() {
     try {
@@ -150,13 +150,13 @@ export default function RecentPage() {
 
         <h2 className="text-xs uppercase tracking-wide text-fg-subtle font-semibold pt-2">Recent</h2>
 
-        {recent.length === 0 ? (
+        {sorted.length === 0 ? (
           <div className="text-center text-fg-subtle text-sm py-12 px-4">
             No listings yet — paste a URL above or share one from the Centris app.
           </div>
         ) : (
           <div className="space-y-2">
-            {recent.map(l => (
+            {sorted.map(l => (
               <ListingCard key={l.id} listing={l} onTap={onTapCard} onDelete={onDeleteCard} />
             ))}
           </div>

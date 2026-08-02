@@ -88,13 +88,16 @@ describe('/recent page', () => {
     expect(screen.getByText(/no listings yet/i)).toBeInTheDocument()
   })
 
-  it('renders at most 10 listing cards, newest first', () => {
+  it('renders every listing, newest first', () => {
     mockListings = Array.from({ length: 12 }, (_, i) =>
       makeListing({ id: `x-${i}`, location: `City-${i}`, created_at: new Date(2026, 3, 21, i).toISOString() })
     )
     render(<RecentPage />, { wrapper: ThemeProvider })
     const cards = screen.getAllByTestId('listing-card-body')
-    expect(cards.length).toBe(10)
+    expect(cards.length).toBe(12)
+    // Newest (City-11, created at hour 11) must be first.
+    expect(cards[0]).toHaveTextContent('City-11')
+    expect(cards[11]).toHaveTextContent('City-0')
   })
 
   it('POSTs to /api/scrape-centris on Add, clears input on success', async () => {
