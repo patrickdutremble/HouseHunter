@@ -87,7 +87,7 @@ export default function RecentPage() {
             type="button"
             onClick={() => setFavoritesOnly(v => !v)}
             aria-pressed={favoritesOnly}
-            aria-label={favoritesOnly ? 'Show all listings' : 'Show favorites only'}
+            aria-label="Favorites only"
             className={`shrink-0 w-11 h-11 flex items-center justify-center rounded-lg border transition-colors ${
               favoritesOnly
                 ? 'border-amber-500 text-amber-500 bg-amber-50 dark:bg-amber-900/30'

@@ -153,11 +153,14 @@ describe('/recent page', () => {
       makeListing({ id: 'b', full_address: 'Other place', favorite: false }),
     ]
     render(<RecentPage />, { wrapper: ThemeProvider })
+    const toggle = screen.getByRole('button', { name: /favorites only/i })
     expect(screen.getAllByTestId('listing-card-body').length).toBe(2)
-    fireEvent.click(screen.getByRole('button', { name: /show favorites only/i }))
+    fireEvent.click(toggle)
+    expect(toggle).toHaveAttribute('aria-pressed', 'true')
     expect(screen.getAllByTestId('listing-card-body').length).toBe(1)
     expect(screen.getByText('Fav place')).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: /show all listings/i }))
+    fireEvent.click(toggle)
+    expect(toggle).toHaveAttribute('aria-pressed', 'false')
     expect(screen.getAllByTestId('listing-card-body').length).toBe(2)
   })
 
@@ -169,7 +172,7 @@ describe('/recent page', () => {
     ]
     render(<RecentPage />, { wrapper: ThemeProvider })
     fireEvent.change(screen.getByLabelText(/search listings/i), { target: { value: 'cartier' } })
-    fireEvent.click(screen.getByRole('button', { name: /show favorites only/i }))
+    fireEvent.click(screen.getByRole('button', { name: /favorites only/i }))
     expect(screen.getAllByTestId('listing-card-body').length).toBe(1)
     expect(screen.getByText('123 rue Cartier')).toBeInTheDocument()
   })
@@ -177,12 +180,16 @@ describe('/recent page', () => {
   it('shows the no-match state and its Clear button resets both filters', () => {
     mockListings = [makeListing({ id: 'a', full_address: '123 rue Main' })]
     render(<RecentPage />, { wrapper: ThemeProvider })
+    const favoritesToggle = screen.getByRole('button', { name: /favorites only/i })
     fireEvent.change(screen.getByLabelText(/search listings/i), { target: { value: 'zzzz' } })
+    fireEvent.click(favoritesToggle)
+    expect(favoritesToggle).toHaveAttribute('aria-pressed', 'true')
     expect(screen.getByText(/no listings match/i)).toBeInTheDocument()
     expect(screen.queryByText(/no listings yet/i)).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: /^clear$/i }))
     expect(screen.getAllByTestId('listing-card-body').length).toBe(1)
     expect((screen.getByLabelText(/search listings/i) as HTMLInputElement).value).toBe('')
+    expect(favoritesToggle).toHaveAttribute('aria-pressed', 'false')
   })
 
   it('shows the empty-database state, not the no-match state, when nothing is saved', () => {
