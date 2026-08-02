@@ -11,7 +11,7 @@ import { ViewToggle, type ViewMode } from '@/components/ViewToggle'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { UserMenu } from '@/components/UserMenu'
 import { useListings } from '@/hooks/useListings'
-import { extractCentrisUrl } from '@/lib/extract-centris-url'
+import { filterListings } from '@/lib/search-listings'
 
 const MapView = dynamic(() => import('@/components/MapView'), {
   ssr: false,
@@ -21,14 +21,11 @@ const MapView = dynamic(() => import('@/components/MapView'), {
     </div>
   ),
 })
-type ScrapeStatus = 'idle' | 'loading' | 'success' | 'error' | 'duplicate'
 
 function HomeContent() {
   const { listings, loading, error, fetchListings, updateListing, deleteListing, beginBulkSoftDelete, trashCount } = useListings()
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [centrisUrl, setCentrisUrl] = useState('')
-  const [scrapeStatus, setScrapeStatus] = useState<ScrapeStatus>('idle')
-  const [scrapeMessage, setScrapeMessage] = useState<string | null>(null)
+  const [query, setQuery] = useState('')
   const [compareIds, setCompareIds] = useState<Set<string>>(new Set())
   const [compareMaxWarning, setCompareMaxWarning] = useState(false)
   const [isRedirecting, setIsRedirecting] = useState(() => {
@@ -95,73 +92,12 @@ function HomeContent() {
     ? listings.find(l => l.id === selectedId) ?? null
     : null
 
+  const visibleListings = filterListings(listings, query)
+
   const handleDelete = async (id: string) => {
     const success = await deleteListing(id)
     if (success && selectedId === id) {
       setSelectedId(null)
-    }
-  }
-
-  const handlePaste = async () => {
-    try {
-      const text = await navigator.clipboard.readText()
-      setCentrisUrl(text.trim())
-    } catch {
-      // Clipboard permission denied — user can type/paste manually
-    }
-  }
-
-  const handleScrape = async () => {
-    const raw = centrisUrl.trim()
-    if (!raw) return
-    const url = extractCentrisUrl(raw) ?? raw
-
-    setScrapeStatus('loading')
-    setScrapeMessage(null)
-
-    try {
-      const res = await fetch('/api/scrape-centris', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url }),
-      })
-
-      let data: {
-        listingId?: string
-        listing?: { id?: string }
-        error?: string
-        commuteNote?: string
-      }
-      try {
-        data = await res.json()
-      } catch {
-        setScrapeStatus('error')
-        setScrapeMessage(res.ok ? 'Unexpected server response' : `Server error (${res.status})`)
-        return
-      }
-
-      if (res.status === 409) {
-        setScrapeStatus('duplicate')
-        setScrapeMessage('Already in HouseHunter')
-        if (data.listingId) setSelectedId(data.listingId)
-        return
-      }
-
-      if (!res.ok) {
-        setScrapeStatus('error')
-        setScrapeMessage(data.error || 'Something went wrong')
-        return
-      }
-
-      // Success
-      await fetchListings()
-      if (data.listing?.id) setSelectedId(data.listing.id)
-      setScrapeStatus('success')
-      setScrapeMessage(data.commuteNote ? `Added! (${data.commuteNote})` : 'Added!')
-      setCentrisUrl('')
-    } catch {
-      setScrapeStatus('error')
-      setScrapeMessage('Network error — check your connection')
     }
   }
 
@@ -190,66 +126,32 @@ function HomeContent() {
 
   if (isRedirecting) return null
 
-  const statusColor =
-    scrapeStatus === 'success' ? 'text-green-600 dark:text-green-300' :
-    scrapeStatus === 'duplicate' ? 'text-amber-600 dark:text-amber-300' :
-    scrapeStatus === 'error' ? 'text-red-600 dark:text-red-300' :
-    'text-fg-subtle'
-
   return (
     <div className="h-screen flex flex-col bg-bg">
       <div className="flex items-center gap-2 px-4 py-2 bg-surface border-b border-border">
-        {/* URL input */}
-        <input
-          type="url"
-          value={centrisUrl}
-          onChange={e => { setCentrisUrl(e.target.value); if (scrapeStatus !== 'idle' && scrapeStatus !== 'loading') setScrapeStatus('idle') }}
-          onKeyDown={e => { if (e.key === 'Enter') handleScrape() }}
-          placeholder="Paste a Centris URL..."
-          disabled={scrapeStatus === 'loading'}
-          className="flex-1 min-w-0 px-3 py-1.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent disabled:opacity-50 placeholder:text-fg-subtle"
-        />
-
-        {/* Paste button */}
-        <button
-          onClick={handlePaste}
-          disabled={scrapeStatus === 'loading'}
-          className="hidden sm:block px-3 py-1.5 text-sm font-medium text-fg-muted bg-surface border border-border rounded-lg hover:bg-surface-hover disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-          title="Paste from clipboard"
-        >
-          Paste
-        </button>
-
-        {/* Add button */}
-        <button
-          onClick={handleScrape}
-          disabled={scrapeStatus === 'loading' || !centrisUrl.trim()}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-accent-fg bg-accent rounded-lg hover:bg-sky-700 dark:hover:bg-sky-300 active:bg-sky-800 dark:active:bg-sky-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-        >
-          {scrapeStatus === 'loading' ? (
-            <>
-              <svg className="animate-spin h-3.5 w-3.5" viewBox="0 0 24 24" fill="none">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+        {/* Search */}
+        <div className="relative flex-1 min-w-0">
+          <input
+            type="text"
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Escape') setQuery('') }}
+            placeholder="Search address or notes…"
+            aria-label="Search listings"
+            className="w-full px-3 py-1.5 pr-8 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent placeholder:text-fg-subtle"
+          />
+          {query && (
+            <button
+              onClick={() => setQuery('')}
+              aria-label="Clear search"
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1 text-fg-subtle hover:text-fg-muted rounded"
+            >
+              <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M5 5l10 10M15 5L5 15" />
               </svg>
-              Adding...
-            </>
-          ) : (
-            <>
-              <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M10 4v12M4 10h12" strokeLinecap="round" />
-              </svg>
-              Add
-            </>
+            </button>
           )}
-        </button>
-
-        {/* Status message */}
-        {scrapeStatus !== 'idle' && scrapeStatus !== 'loading' && scrapeMessage && (
-          <span className={`text-sm font-medium truncate min-w-0 ${statusColor}`}>
-            {scrapeMessage}
-          </span>
-        )}
+        </div>
 
         {/* Compare cluster — appears when 2+ listings selected */}
         {compareIds.size >= 2 && (
@@ -294,10 +196,14 @@ function HomeContent() {
       <div className="flex-1 flex overflow-hidden">
         <div className="flex-1 overflow-hidden">
           {view === 'map' ? (
-            <MapView listings={listings} onSelect={setSelectedId} />
+            <MapView listings={visibleListings} onSelect={setSelectedId} />
+          ) : query.trim() && visibleListings.length === 0 ? (
+            <div className="h-full flex items-center justify-center text-fg-subtle text-sm px-4 text-center">
+              No listings match &ldquo;{query.trim()}&rdquo;
+            </div>
           ) : (
             <ListingsTable
-              listings={listings}
+              listings={visibleListings}
               selectedId={selectedId}
               onSelect={setSelectedId}
               onUpdate={updateListing}
