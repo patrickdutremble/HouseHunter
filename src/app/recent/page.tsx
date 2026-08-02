@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useListings } from '@/hooks/useListings'
 import { ListingCard } from '@/components/ListingCard'
+import { StarIcon } from '@/components/StarIcon'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { UserMenu } from '@/components/UserMenu'
 import { filterListings } from '@/lib/search-listings'
@@ -98,18 +99,7 @@ export default function RecentPage() {
                 : 'border-border-strong text-fg-subtle bg-surface'
             }`}
           >
-            <svg
-              width="22"
-              height="22"
-              viewBox="0 0 20 20"
-              fill={favoritesOnly ? 'currentColor' : 'none'}
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M10 2.5l2.39 4.84 5.34.78-3.86 3.76.91 5.32L10 14.8l-4.78 2.51.91-5.32L2.27 8.12l5.34-.78L10 2.5z" />
-            </svg>
+            <StarIcon filled={favoritesOnly} size={22} />
           </button>
         </div>
         {deleteError && (

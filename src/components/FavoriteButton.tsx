@@ -1,5 +1,7 @@
 'use client'
 
+import { StarIcon } from '@/components/StarIcon'
+
 interface FavoriteButtonProps {
   value: boolean
   onToggle: () => void
@@ -20,17 +22,7 @@ export function FavoriteButton({ value, onToggle, size = 18, className = '' }: F
         ${className}
       `}
     >
-      <svg
-        width={size}
-        height={size}
-        viewBox="0 0 20 20"
-        fill={value ? 'currentColor' : 'none'}
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinejoin="round"
-      >
-        <path d="M10 2.5l2.39 4.84 5.34.78-3.86 3.76.91 5.32L10 14.8l-4.78 2.51.91-5.32L2.27 8.12l5.34-.78L10 2.5z" />
-      </svg>
+      <StarIcon filled={value} size={size} />
     </button>
   )
 }
