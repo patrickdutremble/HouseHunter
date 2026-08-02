@@ -3,17 +3,18 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { TableHeader } from './TableHeader'
 import { TableRow } from './TableRow'
-import { FilterBar, type Filters } from './FilterBar'
 import { RefreshStatusesButton } from './RefreshStatusesButton'
 import { BatchDeleteUnavailableButton } from './BatchDeleteUnavailableButton'
 import { timeAgo } from '@/lib/time-ago'
-import { useSort } from '@/hooks/useSort'
 import { useTableKeyboard } from '@/hooks/useTableKeyboard'
-import { applyFilters, EMPTY_FILTERS } from '@/lib/filters'
+import type { SortState } from '@/hooks/useSort'
 import type { Listing } from '@/types/listing'
 
 interface ListingsTableProps {
   listings: Listing[]
+  sort: SortState
+  onToggleSort: (column: string, shift: boolean) => void
+  hasAnyListings: boolean
   selectedId: string | null
   onSelect: (id: string | null) => void
   onUpdate: (id: string, field: string, value: string | number | boolean | null | Record<string, boolean>) => void
@@ -23,16 +24,23 @@ interface ListingsTableProps {
   beginBulkSoftDelete?: (ids: string[]) => { commit: () => Promise<boolean>; undo: () => void; count: number }
 }
 
-export function ListingsTable({ listings, selectedId, onSelect, onUpdate, compareIds, onToggleCompare, onRefreshed, beginBulkSoftDelete }: ListingsTableProps) {
-  const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS)
+export function ListingsTable({
+  listings,
+  sort,
+  onToggleSort,
+  hasAnyListings,
+  selectedId,
+  onSelect,
+  onUpdate,
+  compareIds,
+  onToggleCompare,
+  onRefreshed,
+  beginBulkSoftDelete,
+}: ListingsTableProps) {
   const [focusedId, setFocusedId] = useState<string | null>(null)
 
-  const filtered = useMemo(() => applyFilters(listings, filters), [listings, filters])
-
-  const { sorted, sort, toggleSort, setSort } = useSort(filtered)
-
   useTableKeyboard({
-    listings: sorted,
+    listings,
     focusedId,
     selectedId,
     setFocusedId,
@@ -46,15 +54,10 @@ export function ListingsTable({ listings, selectedId, onSelect, onUpdate, compar
   }, [onSelect])
 
   useEffect(() => {
-    if (focusedId !== null && !sorted.some(l => l.id === focusedId)) {
+    if (focusedId !== null && !listings.some(l => l.id === focusedId)) {
       setFocusedId(null)
     }
-  }, [sorted, focusedId])
-
-  const propertyTypes = useMemo(() => {
-    const types = new Set(listings.map(l => l.property_type).filter(Boolean) as string[])
-    return Array.from(types).sort()
-  }, [listings])
+  }, [listings, focusedId])
 
   const unavailableIds = useMemo(
     () => listings.filter(l => l.status === 'unavailable').map(l => l.id),
@@ -74,13 +77,6 @@ export function ListingsTable({ listings, selectedId, onSelect, onUpdate, compar
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-surface gap-4">
         <div className="flex items-center gap-3 flex-wrap">
-          <FilterBar
-            propertyTypes={propertyTypes}
-            filters={filters}
-            onFilterChange={setFilters}
-            sort={sort}
-            onSortChange={setSort}
-          />
           <RefreshStatusesButton onRefreshed={() => onRefreshed?.()} />
           {beginBulkSoftDelete && (
             <BatchDeleteUnavailableButton
@@ -101,16 +97,16 @@ export function ListingsTable({ listings, selectedId, onSelect, onUpdate, compar
             <kbd className="px-1 py-0.5 text-[10px] font-mono bg-surface-muted border border-border rounded">c</kbd>
           </span>
           <span className="text-sm text-fg-subtle">
-            {sorted.length} listing{sorted.length !== 1 ? 's' : ''}
+            {listings.length} listing{listings.length !== 1 ? 's' : ''}
           </span>
         </div>
       </div>
 
       <div className="flex-1 overflow-auto">
         <table className="w-full border-collapse">
-          <TableHeader sort={sort} onSort={toggleSort} hasCompare />
+          <TableHeader sort={sort} onSort={onToggleSort} hasCompare />
           <tbody>
-            {sorted.map(listing => (
+            {listings.map(listing => (
               <TableRow
                 key={listing.id}
                 listing={listing}
@@ -122,10 +118,10 @@ export function ListingsTable({ listings, selectedId, onSelect, onUpdate, compar
                 onToggleCompare={onToggleCompare}
               />
             ))}
-            {sorted.length === 0 && (
+            {listings.length === 0 && (
               <tr>
                 <td colSpan={99} className="px-4 py-12 text-center text-fg-subtle text-sm">
-                  {listings.length === 0
+                  {!hasAnyListings
                     ? 'No listings yet. Click "Add listing" to get started.'
                     : 'No listings match your filters.'}
                 </td>

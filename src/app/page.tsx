@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, Suspense } from 'react'
+import { useState, useEffect, useCallback, useMemo, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import dynamic from 'next/dynamic'
@@ -10,8 +10,11 @@ import { DetailPanel } from '@/components/DetailPanel'
 import { ViewToggle, type ViewMode } from '@/components/ViewToggle'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { UserMenu } from '@/components/UserMenu'
+import { FilterBar } from '@/components/FilterBar'
 import { useListings } from '@/hooks/useListings'
+import { useSort } from '@/hooks/useSort'
 import { filterListings } from '@/lib/search-listings'
+import { applyFilters, EMPTY_FILTERS, type Filters } from '@/lib/filters'
 
 const MapView = dynamic(() => import('@/components/MapView'), {
   ssr: false,
@@ -26,6 +29,7 @@ function HomeContent() {
   const { listings, loading, error, fetchListings, updateListing, deleteListing, beginBulkSoftDelete, trashCount } = useListings()
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [query, setQuery] = useState('')
+  const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS)
   const [compareIds, setCompareIds] = useState<Set<string>>(new Set())
   const [compareMaxWarning, setCompareMaxWarning] = useState(false)
   const [isRedirecting, setIsRedirecting] = useState(() => {
@@ -92,7 +96,13 @@ function HomeContent() {
     ? listings.find(l => l.id === selectedId) ?? null
     : null
 
-  const visibleListings = filterListings(listings, query)
+  const searched = useMemo(() => filterListings(listings, query), [listings, query])
+  const filtered = useMemo(() => applyFilters(searched, filters), [searched, filters])
+  const { sorted, sort, toggleSort, setSort } = useSort(filtered)
+  const propertyTypes = useMemo(() => {
+    const types = new Set(listings.map(l => l.property_type).filter(Boolean) as string[])
+    return Array.from(types).sort()
+  }, [listings])
 
   const handleDelete = async (id: string) => {
     const success = await deleteListing(id)
@@ -153,6 +163,15 @@ function HomeContent() {
           )}
         </div>
 
+        <FilterBar
+          propertyTypes={propertyTypes}
+          filters={filters}
+          onFilterChange={setFilters}
+          sort={sort}
+          onSortChange={setSort}
+          showSort={view !== 'map'}
+        />
+
         {/* Compare cluster — appears when 2+ listings selected */}
         {compareIds.size >= 2 && (
           <div className="relative flex items-center gap-1.5">
@@ -196,14 +215,13 @@ function HomeContent() {
       <div className="flex-1 flex overflow-hidden">
         <div className="flex-1 overflow-hidden">
           {view === 'map' ? (
-            <MapView listings={visibleListings} onSelect={setSelectedId} />
-          ) : query.trim() && visibleListings.length === 0 ? (
-            <div className="h-full flex items-center justify-center text-fg-subtle text-sm px-4 text-center">
-              No listings match &ldquo;{query.trim()}&rdquo;
-            </div>
+            <MapView listings={filtered} onSelect={setSelectedId} />
           ) : (
             <ListingsTable
-              listings={visibleListings}
+              listings={sorted}
+              sort={sort}
+              onToggleSort={toggleSort}
+              hasAnyListings={listings.length > 0}
               selectedId={selectedId}
               onSelect={setSelectedId}
               onUpdate={updateListing}
