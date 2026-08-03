@@ -101,6 +101,14 @@ describe('/recent/[id] detail page', () => {
     expect(backMock).not.toHaveBeenCalled()
   })
 
+  it('puts Notes first in the field list, above Bedrooms', () => {
+    render(<ThemeProvider><DetailPage /></ThemeProvider>)
+    const notes = screen.getByRole('button', { name: /notes/i })
+    const bedrooms = screen.getByText('3 bdr')
+    // Notes must precede Bedrooms in document order.
+    expect(notes.compareDocumentPosition(bedrooms) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
   it('has a favorite star that writes the favorite flag', async () => {
     render(<ThemeProvider><DetailPage /></ThemeProvider>)
     fireEvent.click(screen.getByTitle('Add to favorites'))

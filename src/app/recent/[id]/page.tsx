@@ -113,6 +113,12 @@ export default function DetailPage() {
         <div className="text-3xl font-bold mt-1">{formatPrice(listing.price)}</div>
 
         <div className="mt-4 divide-y divide-border">
+          {/* Notes leads on mobile — it's the field most often edited on a phone.
+              Desktop keeps its own order in DetailPanel. */}
+          <NotesField
+            value={listing.notes}
+            onSave={next => updateListing(listing.id, 'notes', next)}
+          />
           <Field label="Bedrooms" value={listing.bedrooms ? `${listing.bedrooms} bdr` : null} />
           <Field label="Area" value={listing.liveable_area_sqft ? `${listing.liveable_area_sqft} sqft` : null} />
           <Field label="Property type" value={listing.property_type} />
@@ -120,10 +126,6 @@ export default function DetailPage() {
           <Field label="Commute (car)" value={listing.commute_school_car} />
           <Field label="Commute (transit)" value={listing.commute_pvm_transit} />
           <Field label="Criteria" value={criteriaFlags} />
-          <NotesField
-            value={listing.notes}
-            onSave={next => updateListing(listing.id, 'notes', next)}
-          />
         </div>
 
         {listing.centris_link && (
