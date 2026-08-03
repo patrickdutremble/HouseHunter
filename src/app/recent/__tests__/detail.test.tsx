@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import DetailPage from '@/app/recent/[id]/page'
+import DetailPage, { NotesField } from '@/app/recent/[id]/page'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import type { Listing } from '@/types/listing'
 
@@ -139,5 +139,56 @@ describe('/recent/[id] detail page', () => {
     await waitFor(() =>
       expect(screen.queryByText(/couldn't update favorite/i)).toBeNull()
     )
+  })
+
+  it('opens a textarea when Notes is tapped and saves on blur', async () => {
+    render(<ThemeProvider><DetailPage /></ThemeProvider>)
+    fireEvent.click(screen.getByRole('button', { name: /notes/i }))
+    const box = screen.getByLabelText('Notes') as HTMLTextAreaElement
+    expect(box.value).toBe('Great light')
+    fireEvent.change(box, { target: { value: 'Great light, noisy street' } })
+    fireEvent.blur(box)
+    await waitFor(() =>
+      expect(updateListingMock).toHaveBeenCalledWith('id-1', 'notes', 'Great light, noisy street')
+    )
+  })
+
+  it('saves an emptied notes field as null', async () => {
+    render(<ThemeProvider><DetailPage /></ThemeProvider>)
+    fireEvent.click(screen.getByRole('button', { name: /notes/i }))
+    const box = screen.getByLabelText('Notes')
+    fireEvent.change(box, { target: { value: '   ' } })
+    fireEvent.blur(box)
+    await waitFor(() =>
+      expect(updateListingMock).toHaveBeenCalledWith('id-1', 'notes', null)
+    )
+  })
+
+  it('Escape cancels the edit without saving', () => {
+    render(<ThemeProvider><DetailPage /></ThemeProvider>)
+    fireEvent.click(screen.getByRole('button', { name: /notes/i }))
+    const box = screen.getByLabelText('Notes')
+    fireEvent.change(box, { target: { value: 'discard me' } })
+    fireEvent.keyDown(box, { key: 'Escape' })
+    fireEvent.blur(box)
+    expect(updateListingMock).not.toHaveBeenCalled()
+    expect(screen.getByText('Great light')).toBeInTheDocument()
+  })
+
+  it('keeps the textarea open and shows an error when the save fails', async () => {
+    updateListingMock.mockResolvedValue(false)
+    render(<ThemeProvider><DetailPage /></ThemeProvider>)
+    fireEvent.click(screen.getByRole('button', { name: /notes/i }))
+    const box = screen.getByLabelText('Notes')
+    fireEvent.change(box, { target: { value: 'will fail' } })
+    fireEvent.blur(box)
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(/couldn't save notes/i))
+    expect((screen.getByLabelText('Notes') as HTMLTextAreaElement).value).toBe('will fail')
+  })
+
+  it('renders a tappable placeholder when there are no notes', () => {
+    render(<NotesField value={null} onSave={async () => true} />)
+    expect(screen.getByText(/add notes…/i)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /notes/i })).toBeInTheDocument()
   })
 })
