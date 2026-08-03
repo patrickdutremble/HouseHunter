@@ -27,7 +27,7 @@ function Field({ label, value }: { label: string; value: string | number | null 
 export default function DetailPage() {
   const router = useRouter()
   const params = useParams<{ id: string }>()
-  const { listings, updateListing } = useListings()
+  const { listings, updateListing, deleteListing } = useListings()
   const [favoriteError, setFavoriteError] = useState<string | null>(null)
 
   const listing: Listing | undefined = listings.find(l => l.id === params.id)
@@ -63,6 +63,12 @@ export default function DetailPage() {
       return
     }
     setFavoriteError(null)
+  }
+
+  const handleDelete = async () => {
+    if (!window.confirm('Move this listing to the trash?')) return
+    await deleteListing(listing.id)
+    router.replace('/recent')
   }
 
   return (
@@ -143,6 +149,7 @@ export default function DetailPage() {
           )}
           <button
             type="button"
+            onClick={handleDelete}
             className="block w-full text-center py-3 rounded-lg border border-red-600 dark:border-red-400 text-red-600 dark:text-red-300 font-medium active:bg-red-50 dark:active:bg-red-900/30 transition-colors"
           >
             Delete listing

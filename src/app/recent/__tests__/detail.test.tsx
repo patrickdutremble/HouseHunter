@@ -120,6 +120,24 @@ describe('/recent/[id] detail page', () => {
     expect(screen.getByRole('button', { name: /delete listing/i })).toBeInTheDocument()
   })
 
+  it('does not delete when the confirmation is cancelled', () => {
+    confirmSpy.mockReturnValueOnce(false)
+    render(<ThemeProvider><DetailPage /></ThemeProvider>)
+    fireEvent.click(screen.getByRole('button', { name: /delete listing/i }))
+    expect(window.confirm).toHaveBeenCalledWith('Move this listing to the trash?')
+    expect(deleteListingMock).not.toHaveBeenCalled()
+    expect(replaceMock).not.toHaveBeenCalled()
+  })
+
+  it('deletes and returns to the list when the confirmation is accepted', async () => {
+    render(<ThemeProvider><DetailPage /></ThemeProvider>)
+    fireEvent.click(screen.getByRole('button', { name: /delete listing/i }))
+    await waitFor(() => expect(deleteListingMock).toHaveBeenCalledWith('id-1'))
+    await waitFor(() => expect(replaceMock).toHaveBeenCalledWith('/recent'))
+    // replace, not back — back/forward navigation restores Next's cached list.
+    expect(backMock).not.toHaveBeenCalled()
+  })
+
   it('renders a fallback message when the id is not in the list', () => {
     // Intentional no-op — a second test file with a distinct useParams mock
     // would be the right tool. Keep this minimal.
