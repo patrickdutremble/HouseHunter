@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import DetailPage from '@/app/recent/[id]/page'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import type { Listing } from '@/types/listing'
@@ -16,6 +16,8 @@ afterEach(() => {
   backMock.mockReset()
   pushMock.mockReset()
   Object.defineProperty(window, 'history', { configurable: true, value: originalHistory })
+  updateListingMock.mockReset()
+  updateListingMock.mockResolvedValue(true)
 })
 
 const sample: Listing = {
@@ -58,13 +60,14 @@ const sample: Listing = {
   criteria: { garage: true, yard: false },
 }
 
+const updateListingMock = vi.fn(async () => true)
 vi.mock('@/hooks/useListings', () => ({
   useListings: () => ({
     listings: [sample],
     loading: false,
     error: null,
     fetchListings: vi.fn(),
-    updateListing: vi.fn(),
+    updateListing: updateListingMock,
     deleteListing: vi.fn(),
     trashCount: 0,
   }),
@@ -94,5 +97,22 @@ describe('/recent/[id] detail page', () => {
     fireEvent.click(screen.getByRole('button', { name: /back/i }))
     expect(pushMock).toHaveBeenCalledWith('/recent')
     expect(backMock).not.toHaveBeenCalled()
+  })
+
+  it('has a favorite star that writes the favorite flag', async () => {
+    render(<ThemeProvider><DetailPage /></ThemeProvider>)
+    fireEvent.click(screen.getByTitle('Add to favorites'))
+    await waitFor(() =>
+      expect(updateListingMock).toHaveBeenCalledWith('id-1', 'favorite', true)
+    )
+  })
+
+  it('shows an error when the favorite write fails', async () => {
+    updateListingMock.mockResolvedValue(false)
+    render(<ThemeProvider><DetailPage /></ThemeProvider>)
+    fireEvent.click(screen.getByTitle('Add to favorites'))
+    await waitFor(() =>
+      expect(screen.getByText(/couldn't update favorite/i)).toBeInTheDocument()
+    )
   })
 })

@@ -1,7 +1,9 @@
 'use client'
 import Image from 'next/image'
+import { useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { useListings } from '@/hooks/useListings'
+import { FavoriteButton } from '@/components/FavoriteButton'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { UserMenu } from '@/components/UserMenu'
 import type { Listing } from '@/types/listing'
@@ -24,7 +26,8 @@ function Field({ label, value }: { label: string; value: string | number | null 
 export default function DetailPage() {
   const router = useRouter()
   const params = useParams<{ id: string }>()
-  const { listings } = useListings()
+  const { listings, updateListing } = useListings()
+  const [actionError, setActionError] = useState<string | null>(null)
 
   const listing: Listing | undefined = listings.find(l => l.id === params.id)
 
@@ -52,6 +55,16 @@ export default function DetailPage() {
         .join(', ')
     : null
 
+  async function handleToggleFavorite() {
+    if (!listing) return
+    const ok = await updateListing(listing.id, 'favorite', !listing.favorite)
+    if (!ok) {
+      setActionError("Couldn't update favorite — try again")
+      return
+    }
+    setActionError(null)
+  }
+
   return (
     <main className="min-h-screen bg-bg pb-8">
       <div className="px-4 py-3 flex items-center justify-between">
@@ -64,10 +77,19 @@ export default function DetailPage() {
           ← Back
         </button>
         <div className="flex items-center gap-2">
+          <FavoriteButton
+            value={listing.favorite}
+            onToggle={handleToggleFavorite}
+            size={22}
+          />
           <ThemeToggle />
           <UserMenu />
         </div>
       </div>
+
+      {actionError && (
+        <div className="px-4 text-sm text-red-600 dark:text-red-300">{actionError}</div>
+      )}
 
       {listing.image_url ? (
         <div className="relative w-full aspect-video bg-surface-muted">
