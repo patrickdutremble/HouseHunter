@@ -128,16 +128,26 @@ export default function DetailPage() {
           <Field label="Criteria" value={criteriaFlags} />
         </div>
 
-        {listing.centris_link && (
-          <a
-            href={listing.centris_link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-6 block w-full text-center py-3 rounded-lg bg-accent text-accent-fg font-medium hover:bg-sky-700 dark:hover:bg-sky-300 active:bg-sky-800 dark:active:bg-sky-200 transition-colors"
+        {/* Wrapper owns the top margin and the gap so the delete button is
+            spaced correctly whether or not the Centris link is rendered. */}
+        <div className="mt-6 space-y-3">
+          {listing.centris_link && (
+            <a
+              href={listing.centris_link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full text-center py-3 rounded-lg bg-accent text-accent-fg font-medium hover:bg-sky-700 dark:hover:bg-sky-300 active:bg-sky-800 dark:active:bg-sky-200 transition-colors"
+            >
+              Open on Centris
+            </a>
+          )}
+          <button
+            type="button"
+            className="block w-full text-center py-3 rounded-lg border border-red-600 dark:border-red-400 text-red-600 dark:text-red-300 font-medium active:bg-red-50 dark:active:bg-red-900/30 transition-colors"
           >
-            Open on Centris
-          </a>
-        )}
+            Delete listing
+          </button>
+        </div>
       </section>
     </main>
   )

@@ -105,6 +105,21 @@ describe('/recent/[id] detail page', () => {
     expect(link.href).toBe('https://centris.ca/x')
   })
 
+  it('renders a Delete listing button below Open on Centris', () => {
+    render(<ThemeProvider><DetailPage /></ThemeProvider>)
+    const centris = screen.getByRole('link', { name: /open on centris/i })
+    const del = screen.getByRole('button', { name: /delete listing/i })
+    // Delete must come after Centris in document order.
+    expect(centris.compareDocumentPosition(del) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
+  it('still renders Delete listing when the listing has no Centris link', () => {
+    mockListing = { ...sample, centris_link: null }
+    render(<ThemeProvider><DetailPage /></ThemeProvider>)
+    expect(screen.queryByRole('link', { name: /open on centris/i })).toBeNull()
+    expect(screen.getByRole('button', { name: /delete listing/i })).toBeInTheDocument()
+  })
+
   it('renders a fallback message when the id is not in the list', () => {
     // Intentional no-op — a second test file with a distinct useParams mock
     // would be the right tool. Keep this minimal.
