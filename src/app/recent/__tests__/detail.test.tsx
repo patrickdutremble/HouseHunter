@@ -17,6 +17,9 @@ const confirmSpy = vi.spyOn(window, 'confirm')
 
 beforeEach(() => {
   // Default to "OK" — tests that need Cancel override with mockReturnValueOnce(false).
+  // mockReset first: mockReturnValue alone does not drain a leftover
+  // mockReturnValueOnce from a test that failed before consuming it.
+  confirmSpy.mockReset()
   confirmSpy.mockReturnValue(true)
 })
 
