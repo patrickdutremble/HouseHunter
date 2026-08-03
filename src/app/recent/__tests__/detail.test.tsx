@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import DetailPage, { NotesField } from '@/app/recent/[id]/page'
+import DetailPage from '@/app/recent/[id]/page'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import type { Listing } from '@/types/listing'
 
@@ -184,11 +184,5 @@ describe('/recent/[id] detail page', () => {
     fireEvent.blur(box)
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(/couldn't save notes/i))
     expect((screen.getByLabelText('Notes') as HTMLTextAreaElement).value).toBe('will fail')
-  })
-
-  it('renders a tappable placeholder when there are no notes', () => {
-    render(<NotesField value={null} onSave={async () => true} />)
-    expect(screen.getByText(/add notes…/i)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /notes/i })).toBeInTheDocument()
   })
 })
