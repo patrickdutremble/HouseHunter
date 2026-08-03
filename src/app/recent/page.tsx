@@ -78,7 +78,8 @@ export default function RecentPage() {
               onKeyDown={e => { if (e.key === 'Escape') setQuery('') }}
               placeholder="Search address or notes…"
               aria-label="Search listings"
-              className="w-full border border-border-strong rounded-lg pl-3 pr-9 py-2.5 text-sm bg-surface text-fg placeholder:text-fg-subtle"
+              // h-11 matches the favorites toggle beside it; py-2.5 came out 2px shorter.
+              className="w-full h-11 border border-border-strong rounded-lg pl-3 pr-9 text-sm bg-surface text-fg placeholder:text-fg-subtle"
             />
             {query && (
               <button
