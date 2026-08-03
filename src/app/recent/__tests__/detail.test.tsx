@@ -18,6 +18,7 @@ afterEach(() => {
   Object.defineProperty(window, 'history', { configurable: true, value: originalHistory })
   updateListingMock.mockReset()
   updateListingMock.mockResolvedValue(true)
+  mockListing = sample
 })
 
 const sample: Listing = {
@@ -60,10 +61,11 @@ const sample: Listing = {
   criteria: { garage: true, yard: false },
 }
 
+let mockListing: Listing = sample
 const updateListingMock = vi.fn(async () => true)
 vi.mock('@/hooks/useListings', () => ({
   useListings: () => ({
-    listings: [sample],
+    listings: [mockListing],
     loading: false,
     error: null,
     fetchListings: vi.fn(),
@@ -113,6 +115,29 @@ describe('/recent/[id] detail page', () => {
     fireEvent.click(screen.getByTitle('Add to favorites'))
     await waitFor(() =>
       expect(screen.getByText(/couldn't update favorite/i)).toBeInTheDocument()
+    )
+  })
+
+  it('shows Remove from favorites and writes false for an already-favorited listing', async () => {
+    mockListing = { ...sample, favorite: true }
+    render(<ThemeProvider><DetailPage /></ThemeProvider>)
+    expect(screen.getByTitle('Remove from favorites')).toBeInTheDocument()
+    fireEvent.click(screen.getByTitle('Remove from favorites'))
+    await waitFor(() =>
+      expect(updateListingMock).toHaveBeenCalledWith('id-1', 'favorite', false)
+    )
+  })
+
+  it('clears the favorite error after a subsequent successful write', async () => {
+    updateListingMock.mockResolvedValueOnce(false).mockResolvedValueOnce(true)
+    render(<ThemeProvider><DetailPage /></ThemeProvider>)
+    fireEvent.click(screen.getByTitle('Add to favorites'))
+    await waitFor(() =>
+      expect(screen.getByText(/couldn't update favorite/i)).toBeInTheDocument()
+    )
+    fireEvent.click(screen.getByTitle('Add to favorites'))
+    await waitFor(() =>
+      expect(screen.queryByText(/couldn't update favorite/i)).toBeNull()
     )
   })
 })

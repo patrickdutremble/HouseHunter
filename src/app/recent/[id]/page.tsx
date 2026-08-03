@@ -27,7 +27,7 @@ export default function DetailPage() {
   const router = useRouter()
   const params = useParams<{ id: string }>()
   const { listings, updateListing } = useListings()
-  const [actionError, setActionError] = useState<string | null>(null)
+  const [favoriteError, setFavoriteError] = useState<string | null>(null)
 
   const listing: Listing | undefined = listings.find(l => l.id === params.id)
 
@@ -55,14 +55,13 @@ export default function DetailPage() {
         .join(', ')
     : null
 
-  async function handleToggleFavorite() {
-    if (!listing) return
+  const handleToggleFavorite = async () => {
     const ok = await updateListing(listing.id, 'favorite', !listing.favorite)
     if (!ok) {
-      setActionError("Couldn't update favorite — try again")
+      setFavoriteError("Couldn't update favorite — try again")
       return
     }
-    setActionError(null)
+    setFavoriteError(null)
   }
 
   return (
@@ -81,14 +80,15 @@ export default function DetailPage() {
             value={listing.favorite}
             onToggle={handleToggleFavorite}
             size={22}
+            className="w-10 h-10"
           />
           <ThemeToggle />
           <UserMenu />
         </div>
       </div>
 
-      {actionError && (
-        <div className="px-4 text-sm text-red-600 dark:text-red-300">{actionError}</div>
+      {favoriteError && (
+        <div role="alert" className="px-4 text-sm text-red-600 dark:text-red-300">{favoriteError}</div>
       )}
 
       {listing.image_url ? (

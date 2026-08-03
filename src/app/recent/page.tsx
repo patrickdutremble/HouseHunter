@@ -108,7 +108,7 @@ export default function RecentPage() {
           </button>
         </div>
         {actionError && (
-          <div className="text-sm text-red-600 dark:text-red-300">{actionError}</div>
+          <div role="alert" className="text-sm text-red-600 dark:text-red-300">{actionError}</div>
         )}
 
         {listings.length === 0 ? (
