@@ -12,6 +12,7 @@ vi.mock('next/navigation', () => ({
 let mockListings: Listing[] = []
 const fetchListingsMock = vi.fn(async () => {})
 const deleteListingMock = vi.fn(async () => true)
+const updateListingMock = vi.fn(async () => true)
 
 vi.mock('@/hooks/useListings', () => ({
   useListings: () => ({
@@ -19,7 +20,7 @@ vi.mock('@/hooks/useListings', () => ({
     loading: false,
     error: null,
     fetchListings: fetchListingsMock,
-    updateListing: vi.fn(),
+    updateListing: updateListingMock,
     deleteListing: deleteListingMock,
     trashCount: 3,
   }),
@@ -75,70 +76,59 @@ describe('/recent page', () => {
     fetchListingsMock.mockResolvedValue(undefined)
     deleteListingMock.mockReset()
     deleteListingMock.mockResolvedValue(true)
+    updateListingMock.mockReset()
+    updateListingMock.mockResolvedValue(true)
     mockListings = []
   })
   afterEach(() => {
     vi.unstubAllGlobals()
   })
 
-  it('renders the paste card and empty state when there are no listings', () => {
+  it('renders the search bar and the empty-database state when there are no listings', () => {
     mockListings = []
     render(<RecentPage />, { wrapper: ThemeProvider })
-    expect(screen.getByPlaceholderText(/paste a centris url/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/search listings/i)).toBeInTheDocument()
+    expect(screen.queryByPlaceholderText(/paste a centris url/i)).toBeNull()
     expect(screen.getByText(/no listings yet/i)).toBeInTheDocument()
   })
 
-  it('renders at most 10 listing cards, newest first', () => {
+  it('filters cards by the search query across address and notes', () => {
+    mockListings = [
+      makeListing({ id: 'a', full_address: '123 rue Main', notes: null }),
+      makeListing({ id: 'b', full_address: '456 boulevard Cartier', notes: null }),
+      makeListing({ id: 'c', full_address: '789 avenue Park', notes: 'near cartier park' }),
+    ]
+    render(<RecentPage />, { wrapper: ThemeProvider })
+    fireEvent.change(screen.getByLabelText(/search listings/i), { target: { value: 'cartier' } })
+    expect(screen.getAllByTestId('listing-card-body').length).toBe(2)
+    expect(screen.getByText('456 boulevard Cartier')).toBeInTheDocument()
+    expect(screen.getByText('789 avenue Park')).toBeInTheDocument()
+  })
+
+  it('restores the full list when the clear-search button is tapped', () => {
+    mockListings = [
+      makeListing({ id: 'a', full_address: '123 rue Main' }),
+      makeListing({ id: 'b', full_address: '456 boulevard Cartier' }),
+    ]
+    render(<RecentPage />, { wrapper: ThemeProvider })
+    const input = screen.getByLabelText(/search listings/i) as HTMLInputElement
+    fireEvent.change(input, { target: { value: 'cartier' } })
+    expect(screen.getAllByTestId('listing-card-body').length).toBe(1)
+    fireEvent.click(screen.getByRole('button', { name: /clear search/i }))
+    expect(input.value).toBe('')
+    expect(screen.getAllByTestId('listing-card-body').length).toBe(2)
+  })
+
+  it('renders every listing, newest first', () => {
     mockListings = Array.from({ length: 12 }, (_, i) =>
       makeListing({ id: `x-${i}`, location: `City-${i}`, created_at: new Date(2026, 3, 21, i).toISOString() })
     )
     render(<RecentPage />, { wrapper: ThemeProvider })
     const cards = screen.getAllByTestId('listing-card-body')
-    expect(cards.length).toBe(10)
-  })
-
-  it('POSTs to /api/scrape-centris on Add, clears input on success', async () => {
-    const fetchMock = vi.fn(async () => ({
-      ok: true,
-      status: 200,
-      json: async () => ({ listing: makeListing({ id: 'new-1' }) }),
-    }))
-    vi.stubGlobal('fetch', fetchMock)
-    render(<RecentPage />, { wrapper: ThemeProvider })
-    const input = screen.getByPlaceholderText(/paste a centris url/i) as HTMLInputElement
-    fireEvent.change(input, { target: { value: 'https://centris.ca/new' } })
-    fireEvent.click(screen.getByRole('button', { name: /^add$/i }))
-    await waitFor(() => expect(fetchMock).toHaveBeenCalled())
-    expect(JSON.parse((fetchMock.mock.calls[0][1] as RequestInit).body as string)).toEqual({ url: 'https://centris.ca/new' })
-    await waitFor(() => expect(screen.getByText(/added/i)).toBeInTheDocument())
-    await waitFor(() => expect(fetchListingsMock).toHaveBeenCalled())
-    expect(input.value).toBe('')
-  })
-
-  it('shows amber Already saved inline feedback on 409', async () => {
-    const fetchMock = vi.fn(async () => ({
-      ok: false,
-      status: 409,
-      json: async () => ({ listingId: 'x', error: 'Duplicate' }),
-    }))
-    vi.stubGlobal('fetch', fetchMock)
-    render(<RecentPage />, { wrapper: ThemeProvider })
-    fireEvent.change(screen.getByPlaceholderText(/paste a centris url/i), { target: { value: 'https://centris.ca/d' } })
-    fireEvent.click(screen.getByRole('button', { name: /^add$/i }))
-    await waitFor(() => expect(screen.getByText(/already saved/i)).toBeInTheDocument())
-  })
-
-  it('shows red error message on 500', async () => {
-    const fetchMock = vi.fn(async () => ({
-      ok: false,
-      status: 500,
-      json: async () => ({ error: 'Boom' }),
-    }))
-    vi.stubGlobal('fetch', fetchMock)
-    render(<RecentPage />, { wrapper: ThemeProvider })
-    fireEvent.change(screen.getByPlaceholderText(/paste a centris url/i), { target: { value: 'https://centris.ca/bad' } })
-    fireEvent.click(screen.getByRole('button', { name: /^add$/i }))
-    await waitFor(() => expect(screen.getByText(/boom/i)).toBeInTheDocument())
+    expect(cards.length).toBe(12)
+    // Newest (City-11, created at hour 11) must be first.
+    expect(cards[0]).toHaveTextContent('City-11')
+    expect(cards[11]).toHaveTextContent('City-0')
   })
 
   it('trash link shows trashCount badge and targets /trash', () => {
@@ -146,22 +136,6 @@ describe('/recent page', () => {
     const trash = screen.getByRole('link', { name: /trash/i }) as HTMLAnchorElement
     expect(trash.getAttribute('href')).toBe('/trash')
     expect(screen.getByText('3')).toBeInTheDocument()
-  })
-
-  it('clears the success banner when the user edits the URL input', async () => {
-    const fetchMock = vi.fn(async () => ({
-      ok: true,
-      status: 200,
-      json: async () => ({ listing: makeListing({ id: 'new' }) }),
-    }))
-    vi.stubGlobal('fetch', fetchMock)
-    render(<RecentPage />, { wrapper: ThemeProvider })
-    const input = screen.getByPlaceholderText(/paste a centris/i) as HTMLInputElement
-    fireEvent.change(input, { target: { value: 'https://www.centris.ca/x' } })
-    fireEvent.click(screen.getByRole('button', { name: /^add$/i }))
-    await waitFor(() => expect(screen.getByText(/added/i)).toBeInTheDocument())
-    fireEvent.change(input, { target: { value: 'https://www.centris.ca/y' } })
-    expect(screen.queryByText(/added/i)).not.toBeInTheDocument()
   })
 
   it('surfaces error if card delete fails', async () => {
@@ -176,16 +150,83 @@ describe('/recent page', () => {
     confirmSpy.mockRestore()
   })
 
-  it('shows a server error message when the response is not JSON', async () => {
-    const fetchMock = vi.fn(async () => ({
-      ok: false,
-      status: 502,
-      json: async () => { throw new SyntaxError('Unexpected token <') },
-    }))
-    vi.stubGlobal('fetch', fetchMock)
+  it('shows only favorites when the star toggle is on, and all listings when off', () => {
+    mockListings = [
+      makeListing({ id: 'a', full_address: 'Fav place', favorite: true }),
+      makeListing({ id: 'b', full_address: 'Other place', favorite: false }),
+    ]
     render(<RecentPage />, { wrapper: ThemeProvider })
-    fireEvent.change(screen.getByPlaceholderText(/paste a centris/i), { target: { value: 'https://www.centris.ca/x' } })
-    fireEvent.click(screen.getByRole('button', { name: /^add$/i }))
-    await waitFor(() => expect(screen.getByText(/server error \(502\)/i)).toBeInTheDocument())
+    const toggle = screen.getByRole('button', { name: /favorites only/i })
+    expect(screen.getAllByTestId('listing-card-body').length).toBe(2)
+    fireEvent.click(toggle)
+    expect(toggle).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getAllByTestId('listing-card-body').length).toBe(1)
+    expect(screen.getByText('Fav place')).toBeInTheDocument()
+    fireEvent.click(toggle)
+    expect(toggle).toHaveAttribute('aria-pressed', 'false')
+    expect(screen.getAllByTestId('listing-card-body').length).toBe(2)
+  })
+
+  it('applies the search query and the favorites toggle together', () => {
+    mockListings = [
+      makeListing({ id: 'a', full_address: '123 rue Cartier', favorite: true }),
+      makeListing({ id: 'b', full_address: '456 rue Cartier', favorite: false }),
+      makeListing({ id: 'c', full_address: '789 rue Main', favorite: true }),
+    ]
+    render(<RecentPage />, { wrapper: ThemeProvider })
+    fireEvent.change(screen.getByLabelText(/search listings/i), { target: { value: 'cartier' } })
+    fireEvent.click(screen.getByRole('button', { name: /favorites only/i }))
+    expect(screen.getAllByTestId('listing-card-body').length).toBe(1)
+    expect(screen.getByText('123 rue Cartier')).toBeInTheDocument()
+  })
+
+  it('shows the no-match state and its Clear button resets both filters', () => {
+    mockListings = [makeListing({ id: 'a', full_address: '123 rue Main' })]
+    render(<RecentPage />, { wrapper: ThemeProvider })
+    const favoritesToggle = screen.getByRole('button', { name: /favorites only/i })
+    fireEvent.change(screen.getByLabelText(/search listings/i), { target: { value: 'zzzz' } })
+    fireEvent.click(favoritesToggle)
+    expect(favoritesToggle).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByText(/no listings match/i)).toBeInTheDocument()
+    expect(screen.queryByText(/no listings yet/i)).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: /^clear$/i }))
+    expect(screen.getAllByTestId('listing-card-body').length).toBe(1)
+    expect((screen.getByLabelText(/search listings/i) as HTMLInputElement).value).toBe('')
+    expect(favoritesToggle).toHaveAttribute('aria-pressed', 'false')
+  })
+
+  it('shows the empty-database state, not the no-match state, when nothing is saved', () => {
+    mockListings = []
+    render(<RecentPage />, { wrapper: ThemeProvider })
+    expect(screen.getByText(/no listings yet/i)).toBeInTheDocument()
+    expect(screen.queryByText(/no listings match/i)).toBeNull()
+  })
+
+  it('tapping a card star writes the favorite flag', async () => {
+    mockListings = [makeListing({ id: 'card-1', favorite: false })]
+    render(<RecentPage />, { wrapper: ThemeProvider })
+    fireEvent.click(screen.getByTitle('Add to favorites'))
+    await waitFor(() =>
+      expect(updateListingMock).toHaveBeenCalledWith('card-1', 'favorite', true)
+    )
+  })
+
+  it('shows an error when the favorite write fails', async () => {
+    mockListings = [makeListing({ id: 'card-1', favorite: false })]
+    updateListingMock.mockResolvedValue(false)
+    render(<RecentPage />, { wrapper: ThemeProvider })
+    fireEvent.click(screen.getByTitle('Add to favorites'))
+    await waitFor(() =>
+      expect(screen.getByText(/couldn't update favorite/i)).toBeInTheDocument()
+    )
+  })
+
+  it('tapping the star on a favorite listing clears the flag', async () => {
+    mockListings = [makeListing({ id: 'card-1', favorite: true })]
+    render(<RecentPage />, { wrapper: ThemeProvider })
+    fireEvent.click(screen.getByTitle('Remove from favorites'))
+    await waitFor(() =>
+      expect(updateListingMock).toHaveBeenCalledWith('card-1', 'favorite', false)
+    )
   })
 })

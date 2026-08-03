@@ -108,4 +108,41 @@ describe('ListingCard', () => {
     expect(link.href).toBe('https://centris.ca/x')
     expect(link.target).toBe('_blank')
   })
+
+  it('renders a favorite star and calls onToggleFavorite without triggering onTap', () => {
+    const onToggleFavorite = vi.fn()
+    const onTap = vi.fn()
+    render(
+      <ListingCard
+        listing={sample}
+        onTap={onTap}
+        onDelete={() => {}}
+        onToggleFavorite={onToggleFavorite}
+      />
+    )
+    fireEvent.click(screen.getByTitle('Add to favorites'))
+    expect(onToggleFavorite).toHaveBeenCalledWith('id-1', true)
+    expect(onTap).not.toHaveBeenCalled()
+  })
+
+  it('shows the star as pressed and offers removal when already a favorite', () => {
+    const onToggleFavorite = vi.fn()
+    render(
+      <ListingCard
+        listing={{ ...sample, favorite: true }}
+        onTap={() => {}}
+        onDelete={() => {}}
+        onToggleFavorite={onToggleFavorite}
+      />
+    )
+    const star = screen.getByTitle('Remove from favorites')
+    expect(star).toHaveAttribute('aria-pressed', 'true')
+    fireEvent.click(star)
+    expect(onToggleFavorite).toHaveBeenCalledWith('id-1', false)
+  })
+
+  it('renders no star when onToggleFavorite is omitted', () => {
+    render(<ListingCard listing={sample} onTap={() => {}} onDelete={() => {}} />)
+    expect(screen.queryByTitle('Add to favorites')).toBeNull()
+  })
 })

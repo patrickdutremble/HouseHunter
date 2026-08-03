@@ -2,11 +2,13 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import type { Listing } from '@/types/listing'
+import { FavoriteButton } from '@/components/FavoriteButton'
 
 interface ListingCardProps {
   listing: Listing
   onTap: (id: string) => void
   onDelete: (id: string) => void
+  onToggleFavorite?: (id: string, next: boolean) => void
 }
 
 function timeAgo(iso: string): string {
@@ -36,7 +38,7 @@ function PlaceholderIcon() {
   )
 }
 
-export function ListingCard({ listing, onTap, onDelete }: ListingCardProps) {
+export function ListingCard({ listing, onTap, onDelete, onToggleFavorite }: ListingCardProps) {
   const [menuOpen, setMenuOpen] = useState(false)
 
   const address = listing.full_address ?? listing.location ?? '—'
@@ -98,6 +100,19 @@ export function ListingCard({ listing, onTap, onDelete }: ListingCardProps) {
           <circle cx="16" cy="10" r="1.5" />
         </svg>
       </button>
+
+      {/* Bottom-right, sized for a mobile tap target — the top-right
+          corner belongs to the "More" menu button. */}
+      {onToggleFavorite && (
+        <div className="absolute bottom-0 right-0 z-50">
+          <FavoriteButton
+            value={listing.favorite}
+            onToggle={() => onToggleFavorite(listing.id, !listing.favorite)}
+            size={22}
+            className="w-10 h-10"
+          />
+        </div>
+      )}
 
       {menuOpen && (
         <>

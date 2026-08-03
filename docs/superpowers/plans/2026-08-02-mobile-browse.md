@@ -28,8 +28,10 @@ Things that are easy to get wrong here:
 | --- | --- |
 | `src/components/ListingCard.tsx` | Mobile list card. Gains an *optional* favorite star; unchanged when the new prop is omitted. |
 | `src/app/recent/page.tsx` | Mobile browse screen: header, sticky search + favorites row, full list, two empty states. |
-| `src/app/recent/[id]/page.tsx` | Mobile detail screen: adds a favorite star to the top bar and an inline-editable Notes field (local `NotesField` component in the same file). |
+| `src/app/recent/[id]/page.tsx` | Mobile detail screen: adds a favorite star to the top bar and renders `NotesField` in place of the read-only Notes row. |
+| `src/components/NotesField.tsx` | Inline-editable Notes control. Tap to edit, save on blur or Done, Escape cancels, empty saves as `null`. |
 | `src/components/__tests__/ListingCard.test.tsx` | Card tests, plus star behaviour. |
+| `src/components/__tests__/NotesField.test.tsx` | `NotesField` in isolation — placeholder state, and the Escape-then-reopen regression. |
 | `src/app/recent/__tests__/page.test.tsx` | Browse-screen tests. Paste-card tests deleted. |
 | `src/app/recent/__tests__/detail.test.tsx` | Detail-screen tests, plus star and notes editing. |
 
@@ -572,10 +574,12 @@ import { applyFilters, EMPTY_FILTERS } from '@/lib/filters'
   const filtered = applyFilters(searched, { ...EMPTY_FILTERS, favoritesOnly })
 ```
 
-**3d.** Wrap the search input and a new star toggle in a flex row. Replace the **entire** sticky row block written in Task 3 step 3g — from `<div className="relative sticky top-14 ...">` through its closing `</div>` — with this:
+**3d.** Wrap the search input and a new star toggle in a flex row. Replace the **entire** sticky row block written in Task 3 step 3g — from `<div className="relative sticky top-14 ...">` through its closing `</div>` — with this.
+
+Note the `z-[60]`: commit `aa8d3b9` raised both the header and this row from `z-10` so they sit above `ListingCard`'s `z-50` menu and favorite buttons, which otherwise painted over the sticky chrome while scrolling. `z-50` would not be enough — the cards come later in the DOM, so a tie goes to them. Keep `z-[60]`.
 
 ```tsx
-        <div className="sticky top-14 z-10 bg-bg py-1 -my-1 flex items-center gap-2">
+        <div className="sticky top-14 z-[60] bg-bg py-1 -my-1 flex items-center gap-2">
           <div className="relative flex-1 min-w-0">
             <input
               type="text"
@@ -945,7 +949,9 @@ Add these four tests inside `describe('/recent/[id] detail page', ...)` in `src/
   })
 ```
 
-Also add a test for the empty-notes placeholder. The shared `sample` always has notes, so this one exercises `NotesField` directly — which is why Step 3 exports it:
+Then create `src/components/__tests__/NotesField.test.tsx` for the two tests that exercise the component directly. It imports only `@/components/NotesField`, so it needs **no** `vi.mock` for `next/navigation` or `@/hooks/useListings` — if you find yourself adding one, the component is still coupled to the page and something is wrong.
+
+The shared `sample` always has notes, so the placeholder state needs its own render:
 
 ```tsx
   it('renders a tappable placeholder when there are no notes', () => {
@@ -955,13 +961,21 @@ Also add a test for the empty-notes placeholder. The shared `sample` always has 
   })
 ```
 
-Add the import at the top of the test file:
+And this regression test, which pins the Escape bug described in Step 3. Note it deliberately fires **no** blur after Escape — that absence is the bug's trigger, so a test that blurs there would pass vacuously:
 
 ```tsx
-import DetailPage, { NotesField } from '@/app/recent/[id]/page'
+  it('still saves on blur in a later edit after an earlier edit was cancelled with Escape', async () => {
+    const onSave = vi.fn(async () => true)
+    render(<NotesField value={null} onSave={onSave} />)
+    fireEvent.click(screen.getByRole('button', { name: /notes/i }))
+    fireEvent.keyDown(screen.getByLabelText('Notes'), { key: 'Escape' })
+    fireEvent.click(screen.getByRole('button', { name: /notes/i }))
+    const box = screen.getByLabelText('Notes')
+    fireEvent.change(box, { target: { value: 'keep me' } })
+    fireEvent.blur(box)
+    await waitFor(() => expect(onSave).toHaveBeenCalledWith('keep me'))
+  })
 ```
-
-(replacing the existing `import DetailPage from '@/app/recent/[id]/page'` line).
 
 - [ ] **Step 2: Run the tests to verify they fail**
 
@@ -969,19 +983,17 @@ import DetailPage, { NotesField } from '@/app/recent/[id]/page'
 npx vitest run src/app/recent/__tests__/detail.test.tsx
 ```
 
-Expected: FAIL — `NotesField` is not exported, and no button named "Notes" exists.
+Expected: FAIL — `@/components/NotesField` does not exist, and no button named "Notes" exists.
 
 - [ ] **Step 3: Implement `NotesField` and use it**
 
-In `src/app/recent/[id]/page.tsx`, add `useRef` and `useState` to the React import at the top of the file:
+Create `src/components/NotesField.tsx`, matching the `'use client'` + named-export shape of its siblings (`FavoriteButton.tsx`, `ThemeToggle.tsx`):
 
 ```tsx
+'use client'
+
 import { useRef, useState } from 'react'
-```
 
-Add this component below the existing `Field` helper (above `export default function DetailPage`):
-
-```tsx
 export function NotesField({
   value,
   onSave,
@@ -999,16 +1011,22 @@ export function NotesField({
     return (
       <button
         type="button"
-        aria-label="Notes"
+        // aria-label overrides the button's text, so fold the note into it —
+        // otherwise a screen reader announces "Notes, button" and never the note.
+        aria-label={value ? `Notes: ${value}` : 'Notes — add notes'}
         onClick={() => {
           setDraft(value ?? '')
           setFailed(false)
+          // Escape unmounts the focused textarea, and Chrome/Safari fire no blur
+          // on a removed element — so the flag must be cleared on open, not only
+          // in onBlur, or the NEXT edit's blur-save is silently swallowed.
+          cancelled.current = false
           setEditing(true)
         }}
         className="w-full text-left py-2 border-b border-border"
       >
         <div className="text-[11px] uppercase tracking-wide text-fg-subtle">Notes</div>
-        <div className={value ? 'text-fg' : 'text-fg-subtle'}>{value || 'Add notes…'}</div>
+        <div className={value ? 'text-fg whitespace-pre-wrap break-words' : 'text-fg-subtle'}>{value || 'Add notes…'}</div>
       </button>
     )
   }
@@ -1059,7 +1077,7 @@ export function NotesField({
         Done
       </button>
       {failed && (
-        <div className="mt-1 text-sm text-red-600 dark:text-red-300">
+        <div role="alert" className="mt-1 text-sm text-red-600 dark:text-red-300">
           Couldn&apos;t save notes — try again
         </div>
       )}
@@ -1068,7 +1086,13 @@ export function NotesField({
 }
 ```
 
-Then, in the field list, replace:
+Then, in `src/app/recent/[id]/page.tsx`, add the import next to the other component imports:
+
+```tsx
+import { NotesField } from '@/components/NotesField'
+```
+
+and in the field list, replace:
 
 ```tsx
           <Field label="Notes" value={listing.notes} />
@@ -1083,20 +1107,20 @@ with:
           />
 ```
 
-`updateListing` is already destructured from the hook in Task 6.
+`updateListing` is already destructured from the hook in Task 6. Note that `NotesField` keeps its own local `failed` state, deliberately separate from the page-level `favoriteError` Task 6 added — don't merge them into one error slot.
 
 - [ ] **Step 4: Run the tests to verify they pass**
 
 ```bash
-npx vitest run src/app/recent/__tests__/detail.test.tsx
+npx vitest run src/components/__tests__/NotesField.test.tsx src/app/recent/__tests__/detail.test.tsx
 ```
 
-Expected: PASS, whole file green.
+Expected: PASS, both files green.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add src/app/recent/[id]/page.tsx src/app/recent/__tests__/detail.test.tsx
+git add src/components/NotesField.tsx src/components/__tests__/NotesField.test.tsx src/app/recent/[id]/page.tsx src/app/recent/__tests__/detail.test.tsx
 git commit -m "feat(mobile): editable notes on the listing detail page"
 ```
 
@@ -1141,6 +1165,8 @@ Start the dev server and open `http://localhost:3000/recent` in a mobile-sized v
 - Tapping a card's star (bottom-right) toggles it without navigating; reloading the page keeps the change.
 - Tapping the card body still opens the detail page.
 - On the detail page: the star toggles; tapping Notes opens a textarea; Done saves; Escape discards.
+- **Notes is the last field before the Centris link, so check the Done button is not hidden under the on-screen keyboard.** If it is, move Done up beside the "Notes" label instead of below the textarea. Raised in review; needs a real device or an emulated soft keyboard to settle.
+- A multi-line note must redisplay with its line breaks intact.
 - Check both light and dark themes.
 
 - [ ] **Step 5: Commit anything the checks turned up**
