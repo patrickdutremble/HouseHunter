@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import DetailPage from '@/app/recent/[id]/page'
 import { ThemeProvider } from '@/components/ThemeProvider'
@@ -6,18 +6,29 @@ import type { Listing } from '@/types/listing'
 
 const backMock = vi.fn()
 const pushMock = vi.fn()
+const replaceMock = vi.fn()
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ back: backMock, push: pushMock, replace: vi.fn() }),
+  useRouter: () => ({ back: backMock, push: pushMock, replace: replaceMock }),
   useParams: () => ({ id: 'id-1' }),
 }))
 
 const originalHistory = window.history
+const confirmSpy = vi.spyOn(window, 'confirm')
+
+beforeEach(() => {
+  // Default to "OK" — tests that need Cancel override with mockReturnValueOnce(false).
+  confirmSpy.mockReturnValue(true)
+})
+
 afterEach(() => {
   backMock.mockReset()
   pushMock.mockReset()
+  replaceMock.mockReset()
   Object.defineProperty(window, 'history', { configurable: true, value: originalHistory })
   updateListingMock.mockReset()
   updateListingMock.mockResolvedValue(true)
+  deleteListingMock.mockReset()
+  deleteListingMock.mockResolvedValue(true)
   mockListing = sample
 })
 
@@ -61,16 +72,19 @@ const sample: Listing = {
   criteria: { garage: true, yard: false },
 }
 
-let mockListing: Listing = sample
+// Nullable so a test can simulate the listing vanishing from local state
+// mid-delete, which is what deleteListing does in the real hook.
+let mockListing: Listing | null = sample
 const updateListingMock = vi.fn(async () => true)
+const deleteListingMock = vi.fn(async () => true)
 vi.mock('@/hooks/useListings', () => ({
   useListings: () => ({
-    listings: [mockListing],
+    listings: mockListing ? [mockListing] : [],
     loading: false,
     error: null,
     fetchListings: vi.fn(),
     updateListing: updateListingMock,
-    deleteListing: vi.fn(),
+    deleteListing: deleteListingMock,
     trashCount: 0,
   }),
 }))
