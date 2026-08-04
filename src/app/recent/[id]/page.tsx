@@ -31,6 +31,7 @@ export default function DetailPage() {
   // Shared by the favorite toggle and the delete button. Both clear it before
   // starting, so the message on screen always describes the latest action.
   const [actionError, setActionError] = useState<string | null>(null)
+  const [deleting, setDeleting] = useState(false)
 
   const listing: Listing | undefined = listings.find(l => l.id === params.id)
 
@@ -43,6 +44,10 @@ export default function DetailPage() {
   }
 
   if (!listing) {
+    // A successful delete already dropped this listing from local state.
+    // Hold a blank screen for the frame or two before router.replace lands
+    // rather than flashing "Listing not found".
+    if (deleting) return null
     return (
       <main className="min-h-screen bg-bg p-4">
         <button type="button" onClick={handleBack} className="text-fg-muted text-sm" aria-label="Back">← Back</button>
@@ -70,14 +75,17 @@ export default function DetailPage() {
   const handleDelete = async () => {
     if (!window.confirm('Move this listing to the trash?')) return
     setActionError(null)
+    setDeleting(true)
     // deleteListing resolves false on a Supabase error rather than rejecting,
     // but catch anyway — nothing should be able to navigate us away from a
     // listing that wasn't actually deleted.
     const ok = await deleteListing(listing.id).catch(() => false)
     if (!ok) {
       setActionError("Couldn't delete — try again")
+      setDeleting(false)
       return
     }
+    // Stays true on success — the component unmounts when the route changes.
     router.replace('/recent')
   }
 
@@ -160,7 +168,8 @@ export default function DetailPage() {
           <button
             type="button"
             onClick={handleDelete}
-            className="block w-full text-center py-3 rounded-lg border border-red-600 dark:border-red-400 text-red-600 dark:text-red-300 font-medium active:bg-red-50 dark:active:bg-red-900/30 transition-colors"
+            disabled={deleting}
+            className="block w-full text-center py-3 rounded-lg border border-red-600 dark:border-red-400 text-red-600 dark:text-red-300 font-medium disabled:opacity-50 active:bg-red-50 dark:active:bg-red-900/30 transition-colors"
           >
             Delete listing
           </button>

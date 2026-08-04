@@ -159,6 +159,28 @@ describe('/recent/[id] detail page', () => {
     expect(replaceMock).not.toHaveBeenCalled()
   })
 
+  it('does not flash "Listing not found" while the delete is in flight', async () => {
+    // Mirror the real hook: a successful delete removes the listing from state.
+    deleteListingMock.mockImplementation(async () => {
+      mockListing = null
+      return true
+    })
+    render(<ThemeProvider><DetailPage /></ThemeProvider>)
+    fireEvent.click(screen.getByRole('button', { name: /delete listing/i }))
+    await waitFor(() => expect(replaceMock).toHaveBeenCalledWith('/recent'))
+    expect(screen.queryByText(/listing not found/i)).toBeNull()
+  })
+
+  it('disables the delete button while the delete is in flight', async () => {
+    let release: (v: boolean) => void = () => {}
+    deleteListingMock.mockImplementation(() => new Promise<boolean>(r => { release = r }))
+    render(<ThemeProvider><DetailPage /></ThemeProvider>)
+    const del = screen.getByRole('button', { name: /delete listing/i })
+    fireEvent.click(del)
+    await waitFor(() => expect(del).toBeDisabled())
+    release(true)
+  })
+
   it('renders a fallback message when the id is not in the list', () => {
     // Intentional no-op — a second test file with a distinct useParams mock
     // would be the right tool. Keep this minimal.
@@ -207,7 +229,7 @@ describe('/recent/[id] detail page', () => {
     )
   })
 
-  it('clears the favorite error after a subsequent successful write', async () => {
+  it('clears the favorite error when a new attempt starts', async () => {
     updateListingMock.mockResolvedValueOnce(false).mockResolvedValueOnce(true)
     render(<ThemeProvider><DetailPage /></ThemeProvider>)
     fireEvent.click(screen.getByTitle('Add to favorites'))
