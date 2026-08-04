@@ -138,6 +138,27 @@ describe('/recent/[id] detail page', () => {
     expect(backMock).not.toHaveBeenCalled()
   })
 
+  it("shows an error and stays put when the delete fails", async () => {
+    deleteListingMock.mockResolvedValue(false)
+    render(<ThemeProvider><DetailPage /></ThemeProvider>)
+    fireEvent.click(screen.getByRole('button', { name: /delete listing/i }))
+    await waitFor(() =>
+      expect(screen.getByText(/couldn't delete/i)).toBeInTheDocument()
+    )
+    expect(replaceMock).not.toHaveBeenCalled()
+    expect(screen.getByText('123 rue Main')).toBeInTheDocument()
+  })
+
+  it('shows the same error when the delete rejects outright', async () => {
+    deleteListingMock.mockRejectedValue(new Error('offline'))
+    render(<ThemeProvider><DetailPage /></ThemeProvider>)
+    fireEvent.click(screen.getByRole('button', { name: /delete listing/i }))
+    await waitFor(() =>
+      expect(screen.getByText(/couldn't delete/i)).toBeInTheDocument()
+    )
+    expect(replaceMock).not.toHaveBeenCalled()
+  })
+
   it('renders a fallback message when the id is not in the list', () => {
     // Intentional no-op — a second test file with a distinct useParams mock
     // would be the right tool. Keep this minimal.

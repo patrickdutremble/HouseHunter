@@ -28,7 +28,9 @@ export default function DetailPage() {
   const router = useRouter()
   const params = useParams<{ id: string }>()
   const { listings, updateListing, deleteListing } = useListings()
-  const [favoriteError, setFavoriteError] = useState<string | null>(null)
+  // Shared by the favorite toggle and the delete button — only one can be
+  // in flight at a time, so one slot is enough.
+  const [actionError, setActionError] = useState<string | null>(null)
 
   const listing: Listing | undefined = listings.find(l => l.id === params.id)
 
@@ -59,15 +61,22 @@ export default function DetailPage() {
   const handleToggleFavorite = async () => {
     const ok = await updateListing(listing.id, 'favorite', !listing.favorite)
     if (!ok) {
-      setFavoriteError("Couldn't update favorite — try again")
+      setActionError("Couldn't update favorite — try again")
       return
     }
-    setFavoriteError(null)
+    setActionError(null)
   }
 
   const handleDelete = async () => {
     if (!window.confirm('Move this listing to the trash?')) return
-    await deleteListing(listing.id)
+    setActionError(null)
+    // deleteListing resolves false on a Supabase error, but a hard network
+    // failure can reject outright — treat both as "didn't delete".
+    const ok = await deleteListing(listing.id).catch(() => false)
+    if (!ok) {
+      setActionError("Couldn't delete — try again")
+      return
+    }
     router.replace('/recent')
   }
 
@@ -94,8 +103,8 @@ export default function DetailPage() {
         </div>
       </div>
 
-      {favoriteError && (
-        <div role="alert" className="px-4 text-sm text-red-600 dark:text-red-300">{favoriteError}</div>
+      {actionError && (
+        <div role="alert" className="px-4 text-sm text-red-600 dark:text-red-300">{actionError}</div>
       )}
 
       {listing.image_url ? (
