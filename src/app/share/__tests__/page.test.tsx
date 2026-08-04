@@ -48,7 +48,7 @@ describe('/share page', () => {
 
   it('posts to /api/scrape-centris and renders success card on 200', async () => {
     setParams('url=https%3A%2F%2Fcentris.ca%2Fnew')
-    const fetchMock = vi.fn(async () => ({
+    const fetchMock = vi.fn(async (_url: string, _init: RequestInit) => ({
       ok: true,
       status: 200,
       json: async () => ({ listing: { id: 'new-1', location: 'Laval', price: 500000, image_url: null, full_address: null, bedrooms: '2', liveable_area_sqft: 800, commute_school_car: null, commute_pvm_transit: null } }),
@@ -56,7 +56,7 @@ describe('/share page', () => {
     vi.stubGlobal('fetch', fetchMock)
     render(<ThemeProvider><SharePage /></ThemeProvider>)
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1))
-    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit]
+    const [url, init] = fetchMock.mock.calls[0]
     expect(url).toBe('/api/scrape-centris')
     expect(JSON.parse(init.body as string)).toEqual({ url: 'https://centris.ca/new' })
     await waitFor(() => expect(screen.getByText(/added/i)).toBeInTheDocument())
@@ -92,11 +92,11 @@ describe('/share page', () => {
 
   it('falls back to text param if url is missing', async () => {
     setParams('text=https%3A%2F%2Fcentris.ca%2Ffrom-text')
-    const fetchMock = vi.fn(async () => ({ ok: true, status: 200, json: async () => ({ listing: { id: 'x', price: 1, location: 'A', image_url: null, full_address: null, bedrooms: null, liveable_area_sqft: null, commute_school_car: null, commute_pvm_transit: null } }) }))
+    const fetchMock = vi.fn(async (_url: string, _init: RequestInit) => ({ ok: true, status: 200, json: async () => ({ listing: { id: 'x', price: 1, location: 'A', image_url: null, full_address: null, bedrooms: null, liveable_area_sqft: null, commute_school_car: null, commute_pvm_transit: null } }) }))
     vi.stubGlobal('fetch', fetchMock)
     render(<ThemeProvider><SharePage /></ThemeProvider>)
     await waitFor(() => expect(fetchMock).toHaveBeenCalled())
-    const init = fetchMock.mock.calls[0][1] as RequestInit
+    const init = fetchMock.mock.calls[0][1]
     expect(JSON.parse(init.body as string)).toEqual({ url: 'https://centris.ca/from-text' })
   })
 
