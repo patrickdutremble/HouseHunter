@@ -1,6 +1,6 @@
 'use client'
 import Image from 'next/image'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { useListings } from '@/hooks/useListings'
 import { FavoriteButton } from '@/components/FavoriteButton'
@@ -8,6 +8,10 @@ import { NotesField } from '@/components/NotesField'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { UserMenu } from '@/components/UserMenu'
 import type { Listing } from '@/types/listing'
+
+// If router.replace hasn't unmounted us by now, navigation stalled — fall back
+// to the not-found screen so the user isn't stranded on a blank page.
+const NAV_FALLBACK_MS = 5000
 
 function formatPrice(price: number | null): string {
   if (price == null) return '—'
@@ -35,6 +39,12 @@ export default function DetailPage() {
 
   const listing: Listing | undefined = listings.find(l => l.id === params.id)
 
+  useEffect(() => {
+    if (!deleting) return
+    const timer = setTimeout(() => setDeleting(false), NAV_FALLBACK_MS)
+    return () => clearTimeout(timer)
+  }, [deleting])
+
   const handleBack = () => {
     if (typeof window !== 'undefined' && window.history.length <= 1) {
       router.push('/recent')
@@ -45,8 +55,8 @@ export default function DetailPage() {
 
   if (!listing) {
     // A successful delete already dropped this listing from local state.
-    // Hold a blank screen for the frame or two before router.replace lands
-    // rather than flashing "Listing not found".
+    // Hold a blank screen briefly, until router.replace lands, rather than
+    // flashing "Listing not found".
     if (deleting) return null
     return (
       <main className="min-h-screen bg-bg p-4">
@@ -169,6 +179,7 @@ export default function DetailPage() {
             type="button"
             onClick={handleDelete}
             disabled={deleting}
+            aria-label={deleting ? 'Deleting…' : undefined}
             className="block w-full text-center py-3 rounded-lg border border-red-600 dark:border-red-400 text-red-600 dark:text-red-300 font-medium disabled:opacity-50 active:bg-red-50 dark:active:bg-red-900/30 transition-colors"
           >
             Delete listing

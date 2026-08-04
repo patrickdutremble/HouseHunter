@@ -179,7 +179,24 @@ describe('/recent/[id] detail page', () => {
     fireEvent.click(del)
     await waitFor(() => expect(del).toBeDisabled())
     release(true)
+    await waitFor(() => expect(replaceMock).toHaveBeenCalledWith('/recent'))
   })
+
+  it('falls back to the not-found screen if navigation never lands', async () => {
+    deleteListingMock.mockImplementation(async () => {
+      mockListing = null
+      return true
+    })
+    render(<ThemeProvider><DetailPage /></ThemeProvider>)
+    fireEvent.click(screen.getByRole('button', { name: /delete listing/i }))
+    await waitFor(() => expect(replaceMock).toHaveBeenCalledWith('/recent'))
+    expect(screen.queryByText(/listing not found/i)).toBeNull()
+    // Navigation never unmounts us — the watchdog should release the guard.
+    await waitFor(
+      () => expect(screen.getByText(/listing not found/i)).toBeInTheDocument(),
+      { timeout: 6000 }
+    )
+  }, 10000)
 
   it('renders a fallback message when the id is not in the list', () => {
     // Intentional no-op — a second test file with a distinct useParams mock
