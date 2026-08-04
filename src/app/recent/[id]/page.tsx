@@ -28,8 +28,8 @@ export default function DetailPage() {
   const router = useRouter()
   const params = useParams<{ id: string }>()
   const { listings, updateListing, deleteListing } = useListings()
-  // Shared by the favorite toggle and the delete button — only one can be
-  // in flight at a time, so one slot is enough.
+  // Shared by the favorite toggle and the delete button. Both clear it before
+  // starting, so the message on screen always describes the latest action.
   const [actionError, setActionError] = useState<string | null>(null)
 
   const listing: Listing | undefined = listings.find(l => l.id === params.id)
@@ -59,19 +59,20 @@ export default function DetailPage() {
     : null
 
   const handleToggleFavorite = async () => {
+    setActionError(null)
     const ok = await updateListing(listing.id, 'favorite', !listing.favorite)
     if (!ok) {
       setActionError("Couldn't update favorite — try again")
       return
     }
-    setActionError(null)
   }
 
   const handleDelete = async () => {
     if (!window.confirm('Move this listing to the trash?')) return
     setActionError(null)
-    // deleteListing resolves false on a Supabase error, but a hard network
-    // failure can reject outright — treat both as "didn't delete".
+    // deleteListing resolves false on a Supabase error rather than rejecting,
+    // but catch anyway — nothing should be able to navigate us away from a
+    // listing that wasn't actually deleted.
     const ok = await deleteListing(listing.id).catch(() => false)
     if (!ok) {
       setActionError("Couldn't delete — try again")
