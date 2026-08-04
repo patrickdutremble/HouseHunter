@@ -182,6 +182,17 @@ describe('/recent/[id] detail page', () => {
     await waitFor(() => expect(replaceMock).toHaveBeenCalledWith('/recent'))
   })
 
+  it('disables the favorite star while the delete is in flight', async () => {
+    let release: (v: boolean) => void = () => {}
+    deleteListingMock.mockImplementation(() => new Promise<boolean>(r => { release = r }))
+    render(<ThemeProvider><DetailPage /></ThemeProvider>)
+    fireEvent.click(screen.getByRole('button', { name: /delete listing/i }))
+    // Favoriting a listing that's on its way to the trash is wasted work.
+    await waitFor(() => expect(screen.getByTitle('Add to favorites')).toBeDisabled())
+    release(true)
+    await waitFor(() => expect(replaceMock).toHaveBeenCalledWith('/recent'))
+  })
+
   it('falls back to the not-found screen if navigation never lands', async () => {
     deleteListingMock.mockImplementation(async () => {
       mockListing = null

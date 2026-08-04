@@ -116,6 +116,7 @@ export default function DetailPage() {
             onToggle={handleToggleFavorite}
             size={22}
             className="w-10 h-10"
+            disabled={deleting}
           />
           <ThemeToggle />
           <UserMenu />
